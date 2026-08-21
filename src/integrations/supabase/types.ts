@@ -474,7 +474,7 @@ export type Database = {
           payment_method_id: string | null
           receipt_path: string | null
           status: Database["public"]["Enums"]["order_status"]
-          tracking_id: string
+          tracking_id: string | null
           transaction_reference: string | null
           updated_at: string
           whatsapp: string
@@ -497,7 +497,7 @@ export type Database = {
           payment_method_id?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
-          tracking_id: string
+          tracking_id?: string | null
           transaction_reference?: string | null
           updated_at?: string
           whatsapp: string
@@ -520,7 +520,7 @@ export type Database = {
           payment_method_id?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
-          tracking_id?: string
+          tracking_id?: string | null
           transaction_reference?: string | null
           updated_at?: string
           whatsapp?: string
