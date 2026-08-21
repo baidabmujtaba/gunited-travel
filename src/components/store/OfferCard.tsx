@@ -22,7 +22,7 @@ export function OfferCard({ offer }: { offer: CatalogOffer }) {
           loading="lazy"
           className="size-full object-cover transition-transform duration-500 hover:scale-[1.04]"
         />
-        <Badge className="absolute top-3 inline-end-3 bg-card text-forest-deep shadow-soft">
+        <Badge className="absolute top-3 end-3 bg-card text-forest-deep shadow-soft">
           {t(`category.${offer.category}`)}
         </Badge>
       </div>

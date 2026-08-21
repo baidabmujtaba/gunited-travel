@@ -56,7 +56,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="inline-start" className="w-72">
+              <SheetContent side="left" className="w-72">
                 <SheetTitle className="sr-only">{t("brand.name")}</SheetTitle>
                 <div className="mt-6 flex flex-col gap-1">
                   {links.map((l) => (
