@@ -39,6 +39,8 @@ function OfferDetail() {
   const initial = Route.useLoaderData();
   const { slug } = Route.useParams();
   const [currency, setCurrency] = useState("USD");
+  const [active, setActive] = useState(0);
+
   const { lang, t, fmt } = useI18n();
 
   const query = useQuery({
@@ -66,9 +68,11 @@ function OfferDetail() {
   const title = lang === "ar" ? offer.title_ar : offer.title_en;
   const description = lang === "ar" ? offer.description_ar : offer.description_en;
   const duration = lang === "ar" ? offer.duration_ar : offer.duration_en;
-  const gallery = offer.images.length ? offer.images : [offer.primary_image ?? categoryImage(offer.category)];
-  const [active, setActive] = useState(0);
+  const gallery = offer.images.length
+    ? offer.images
+    : [offer.primary_image ?? categoryImage(offer.category)];
   const p = offer.price;
+
 
   return (
     <StoreLayout>
