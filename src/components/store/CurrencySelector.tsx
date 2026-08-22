@@ -18,11 +18,15 @@ export function CurrencySelector({
   onChange: (code: string) => void;
 }) {
   const { lang, t } = useI18n();
+  const selected = currencies.find((c) => c.code === value);
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="w-[190px] bg-card" aria-label={t("catalog.currency")}>
-        <SelectValue />
+        <SelectValue placeholder={t("catalog.currency")}>
+          {selected ? `${selected.code} — ${lang === "ar" ? selected.name_ar : selected.name_en}` : value}
+        </SelectValue>
       </SelectTrigger>
+
       <SelectContent>
         {currencies.map((c) => (
           <SelectItem key={c.code} value={c.code}>
