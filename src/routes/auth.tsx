@@ -56,7 +56,10 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error(t("common.error"), { description: error.message });
+    if (error) {
+      toast.error(t("common.error"), { description: error.message });
+      return;
+    }
     void navigate({ to: target, replace: true });
   }
 
@@ -72,7 +75,10 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(t("common.error"), { description: error.message });
+    if (error) {
+      toast.error(t("common.error"), { description: error.message });
+      return;
+    }
     toast.success(t("auth.signup"));
   }
 
@@ -83,17 +89,26 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     setBusy(false);
-    if (result.error) return toast.error(t("common.error"), { description: result.error.message });
+    if (result.error) {
+      toast.error(t("common.error"), { description: result.error.message });
+      return;
+    }
     if (result.redirected) return;
     void navigate({ to: target, replace: true });
   }
 
   async function forgot() {
-    if (!email) return toast.error(t("checkout.required"));
+    if (!email) {
+      toast.error(t("checkout.required"));
+      return;
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth`,
     });
-    if (error) return toast.error(t("common.error"), { description: error.message });
+    if (error) {
+      toast.error(t("common.error"), { description: error.message });
+      return;
+    }
     toast.success(t("auth.reset.sent"));
   }
 
