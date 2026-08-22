@@ -39,6 +39,8 @@ function OfferDetail() {
   const initial = Route.useLoaderData();
   const { slug } = Route.useParams();
   const [currency, setCurrency] = useState("USD");
+  const [active, setActive] = useState(0);
+
   const { lang, t, fmt } = useI18n();
 
   const query = useQuery({
