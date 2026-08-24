@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { normalizeCurrency } from "./currency";
 import { computePrice } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
 const createOrderInput = z.object({
   offerId: z.string().uuid(),
-  currency: z.string().min(3).max(6),
+  currency: z.unknown().transform(normalizeCurrency),
   customerName: z.string().min(2).max(120),
   customerEmail: z.string().email(),
   whatsapp: z.string().min(7).max(24),

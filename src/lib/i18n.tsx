@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { normalizeCurrency } from "./currency";
 
 export type Lang = "ar" | "en";
 
@@ -242,12 +243,21 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<I18nValue>(() => {
     const t = (key: string) => messages[key]?.[lang] ?? key;
-    const fmt = (n: number, currency?: string) =>
-      new Intl.NumberFormat(lang === "ar" ? "ar-EG" : "en-US", {
-        style: currency ? "currency" : "decimal",
-        currency: currency ?? undefined,
-        maximumFractionDigits: currency === "SDG" ? 0 : 2,
-      }).format(n);
+    const fmt = (n: number, currency?: string) => {
+      const locale = lang === "ar" ? "ar-EG" : "en-US";
+      const value = Number.isFinite(n) ? n : 0;
+      const code = currency ? normalizeCurrency(currency) : undefined;
+      const options: Intl.NumberFormatOptions = {
+        style: code ? "currency" : "decimal",
+        maximumFractionDigits: code === "SDG" ? 0 : 2,
+      };
+      if (code) options.currency = code;
+      try {
+        return new Intl.NumberFormat(locale, options).format(value);
+      } catch {
+        return `${code ? `${code} ` : ""}${value.toLocaleString(locale)}`;
+      }
+    };
     return { lang, dir: lang === "ar" ? "rtl" : "ltr", setLang, t, fmt };
   }, [lang, setLang]);
 
