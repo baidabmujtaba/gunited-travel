@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { normalizeCurrency } from "./currency";
 import { computePrice, type PriceBreakdown } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
@@ -29,7 +30,9 @@ export type CatalogOffer = {
   price: PriceBreakdown;
 };
 
-const currencyInput = z.object({ currency: z.string().min(3).max(6).default("USD") });
+const currencyInput = z.object({
+  currency: z.unknown().transform(normalizeCurrency).default("USD"),
+});
 
 async function loadCurrencies() {
   const sb = getPublicClient();
@@ -79,7 +82,12 @@ export const getCatalog = createServerFn({ method: "GET" })
 
 export const getOffer = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
-    z.object({ slug: z.string().min(1), currency: z.string().default("USD") }).parse(d),
+    z
+      .object({
+        slug: z.string().min(1),
+        currency: z.unknown().transform(normalizeCurrency).default("USD"),
+      })
+      .parse(d),
   )
   .handler(async ({ data }): Promise<{ offer: CatalogOffer | null; currencies: CurrencyInfo[] }> => {
     const sb = getPublicClient();

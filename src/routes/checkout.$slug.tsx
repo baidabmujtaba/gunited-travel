@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { getOffer, getPaymentMethods } from "@/lib/catalog.functions";
+import { normalizeCurrency } from "@/lib/currency";
 import { useI18n } from "@/lib/i18n";
 import { createOrder } from "@/lib/orders.functions";
 import { useSession } from "@/lib/session";
@@ -19,7 +20,9 @@ const ALLOWED = ["image/png", "image/jpeg", "application/pdf"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
 export const Route = createFileRoute("/checkout/$slug")({
-  validateSearch: z.object({ currency: z.string().default("USD") }),
+  validateSearch: z.object({
+    currency: z.unknown().transform(normalizeCurrency).default("USD"),
+  }),
   head: () => ({
     meta: [
       { title: "Checkout — Gunited Travel | إتمام الطلب" },
