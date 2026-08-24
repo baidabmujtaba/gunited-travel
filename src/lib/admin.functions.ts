@@ -67,7 +67,9 @@ export const listAdminOrders = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(200);
 
-    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    if (data.status && data.status !== "all") {
+      q = q.eq("status", statusEnum.parse(data.status));
+    }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
