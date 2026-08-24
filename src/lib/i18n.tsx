@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { normalizeCurrency } from "./currency";
 
 export type Lang = "ar" | "en";
 
