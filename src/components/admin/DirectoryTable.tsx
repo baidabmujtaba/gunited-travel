@@ -43,7 +43,7 @@ export function DirectoryTable({ agency }: { agency: boolean }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-start text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="px-3 py-2 text-start">{t("dash.order")}</th>
+                <th className="px-3 py-2 text-start">{t("admin.people.name")}</th>
                 <th className="px-3 py-2 text-start">{t("admin.people.contact")}</th>
                 <th className="px-3 py-2 text-start">{t("admin.people.orders")}</th>
                 <th className="px-3 py-2 text-start">{t("admin.people.spend")}</th>

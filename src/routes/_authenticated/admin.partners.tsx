@@ -32,7 +32,7 @@ function PartnersHub() {
         <div className="grid gap-4 sm:grid-cols-3">
           <KpiCard label={t("admin.kpi.partners")} value={String(o.partners)} />
           <KpiCard label={t("admin.kpi.offers")} value={`${o.activeOffers}/${o.totalOffers}`} />
-          <KpiCard label={t("admin.kpi.revenue")} value={String(o.totalOrders)} />
+          <KpiCard label={t("admin.kpi.orders")} value={String(o.totalOrders)} />
         </div>
       )}
 

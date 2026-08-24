@@ -181,6 +181,7 @@ export const messages: Dict = {
   "admin.orders.updated": { ar: "تم تحديث حالة الطلب", en: "Order status updated" },
   "admin.orders.manage": { ar: "إدارة", en: "Manage" },
 
+  "admin.people.name": { ar: "الاسم", en: "Name" },
   "admin.people.search": { ar: "ابحث بالاسم أو البريد…", en: "Search by name or email…" },
   "admin.people.empty": { ar: "لا توجد سجلات بعد.", en: "No records yet." },
   "admin.people.orders": { ar: "الطلبات", en: "Orders" },

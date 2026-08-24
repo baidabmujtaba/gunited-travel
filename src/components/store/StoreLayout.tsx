@@ -7,11 +7,12 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
-import { useSession } from "@/lib/session";
+import { useRoles, useSession } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const { session } = useSession();
+  const { isStaff } = useRoles();
   const [open, setOpen] = useState(false);
 
   const links = [
@@ -45,6 +46,11 @@ export function StoreLayout({ children }: { children: ReactNode }) {
 
           <div className="ms-auto flex items-center gap-2 md:ms-0">
             <LanguageSwitcher />
+            {isStaff ? (
+              <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
+                <Link to="/admin">{t("nav.admin")}</Link>
+              </Button>
+            ) : null}
             <Button asChild variant={session ? "outline" : "default"} size="sm" className="hidden sm:inline-flex">
               <Link to={session ? "/account" : "/auth"}>
                 {session ? t("nav.dashboard") : t("nav.login")}
@@ -69,6 +75,15 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                       {l.label}
                     </Link>
                   ))}
+                  {isStaff ? (
+                    <Link
+                      to="/admin"
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
+                      {t("nav.admin")}
+                    </Link>
+                  ) : null}
                   <Link
                     to={session ? "/account" : "/auth"}
                     onClick={() => setOpen(false)}

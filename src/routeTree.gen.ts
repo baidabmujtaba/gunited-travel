@@ -20,6 +20,7 @@ import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersSlugRouteImport } from './routes/offers.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
+import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin.finance'
 import { Route as AuthenticatedAdminPartnersRouteImport } from './routes/_authenticated/admin.partners'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,6 +78,12 @@ const AuthenticatedAdminCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminFinanceRoute =
+  AuthenticatedAdminFinanceRouteImport.update({
+    id: '/finance',
+    path: '/finance',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminPartnersRoute =
   AuthenticatedAdminPartnersRouteImport.update({
     id: '/partners',
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/offers/$slug': typeof OffersSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
   '/offers/$slug': typeof OffersSlugRoute
   '/offers': typeof OffersIndexRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -121,6 +130,7 @@ export interface FileRoutesById {
   '/offers/$slug': typeof OffersSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/_authenticated/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/offers/$slug'
     | '/offers/'
     | '/admin/customers'
+    | '/admin/finance'
     | '/admin/partners'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/offers/$slug'
     | '/offers'
     | '/admin/customers'
+    | '/admin/finance'
     | '/admin/partners'
     | '/admin'
   id:
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
     | '/offers/$slug'
     | '/offers/'
     | '/_authenticated/admin/customers'
+    | '/_authenticated/admin/finance'
     | '/_authenticated/admin/partners'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -256,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/finance': {
+      id: '/_authenticated/admin/finance'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/partners': {
       id: '/_authenticated/admin/partners'
       path: '/partners'
@@ -268,12 +288,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
+  AuthenticatedAdminFinanceRoute: typeof AuthenticatedAdminFinanceRoute
   AuthenticatedAdminPartnersRoute: typeof AuthenticatedAdminPartnersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
+  AuthenticatedAdminFinanceRoute: AuthenticatedAdminFinanceRoute,
   AuthenticatedAdminPartnersRoute: AuthenticatedAdminPartnersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

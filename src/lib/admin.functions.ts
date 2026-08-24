@@ -1,13 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-/** Throws unless the caller holds a staff role. RLS is the second line of defence. */
-async function assertStaff(context: { supabase: any; userId: string }) {
-  const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("FORBIDDEN");
-}
+import { assertStaff, statusEnum } from "./admin.shared";
 
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -67,7 +61,9 @@ export const listAdminOrders = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(200);
 
-    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    if (data.status && data.status !== "all") {
+      q = q.eq("status", statusEnum.parse(data.status));
+    }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
@@ -98,16 +94,6 @@ export const listAdminOrders = createServerFn({ method: "GET" })
       offer_title_ar: map.get(o.offer_id)?.title_ar ?? null,
     }));
   });
-
-const statusEnum = z.enum([
-  "submitted",
-  "payment_pending",
-  "payment_confirmed",
-  "processing",
-  "completed",
-  "cancelled",
-  "rejected",
-]);
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
