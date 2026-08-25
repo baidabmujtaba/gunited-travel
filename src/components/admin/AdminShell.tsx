@@ -16,6 +16,8 @@ const TABS = [
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
+  const { session } = useSession();
+  const signOut = useSignOut();
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
