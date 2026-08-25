@@ -84,25 +84,56 @@ function AccountPage() {
           </div>
         ) : (
           <ul className="mt-8 space-y-3">
-            {orders.map((o) => (
-              <li key={o.id} className="surface-card lift-hover flex flex-wrap items-center gap-4 p-5">
-                <div className="min-w-40 flex-1">
-                  <p className="font-bold tracking-wide text-forest">{o.tracking_id}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(o.created_at).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB")}
-                  </p>
-                </div>
-                <Badge className="bg-mint text-forest-deep">{t(`status.${o.status}`)}</Badge>
-                <p className="font-semibold">
-                  {fmt(Number(o.amount_display), o.currency_code)}
-                </p>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/track" search={{ ref: o.tracking_id ?? "" }}>
-                    {t("nav.track")}
-                  </Link>
-                </Button>
-              </li>
-            ))}
+            {orders.map((o) => {
+              const stageIndex = STAGES.indexOf(o.status as (typeof STAGES)[number]);
+              return (
+                <li key={o.id} className="surface-card lift-hover space-y-4 p-5">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="min-w-40 flex-1">
+                      <p className="font-bold tracking-wide text-forest">{o.tracking_id}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(o.created_at).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB")}
+                      </p>
+                    </div>
+                    <Badge className="bg-mint text-forest-deep">{t(`status.${o.status}`)}</Badge>
+                    <p className="font-semibold">{fmt(Number(o.amount_display), o.currency_code)}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button asChild size="sm" variant="outline">
+                        <Link to="/track" search={{ ref: o.tracking_id ?? "" }}>
+                          {t("nav.track")}
+                        </Link>
+                      </Button>
+                      {o.invoice ? (
+                        <Button asChild size="sm">
+                          <Link
+                            to="/invoice/$number"
+                            params={{ number: o.invoice.invoice_number }}
+                          >
+                            {t("dash.invoice")} · {o.invoice.invoice_number}
+                          </Link>
+                        </Button>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Live progress: refreshed by the realtime subscription above. */}
+                  <div className="flex items-center gap-1.5">
+                    {STAGES.map((stage, i) => (
+                      <div key={stage} className="flex-1">
+                        <span
+                          className={`block h-1.5 rounded-full ${
+                            stageIndex >= i ? "bg-forest" : "bg-border"
+                          }`}
+                        />
+                        <span className="mt-1.5 block truncate text-[10px] text-muted-foreground">
+                          {t(`status.${stage}`)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
