@@ -328,6 +328,8 @@ export const messages: Dict = {
   "order.docs": { ar: "مستندات الطلب", en: "Order documents" },
   "order.docs.empty": { ar: "لا مستندات مرفوعة.", en: "No documents uploaded." },
   "order.docs.view": { ar: "عرض", en: "View" },
+  "order.docs.download": { ar: "تنزيل", en: "Download" },
+  "order.docs.downloadAll": { ar: "تنزيل الكل", en: "Download all" },
   "common.cancel": { ar: "إلغاء", en: "Cancel" },
   "common.edit": { ar: "تعديل", en: "Edit" },
   "common.delete": { ar: "حذف", en: "Delete" },
