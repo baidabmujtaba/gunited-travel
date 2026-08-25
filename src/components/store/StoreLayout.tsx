@@ -3,6 +3,7 @@ import { LogOut, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
+import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
 
           <div className="ms-auto flex items-center gap-2 md:ms-0">
             <LanguageSwitcher />
+            <NotificationBell />
             {isStaff ? (
               <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
                 <Link to="/admin">{t("nav.admin")}</Link>
