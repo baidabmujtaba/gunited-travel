@@ -16,14 +16,21 @@ export const listOrderDocuments = createServerFn({ method: "GET" })
     return rows ?? [];
   });
 
-/** Short-lived link for viewing one uploaded document. */
+/** Short-lived link for viewing or downloading one uploaded document. */
 export const getOrderDocumentUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ path: z.string().min(3).max(400) }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        path: z.string().min(3).max(400),
+        download: z.union([z.boolean(), z.string().max(200)]).optional(),
+      })
+      .parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { data: signed, error } = await context.supabase.storage
       .from("order-documents")
-      .createSignedUrl(data.path, 300);
+      .createSignedUrl(data.path, 300, data.download ? { download: data.download } : undefined);
     if (error) throw new Error(error.message);
     return { url: signed?.signedUrl ?? null };
   });
