@@ -280,6 +280,23 @@ function OrderPanel({ row }: { row: any }) {
         >
           {t("admin.orders.setstatus")}
         </Button>
+
+        {["completed", "cancelled", "rejected"].includes(row.status) ? (
+          <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+            <p className="text-xs text-muted-foreground">{t("admin.orders.archive.hint")}</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-2 text-destructive"
+              disabled={archiveMutation.isPending}
+              onClick={() => {
+                if (window.confirm(t("admin.orders.archive.confirm"))) archiveMutation.mutate();
+              }}
+            >
+              {t("admin.orders.archive")}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
