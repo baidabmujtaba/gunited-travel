@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { AssistantWidget } from "@/components/AssistantWidget";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-8">{children}</main>
+      <AssistantWidget mode="admin" />
     </div>
   );
 }

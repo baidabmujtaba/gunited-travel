@@ -138,6 +138,45 @@ export const messages: Dict = {
 
   "common.loading": { ar: "جارٍ التحميل…", en: "Loading…" },
   "common.error": { ar: "حدث خطأ. حاول مرة أخرى.", en: "Something went wrong. Please try again." },
+  "common.close": { ar: "إغلاق", en: "Close" },
+  "assistant.client.open": { ar: "مساعد الحجز", en: "Booking assistant" },
+  "assistant.admin.open": { ar: "مساعد الإدارة", en: "ERP copilot" },
+  "assistant.client.title": { ar: "مساعد جيونايتد ترافيل", en: "Gunited Travel assistant" },
+  "assistant.admin.title": { ar: "مساعد الإدارة الذكي", en: "Gunited ERP copilot" },
+  "assistant.client.scope": {
+    ar: "معلومات الخدمات والحجز فقط",
+    en: "Services & booking info only",
+  },
+  "assistant.admin.scope": {
+    ar: "بيانات النظام الكاملة — للموظفين فقط",
+    en: "Full system data — staff only",
+  },
+  "assistant.client.hello": {
+    ar: "مرحبًا! اسألني عن الخدمات، الأسعار، المستندات المطلوبة، طرق الدفع أو خطوات الحجز والتتبع. لا أستطيع الوصول إلى بيانات مالية أو حسابات العملاء.",
+    en: "Hi! Ask me about services, prices, required documents, payment methods, or how booking and tracking work. I cannot access financial records or customer accounts.",
+  },
+  "assistant.admin.hello": {
+    ar: "اسألني عن الطلبات، الإيرادات، الفواتير، التحصيل، العملاء، الوكالات أو المستخدمين والأدوار.",
+    en: "Ask me about orders, revenue, invoices, collections, customers, agencies, users and roles.",
+  },
+  "assistant.placeholder": { ar: "اكتب سؤالك…", en: "Type your question…" },
+  "assistant.thinking": { ar: "جارٍ التحليل…", en: "Thinking…" },
+  "assistant.err.generic": {
+    ar: "المساعد غير متاح حاليًا. حاول لاحقًا.",
+    en: "The assistant is unavailable right now. Please try again.",
+  },
+  "assistant.err.rate": {
+    ar: "عدد كبير من الطلبات، انتظر لحظة ثم أعد المحاولة.",
+    en: "Too many requests — wait a moment and try again.",
+  },
+  "assistant.err.credits": {
+    ar: "انتهى رصيد الذكاء الاصطناعي، تواصل مع مدير النظام.",
+    en: "AI credits exhausted — contact the workspace admin.",
+  },
+  "assistant.err.forbidden": {
+    ar: "هذا المساعد للموظفين المصرح لهم فقط.",
+    en: "This assistant is limited to authorised staff.",
+  },
   "common.back": { ar: "رجوع", en: "Back" },
   "common.whatsapp": { ar: "تواصل معنا على واتساب", en: "Chat with us on WhatsApp" },
   "footer.rights": { ar: "جميع الحقوق محفوظة", en: "All rights reserved" },
