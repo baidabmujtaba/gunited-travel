@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
+import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Badge className="bg-gold/90 text-forest-deep">{t("admin.title")}</Badge>
           <div className="ms-auto flex items-center gap-2">
             <LanguageSwitcher />
+            <NotificationBell />
             <Button asChild size="sm" variant="outline" className="border-cream/40 bg-transparent text-cream hover:bg-cream/10">
               <Link to="/">{t("admin.backstore")}</Link>
             </Button>

@@ -136,6 +136,16 @@ export const messages: Dict = {
   "dash.amount": { ar: "المبلغ", en: "Amount" },
   "dash.status": { ar: "الحالة", en: "Status" },
 
+  "notif.title": { ar: "الإشعارات", en: "Notifications" },
+  "notif.empty": { ar: "لا إشعارات حتى الآن.", en: "No notifications yet." },
+  "notif.markall": { ar: "تحديد الكل كمقروء", en: "Mark all read" },
+  "dash.subtitle": {
+    ar: "تابع حالة كل طلب لحظيًا وحمّل فاتورتك عند الاكتمال.",
+    en: "Follow every order in real time and download your invoice once completed.",
+  },
+  "dash.invoice": { ar: "الفاتورة", en: "Invoice" },
+  "dash.live": { ar: "تحديث مباشر", en: "Live" },
+
   "common.loading": { ar: "جارٍ التحميل…", en: "Loading…" },
   "common.error": { ar: "حدث خطأ. حاول مرة أخرى.", en: "Something went wrong. Please try again." },
   "common.close": { ar: "إغلاق", en: "Close" },

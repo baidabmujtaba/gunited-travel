@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
