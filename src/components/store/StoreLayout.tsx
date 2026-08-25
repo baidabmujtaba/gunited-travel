@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
@@ -7,12 +7,13 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
-import { useRoles, useSession } from "@/lib/session";
+import { useRoles, useSession, useSignOut } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const { session } = useSession();
   const { isStaff } = useRoles();
+  const signOut = useSignOut();
   const [open, setOpen] = useState(false);
 
   const links = [
