@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { normalizeCurrency } from "./currency";
-import { normalizeDocs } from "./catalog.functions";
+import { normalizeDocs } from "./offer-docs";
 import { computePrice } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
