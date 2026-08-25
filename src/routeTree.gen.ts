@@ -25,6 +25,8 @@ import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin.finance'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin.offers'
 import { Route as AuthenticatedAdminPartnersRouteImport } from './routes/_authenticated/admin.partners'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
 import { Route as AuthenticatedAdminCustomerIdRouteImport } from './routes/_authenticated/admin.customer.$id'
@@ -113,6 +115,17 @@ const AuthenticatedAdminPartnersRoute =
     path: '/partners',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedInvoiceNumberRoute =
   AuthenticatedInvoiceNumberRouteImport.update({
     id: '/invoice/$number',
@@ -147,6 +160,8 @@ export interface FileRoutesByFullPath {
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -166,6 +181,8 @@ export interface FileRoutesByTo {
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -188,6 +205,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/_authenticated/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -210,6 +229,8 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/offers'
     | '/admin/partners'
+    | '/admin/settings'
+    | '/admin/users'
     | '/invoice/$number'
     | '/admin/'
     | '/admin/agency/$id'
@@ -229,6 +250,8 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/offers'
     | '/admin/partners'
+    | '/admin/settings'
+    | '/admin/users'
     | '/invoice/$number'
     | '/admin'
     | '/admin/agency/$id'
@@ -250,6 +273,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/finance'
     | '/_authenticated/admin/offers'
     | '/_authenticated/admin/partners'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/users'
     | '/_authenticated/invoice/$number'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/agency/$id'
@@ -382,6 +407,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPartnersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/invoice/$number': {
       id: '/_authenticated/invoice/$number'
       path: '/invoice/$number'
@@ -412,6 +451,8 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminFinanceRoute: typeof AuthenticatedAdminFinanceRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPartnersRoute: typeof AuthenticatedAdminPartnersRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminAgencyIdRoute: typeof AuthenticatedAdminAgencyIdRoute
   AuthenticatedAdminCustomerIdRoute: typeof AuthenticatedAdminCustomerIdRoute
@@ -423,6 +464,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminFinanceRoute: AuthenticatedAdminFinanceRoute,
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
   AuthenticatedAdminPartnersRoute: AuthenticatedAdminPartnersRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminAgencyIdRoute: AuthenticatedAdminAgencyIdRoute,
   AuthenticatedAdminCustomerIdRoute: AuthenticatedAdminCustomerIdRoute,
