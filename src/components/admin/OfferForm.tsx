@@ -97,9 +97,9 @@ export function OfferForm({
         setPreviews((prev) => ({
           ...prev,
           ...Object.fromEntries(
-            data
-              .filter((d) => d.path && d.signedUrl)
-              .map((d) => [String(d.path), d.signedUrl]),
+            data.flatMap((d): [string, string][] =>
+              d.path && d.signedUrl ? [[d.path, d.signedUrl]] : [],
+            ),
           ),
         }));
       });
