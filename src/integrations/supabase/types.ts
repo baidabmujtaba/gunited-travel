@@ -171,8 +171,12 @@ export type Database = {
           frozen_rate: number
           id: string
           invoice_number: string
+          issued_by: string | null
+          notes: string | null
           order_id: string | null
           paid_usd: number
+          payment_method_id: string | null
+          pdf_url: string | null
           status: string
           subtotal_usd: number
           tax_usd: number
@@ -193,8 +197,12 @@ export type Database = {
           frozen_rate?: number
           id?: string
           invoice_number: string
+          issued_by?: string | null
+          notes?: string | null
           order_id?: string | null
           paid_usd?: number
+          payment_method_id?: string | null
+          pdf_url?: string | null
           status?: string
           subtotal_usd?: number
           tax_usd?: number
@@ -215,8 +223,12 @@ export type Database = {
           frozen_rate?: number
           id?: string
           invoice_number?: string
+          issued_by?: string | null
+          notes?: string | null
           order_id?: string | null
           paid_usd?: number
+          payment_method_id?: string | null
+          pdf_url?: string | null
           status?: string
           subtotal_usd?: number
           tax_usd?: number
@@ -230,6 +242,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_method_configs"
             referencedColumns: ["id"]
           },
         ]
@@ -689,6 +708,7 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      next_invoice_number: { Args: never; Returns: string }
       next_tracking_id: { Args: never; Returns: string }
     }
     Enums: {
