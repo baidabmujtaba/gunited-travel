@@ -171,7 +171,7 @@ export const createCrmRecord = createServerFn({ method: "POST" })
 
     const { data: inserted, error } = await context.supabase
       .from(tableFor(kind))
-      .insert(payload)
+      .insert(payload as any)
       .select("id")
       .single();
     if (error) throw new Error(error.message);
