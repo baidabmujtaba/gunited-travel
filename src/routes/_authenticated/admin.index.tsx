@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getOrderDocumentUrl, listOrderDocuments } from "@/lib/order-docs.functions";
+import {
+  deleteOrderDocument,
+  getOrderDocumentUrl,
+  listOrderDocumentHistory,
+  listOrderDocuments,
+  replaceOrderDocument,
+} from "@/lib/order-docs.functions";
 import { toast } from "sonner";
 import { KpiCard, StatusBadge } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -17,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  archiveOrder,
   getAdminOverview,
   getReceiptUrl,
   listAdminOrders,
@@ -193,6 +200,16 @@ function OrderPanel({ row }: { row: any }) {
     onError: () => toast.error(t("common.error")),
   });
 
+  const archiveMutation = useMutation({
+    mutationFn: () => archiveOrder({ data: { orderId: row.id, reason: note || undefined } }),
+    onSuccess: () => {
+      toast.success(t("admin.orders.archived"));
+      void queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
   const receiptMutation = useMutation({
     mutationFn: () => getReceiptUrl({ data: { path: row.receipt_path } }),
     onSuccess: (res) => {
@@ -273,6 +290,23 @@ function OrderPanel({ row }: { row: any }) {
         >
           {t("admin.orders.setstatus")}
         </Button>
+
+        {["completed", "cancelled", "rejected"].includes(row.status) ? (
+          <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+            <p className="text-xs text-muted-foreground">{t("admin.orders.archive.hint")}</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-2 text-destructive"
+              disabled={archiveMutation.isPending}
+              onClick={() => {
+                if (window.confirm(t("admin.orders.archive.confirm"))) archiveMutation.mutate();
+              }}
+            >
+              {t("admin.orders.archive")}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -281,9 +315,50 @@ function OrderPanel({ row }: { row: any }) {
 /** Documents the customer uploaded for this order, opened via short-lived links. */
 function OrderDocuments({ orderId }: { orderId: string }) {
   const { t, lang } = useI18n();
+  const queryClient = useQueryClient();
+  const [busyId, setBusyId] = useState<string | null>(null);
   const docs = useQuery({
     queryKey: ["order-docs", orderId],
     queryFn: () => listOrderDocuments({ data: { orderId } }),
+  });
+  const history = useQuery({
+    queryKey: ["order-docs-history", orderId],
+    queryFn: () => listOrderDocumentHistory({ data: { orderId } }),
+  });
+
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ["order-docs", orderId] });
+    void queryClient.invalidateQueries({ queryKey: ["order-docs-history", orderId] });
+  };
+
+  const remove = useMutation({
+    mutationFn: (documentId: string) => deleteOrderDocument({ data: { documentId } }),
+    onSuccess: () => {
+      toast.success(t("order.docs.deleted"));
+      refresh();
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
+  const replace = useMutation({
+    mutationFn: async ({ documentId, file }: { documentId: string; file: File }) => {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user.id;
+      if (!uid) throw new Error("NO_SESSION");
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+      const path = `${uid}/${Date.now()}-replacement.${ext}`;
+      const { error } = await supabase.storage
+        .from("order-documents")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw new Error(error.message);
+      return replaceOrderDocument({ data: { documentId, path, name: file.name } });
+    },
+    onSuccess: () => {
+      toast.success(t("order.docs.replaced"));
+      refresh();
+    },
+    onError: () => toast.error(t("common.error")),
+    onSettled: () => setBusyId(null),
   });
   const open = useMutation({
     mutationFn: (path: string) => getOrderDocumentUrl({ data: { path } }),
@@ -341,9 +416,9 @@ function OrderDocuments({ orderId }: { orderId: string }) {
       {rows.length > 0 ? (
         <ul className="space-y-1.5">
           {rows.map((d) => (
-            <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
+            <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <span className="truncate">{lang === "ar" ? d.label_ar : d.label_en}</span>
-              <span className="flex shrink-0 gap-2">
+              <span className="flex shrink-0 flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => open.mutate(d.file_path)}>
                   {t("order.docs.view")}
                 </Button>
@@ -360,6 +435,38 @@ function OrderDocuments({ orderId }: { orderId: string }) {
                 >
                   {t("order.docs.download")}
                 </Button>
+                <label>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      setBusyId(d.id);
+                      replace.mutate({ documentId: d.id, file });
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                    disabled={replace.isPending && busyId === d.id}
+                  >
+                    <span className="cursor-pointer">{t("order.docs.replace")}</span>
+                  </Button>
+                </label>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive"
+                  disabled={remove.isPending}
+                  onClick={() => {
+                    if (window.confirm(t("order.docs.deleteConfirm"))) remove.mutate(d.id);
+                  }}
+                >
+                  {t("order.docs.delete")}
+                </Button>
               </span>
             </li>
           ))}
@@ -367,6 +474,29 @@ function OrderDocuments({ orderId }: { orderId: string }) {
       ) : (
         <p className="text-sm text-muted-foreground">{t("order.docs.empty")}</p>
       )}
+
+      {history.data && history.data.length > 0 ? (
+        <div className="mt-3 rounded-lg border border-border/70 bg-muted/40 p-3">
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+            {t("order.docs.history")}
+          </p>
+          <ul className="space-y-1 text-xs text-muted-foreground">
+            {history.data.map((h: any) => (
+              <li key={h.id}>
+                <span className="font-medium text-foreground">
+                  {h.action === "order_document.delete"
+                    ? t("order.docs.delete")
+                    : t("order.docs.replace")}
+                </span>{" "}
+                · {String(h.before_data?.file_name ?? h.before_data?.doc_key ?? "—")}
+                {h.after_data?.file_name ? ` → ${String(h.after_data.file_name)}` : ""} ·{" "}
+                {h.actor_email ?? "—"} ·{" "}
+                {new Date(h.created_at).toLocaleString(lang === "ar" ? "ar-EG" : "en-GB")}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
