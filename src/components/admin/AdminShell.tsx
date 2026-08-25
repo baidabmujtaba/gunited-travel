@@ -33,6 +33,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <Button asChild size="sm" variant="outline" className="border-cream/40 bg-transparent text-cream hover:bg-cream/10">
               <Link to="/">{t("admin.backstore")}</Link>
             </Button>
+            {session ? (
+              <Button
+                size="sm"
+                onClick={() => void signOut()}
+                className="bg-gold text-forest-deep hover:bg-gold/90"
+              >
+                {t("nav.logout")}
+              </Button>
+            ) : (
+              <Button asChild size="sm" className="bg-gold text-forest-deep hover:bg-gold/90">
+                <Link to="/auth">{t("nav.login")}</Link>
+              </Button>
+            )}
           </div>
         </div>
         <nav className="mx-auto flex w-full max-w-7xl gap-1 overflow-x-auto px-5">
