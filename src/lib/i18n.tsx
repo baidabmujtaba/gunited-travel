@@ -305,8 +305,21 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+function buildFallback(lang: Lang): I18nValue {
+  return {
+    lang,
+    dir: lang === "ar" ? "rtl" : "ltr",
+    setLang: () => {},
+    t: (key: string) => messages[key]?.[lang] ?? key,
+    fmt: (n: number, currency?: string) => {
+      const code = currency ? normalizeCurrency(currency) : undefined;
+      const value = Number.isFinite(n) ? n : 0;
+      return `${code ? `${code} ` : ""}${value.toLocaleString(lang === "ar" ? "ar-EG" : "en-US")}`;
+    },
+  };
+}
+
 export function useI18n() {
   const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  return ctx ?? buildFallback("ar");
 }
