@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  archiveOrder,
   getAdminOverview,
   getReceiptUrl,
   listAdminOrders,
