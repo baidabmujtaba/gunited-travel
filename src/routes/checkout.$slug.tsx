@@ -58,6 +58,7 @@ function Checkout() {
   const [whatsapp, setWhatsapp] = useState("");
   const [reference, setReference] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [docFiles, setDocFiles] = useState<Record<string, File>>({});
   const [result, setResult] = useState<{ trackingId: string } | null>(null);
 
   useEffect(() => {
@@ -68,12 +69,16 @@ function Checkout() {
     }
   }, [session]);
 
-  const methods = methodsQuery.data ?? [];
-  useEffect(() => {
-    if (!methodId && methods.length) setMethodId(methods[0]!.id);
-  }, [methods, methodId]);
-
   const offer = offerQuery.data?.offer;
+  const allowedIds = offer?.allowed_payment_methods ?? [];
+  const requiredDocs = offer?.required_documents ?? [];
+  // Only the payment methods the admin allowed on this offer are selectable.
+  const methods = (methodsQuery.data ?? []).filter(
+    (m) => allowedIds.length === 0 || allowedIds.includes(m.id),
+  );
+  useEffect(() => {
+    if (methods.length && !methods.some((m) => m.id === methodId)) setMethodId(methods[0]!.id);
+  }, [methods, methodId]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -87,6 +92,32 @@ function Checkout() {
       });
       if (upErr) throw new Error(upErr.message);
 
+      // Each required document goes to the private order-documents bucket.
+      const documents: {
+        key: string;
+        label_en: string;
+        label_ar: string;
+        path: string;
+        name: string;
+      }[] = [];
+      for (const doc of requiredDocs) {
+        const docFile = docFiles[doc.key];
+        if (!docFile) continue;
+        const dExt = docFile.name.split(".").pop()?.toLowerCase() ?? "bin";
+        const dPath = `${session.user.id}/${Date.now()}-${doc.key}.${dExt}`;
+        const { error: dErr } = await supabase.storage
+          .from("order-documents")
+          .upload(dPath, docFile, { contentType: docFile.type, upsert: false });
+        if (dErr) throw new Error(dErr.message);
+        documents.push({
+          key: doc.key,
+          label_en: doc.label_en,
+          label_ar: doc.label_ar,
+          path: dPath,
+          name: docFile.name,
+        });
+      }
+
       return createOrder({
         data: {
           offerId: offer.id,
@@ -97,6 +128,7 @@ function Checkout() {
           transactionReference: reference.trim(),
           paymentMethodId: methodId,
           receiptPath: path,
+          documents,
         },
       });
     },
@@ -106,6 +138,19 @@ function Checkout() {
     },
     onError: (e) => toast.error(t("common.error"), { description: String(e.message ?? e) }),
   });
+
+  function onPickDoc(key: string, f: File | null) {
+    if (!f) return;
+    if (!ALLOWED.includes(f.type)) {
+      toast.error(t("checkout.filetype"));
+      return;
+    }
+    if (f.size > MAX_BYTES) {
+      toast.error(t("checkout.filesize"));
+      return;
+    }
+    setDocFiles((prev) => ({ ...prev, [key]: f }));
+  }
 
   function onPickFile(f: File | null) {
     if (!f) return setFile(null);
@@ -118,6 +163,11 @@ function Checkout() {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !whatsapp.trim() || !reference.trim() || !file || !methodId) {
       toast.error(t("checkout.required"));
+      return;
+    }
+    const missing = requiredDocs.filter((d) => d.required && !docFiles[d.key]);
+    if (missing.length > 0) {
+      toast.error(t("checkout.docs.missing"));
       return;
     }
     mutation.mutate();
@@ -217,6 +267,47 @@ function Checkout() {
                 ))}
               </RadioGroup>
             </section>
+
+            {requiredDocs.length > 0 ? (
+              <section className="surface-card space-y-4 p-6">
+                <h2 className="text-lg font-bold">{t("checkout.docs")}</h2>
+                <p className="text-sm text-muted-foreground">{t("checkout.docs.note")}</p>
+                <ul className="space-y-3">
+                  {requiredDocs.map((doc) => {
+                    const picked = docFiles[doc.key];
+                    return (
+                      <li key={doc.key}>
+                        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-sage/70 bg-secondary/40 p-4 text-sm transition-colors hover:bg-secondary">
+                          <Upload className="size-4 shrink-0 text-sage" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block font-semibold">
+                              {lang === "ar" ? doc.label_ar : doc.label_en}
+                              {doc.required ? (
+                                <span className="text-destructive"> *</span>
+                              ) : (
+                                <span className="text-xs font-normal text-muted-foreground">
+                                  {" "}
+                                  ({t("checkout.docs.optional")})
+                                </span>
+                              )}
+                            </span>
+                            <span className="block truncate text-xs text-muted-foreground">
+                              {picked ? `${t("checkout.docs.uploaded")} · ${picked.name}` : "PNG / JPG / PDF"}
+                            </span>
+                          </span>
+                          <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.pdf"
+                            className="sr-only"
+                            onChange={(e) => onPickDoc(doc.key, e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ) : null}
 
             <section className="surface-card space-y-4 p-6">
               <h2 className="text-lg font-bold">{t("checkout.yourdetails")}</h2>

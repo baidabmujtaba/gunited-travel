@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { getOrderDocumentUrl, listOrderDocuments } from "@/lib/order-docs.functions";
 import { toast } from "sonner";
 import { KpiCard, StatusBadge } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -230,6 +231,7 @@ function OrderPanel({ row }: { row: any }) {
             {t("admin.orders.receipt")}
           </Button>
         ) : null}
+        <OrderDocuments orderId={row.id} />
         <div>
           <p className="mb-1 text-xs text-muted-foreground">{t("admin.orders.internal")}</p>
           <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -272,6 +274,43 @@ function OrderPanel({ row }: { row: any }) {
           {t("admin.orders.setstatus")}
         </Button>
       </div>
+    </div>
+  );
+}
+
+/** Documents the customer uploaded for this order, opened via short-lived links. */
+function OrderDocuments({ orderId }: { orderId: string }) {
+  const { t, lang } = useI18n();
+  const docs = useQuery({
+    queryKey: ["order-docs", orderId],
+    queryFn: () => listOrderDocuments({ data: { orderId } }),
+  });
+  const open = useMutation({
+    mutationFn: (path: string) => getOrderDocumentUrl({ data: { path } }),
+    onSuccess: (res) => {
+      if (res.url) window.open(res.url, "_blank", "noopener");
+      else toast.error(t("common.error"));
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
+  return (
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">{t("order.docs")}</p>
+      {docs.data && docs.data.length > 0 ? (
+        <ul className="space-y-1.5">
+          {docs.data.map((d) => (
+            <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
+              <span className="truncate">{lang === "ar" ? d.label_ar : d.label_en}</span>
+              <Button size="sm" variant="outline" onClick={() => open.mutate(d.file_path)}>
+                {t("order.docs.view")}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">{t("order.docs.empty")}</p>
+      )}
     </div>
   );
 }

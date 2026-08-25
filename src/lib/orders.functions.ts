@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { normalizeCurrency } from "./currency";
+import { normalizeDocs } from "./offer-docs";
 import { computePrice } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
@@ -14,6 +15,18 @@ const createOrderInput = z.object({
   transactionReference: z.string().min(2).max(80),
   paymentMethodId: z.string().uuid(),
   receiptPath: z.string().min(3).max(400),
+  documents: z
+    .array(
+      z.object({
+        key: z.string().max(60).default(""),
+        label_en: z.string().max(160).default(""),
+        label_ar: z.string().max(160).default(""),
+        path: z.string().min(3).max(400),
+        name: z.string().max(200).default(""),
+      }),
+    )
+    .max(20)
+    .default([]),
 });
 
 export const createOrder = createServerFn({ method: "POST" })
@@ -25,12 +38,26 @@ export const createOrder = createServerFn({ method: "POST" })
     const { data: offer, error: offerErr } = await supabase
       .from("service_offers")
       .select(
-        "id,base_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status",
+        "id,base_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
       )
       .eq("id", data.offerId)
       .maybeSingle();
     if (offerErr) throw new Error(offerErr.message);
     if (!offer || offer.status !== "active") throw new Error("OFFER_UNAVAILABLE");
+
+    // Respect the payment methods the admin allowed for this offer.
+    const allowed = Array.isArray(offer.allowed_payment_methods)
+      ? (offer.allowed_payment_methods as string[])
+      : [];
+    if (allowed.length > 0 && !allowed.includes(data.paymentMethodId)) {
+      throw new Error("PAYMENT_METHOD_NOT_ALLOWED");
+    }
+
+    // Every mandatory document from the offer checklist must be attached.
+    const requiredDocs = normalizeDocs(offer.required_documents).filter((d) => d.required);
+    const provided = new Set(data.documents.map((d) => d.key));
+    const missing = requiredDocs.filter((d) => !provided.has(d.key));
+    if (missing.length > 0) throw new Error("DOCUMENTS_MISSING");
 
     const { data: currency } = await supabase
       .from("currencies")
@@ -79,16 +106,33 @@ export const createOrder = createServerFn({ method: "POST" })
         payment_method_id: data.paymentMethodId,
         transaction_reference: data.transactionReference,
         receipt_path: data.receiptPath,
+        payment_notified_at: new Date().toISOString(),
+        document_status: requiredDocs.length > 0 ? "documents_submitted" : "awaiting_documents",
         status: "submitted",
       })
       .select("id,tracking_id,amount_display,currency_code")
       .single();
     if (error) throw new Error(error.message);
 
+    if (data.documents.length > 0) {
+      const { error: docErr } = await supabase.from("order_documents").insert(
+        data.documents.map((d) => ({
+          order_id: order.id,
+          doc_key: d.key,
+          label_en: d.label_en,
+          label_ar: d.label_ar,
+          file_path: d.path,
+          file_name: d.name,
+          uploaded_by: userId,
+        })),
+      );
+      if (docErr) throw new Error(docErr.message);
+    }
+
     await supabase.from("order_status_history").insert({
       order_id: order.id,
       new_status: "submitted",
-      note: "Order submitted with payment receipt",
+      note: `Payment notified · ref ${data.transactionReference} · ${data.documents.length} document(s) uploaded`,
       actor_id: userId,
       actor_name: data.customerName,
     });

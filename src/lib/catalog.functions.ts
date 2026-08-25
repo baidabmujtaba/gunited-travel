@@ -1,6 +1,8 @@
+export type { RequiredDocument };
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { normalizeCurrency } from "./currency";
+import { normalizeDocs, type RequiredDocument } from "./offer-docs";
 import { computePrice, type PriceBreakdown } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
@@ -27,6 +29,8 @@ export type CatalogOffer = {
   features: string[];
   images: string[];
   primary_image: string | null;
+  allowed_payment_methods: string[];
+  required_documents: RequiredDocument[];
   price: PriceBreakdown;
 };
 
@@ -46,6 +50,24 @@ async function loadCurrencies() {
     rate: rateMap.get(c.code) ?? 1,
   }));
   return list;
+}
+
+/** Offer artwork lives in a private bucket; public reads go through short signed URLs. */
+async function signImages(paths: string[]): Promise<string[]> {
+  const storagePaths = paths.filter((p) => p && !/^(https?:|\/|data:)/.test(p));
+  if (storagePaths.length === 0) return paths;
+  const sb = getPublicClient();
+  const { data } = await sb.storage.from("offer-images").createSignedUrls(storagePaths, 60 * 60);
+  const map = new Map((data ?? []).map((d) => [d.path, d.signedUrl]));
+  return paths.map((p) => map.get(p) ?? p);
+}
+
+async function withSignedImages(offer: CatalogOffer): Promise<CatalogOffer> {
+  const all = [...(offer.primary_image ? [offer.primary_image] : []), ...offer.images];
+  const signed = await signImages(all);
+  const primary = offer.primary_image ? (signed[0] ?? null) : null;
+  const images = offer.primary_image ? signed.slice(1) : signed;
+  return { ...offer, primary_image: primary ?? images[0] ?? null, images };
 }
 
 export const getCurrencies = createServerFn({ method: "GET" }).handler(async () => loadCurrencies());
@@ -73,9 +95,11 @@ export const getCatalog = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const today = new Date().toISOString().slice(0, 10);
-    const offers = (rows ?? [])
-      .filter((r) => !r.expiry_date || r.expiry_date >= today)
-      .map((r) => mapOffer(r, selected));
+    const offers = await Promise.all(
+      (rows ?? [])
+        .filter((r) => !r.expiry_date || r.expiry_date >= today)
+        .map((r) => withSignedImages(mapOffer(r as OfferRow, selected))),
+    );
 
     return { offers, currencies };
   });
@@ -102,7 +126,10 @@ export const getOffer = createServerFn({ method: "GET" })
       .eq("status", "active")
       .is("deleted_at", null)
       .maybeSingle();
-    return { offer: row ? mapOffer(row, selected) : null, currencies };
+    return {
+      offer: row ? await withSignedImages(mapOffer(row as OfferRow, selected)) : null,
+      currencies,
+    };
   });
 
 export const getPaymentMethods = createServerFn({ method: "GET" }).handler(async () => {
@@ -136,6 +163,8 @@ type OfferRow = {
   fee_amount_usd: number;
   discount_percent: number;
   commission_percent: number;
+  allowed_payment_methods: unknown;
+  required_documents: unknown;
 };
 
 function mapOffer(
@@ -156,6 +185,10 @@ function mapOffer(
     features: Array.isArray(r.features) ? (r.features as string[]) : [],
     images: Array.isArray(r.images) ? (r.images as string[]) : [],
     primary_image: r.primary_image,
+    allowed_payment_methods: Array.isArray(r.allowed_payment_methods)
+      ? (r.allowed_payment_methods as string[])
+      : [],
+    required_documents: normalizeDocs(r.required_documents),
     price: computePrice(
       {
         basePriceUsd: Number(r.base_price_usd),
