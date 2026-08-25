@@ -281,9 +281,50 @@ function OrderPanel({ row }: { row: any }) {
 /** Documents the customer uploaded for this order, opened via short-lived links. */
 function OrderDocuments({ orderId }: { orderId: string }) {
   const { t, lang } = useI18n();
+  const queryClient = useQueryClient();
+  const [busyId, setBusyId] = useState<string | null>(null);
   const docs = useQuery({
     queryKey: ["order-docs", orderId],
     queryFn: () => listOrderDocuments({ data: { orderId } }),
+  });
+  const history = useQuery({
+    queryKey: ["order-docs-history", orderId],
+    queryFn: () => listOrderDocumentHistory({ data: { orderId } }),
+  });
+
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ["order-docs", orderId] });
+    void queryClient.invalidateQueries({ queryKey: ["order-docs-history", orderId] });
+  };
+
+  const remove = useMutation({
+    mutationFn: (documentId: string) => deleteOrderDocument({ data: { documentId } }),
+    onSuccess: () => {
+      toast.success(t("order.docs.deleted"));
+      refresh();
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
+  const replace = useMutation({
+    mutationFn: async ({ documentId, file }: { documentId: string; file: File }) => {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user.id;
+      if (!uid) throw new Error("NO_SESSION");
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+      const path = `${uid}/${Date.now()}-replacement.${ext}`;
+      const { error } = await supabase.storage
+        .from("order-documents")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw new Error(error.message);
+      return replaceOrderDocument({ data: { documentId, path, name: file.name } });
+    },
+    onSuccess: () => {
+      toast.success(t("order.docs.replaced"));
+      refresh();
+    },
+    onError: () => toast.error(t("common.error")),
+    onSettled: () => setBusyId(null),
   });
   const open = useMutation({
     mutationFn: (path: string) => getOrderDocumentUrl({ data: { path } }),
