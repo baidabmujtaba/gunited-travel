@@ -276,10 +276,8 @@ export const getFinanceBoard = createServerFn({ method: "GET" })
           .is("deleted_at", null)
           .order("created_at", { ascending: false })
           .limit(100),
-        sb
-          .from("service_orders")
-          .select("status,amount_usd,currency_code,created_at")
-          .is("deleted_at", null),
+        // Archived orders stay in the financial figures on purpose.
+        sb.from("service_orders").select("status,amount_usd,currency_code,created_at"),
         sb.from("exchange_rates").select("currency_code,rate_per_usd,updated_at"),
         sb.from("payment_method_configs").select("id,name_en,name_ar,is_active,sort_order"),
       ]);
