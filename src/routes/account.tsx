@@ -61,7 +61,14 @@ function AccountPage() {
   return (
     <StoreLayout>
       <div className="mx-auto w-full max-w-4xl px-5 py-12">
-        <h1 className="text-3xl font-bold">{t("dash.title")}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-bold">{t("dash.title")}</h1>
+          <Badge variant="outline" className="gap-1.5 border-forest/30 text-forest">
+            <span className="size-2 animate-pulse rounded-full bg-forest" />
+            {t("dash.live")}
+          </Badge>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{t("dash.subtitle")}</p>
 
         {query.isPending ? (
           <div className="mt-8 space-y-3">
