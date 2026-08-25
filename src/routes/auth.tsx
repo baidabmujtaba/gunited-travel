@@ -103,8 +103,7 @@ function AuthPage() {
       toast.error(t("common.error"), { description: result.error.message });
       return;
     }
-    if (result.redirected) return;
-    void navigate({ to: target, replace: true });
+    // Session arrives via onAuthStateChange; the effect above handles routing by role.
   }
 
   async function forgot() {
