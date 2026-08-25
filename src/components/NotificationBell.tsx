@@ -127,9 +127,9 @@ export function NotificationBell() {
                 return (
                   <li key={n.id}>
                     {n.link ? (
-                      <Link to={n.link} className="block hover:bg-secondary/70">
+                      <a href={n.link} className="block hover:bg-secondary/70">
                         {content}
-                      </Link>
+                      </a>
                     ) : (
                       content
                     )}
