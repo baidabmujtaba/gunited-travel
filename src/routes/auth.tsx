@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useI18n } from "@/lib/i18n";
-import { useSession } from "@/lib/session";
+import { fetchLandingPath, useSession } from "@/lib/session";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ redirect: z.string().optional() }),
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function safePath(value: string | undefined) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/account";
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
   return value;
 }
 
@@ -45,22 +45,32 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const target = safePath(redirect);
+  const requested = safePath(redirect);
+  const target = requested ?? "/catalog";
 
   useEffect(() => {
-    if (!loading && session) void navigate({ to: target, replace: true });
-  }, [loading, session, target, navigate]);
+    if (loading || !session) return;
+    let active = true;
+    void (async () => {
+      const dest = requested ?? (await fetchLandingPath(session.user.id));
+      if (active) void navigate({ to: dest, replace: true });
+    })();
+    return () => {
+      active = false;
+    };
+  }, [loading, session, requested, navigate]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) {
       toast.error(t("common.error"), { description: error.message });
       return;
     }
-    void navigate({ to: target, replace: true });
+    const dest = requested ?? (data.user ? await fetchLandingPath(data.user.id) : "/catalog");
+    void navigate({ to: dest, replace: true });
   }
 
   async function signUp(e: React.FormEvent) {
@@ -93,8 +103,7 @@ function AuthPage() {
       toast.error(t("common.error"), { description: result.error.message });
       return;
     }
-    if (result.redirected) return;
-    void navigate({ to: target, replace: true });
+    // Session arrives via onAuthStateChange; the effect above handles routing by role.
   }
 
   async function forgot() {

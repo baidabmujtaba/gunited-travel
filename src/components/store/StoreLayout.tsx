@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
@@ -7,12 +7,13 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
-import { useRoles, useSession } from "@/lib/session";
+import { useRoles, useSession, useSignOut } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const { session } = useSession();
   const { isStaff } = useRoles();
+  const signOut = useSignOut();
   const [open, setOpen] = useState(false);
 
   const links = [
@@ -51,11 +52,26 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                 <Link to="/admin">{t("nav.admin")}</Link>
               </Button>
             ) : null}
-            <Button asChild variant={session ? "outline" : "default"} size="sm" className="hidden sm:inline-flex">
-              <Link to={session ? "/account" : "/auth"}>
-                {session ? t("nav.dashboard") : t("nav.login")}
-              </Link>
-            </Button>
+            {session ? (
+              <>
+                <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                  <Link to="/account">{t("nav.dashboard")}</Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:inline-flex"
+                  onClick={() => void signOut()}
+                >
+                  <LogOut className="me-1.5 size-4" />
+                  {t("nav.logout")}
+                </Button>
+              </>
+            ) : (
+              <Button asChild size="sm" className="hidden sm:inline-flex">
+                <Link to="/auth">{t("nav.login")}</Link>
+              </Button>
+            )}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden" aria-label={t("nav.home")}>
@@ -91,6 +107,18 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                   >
                     {session ? t("nav.dashboard") : t("nav.login")}
                   </Link>
+                  {session ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                      }}
+                      className="rounded-lg px-3 py-2.5 text-start text-sm font-medium hover:bg-secondary"
+                    >
+                      {t("nav.logout")}
+                    </button>
+                  ) : null}
                 </div>
               </SheetContent>
             </Sheet>
