@@ -294,17 +294,73 @@ function OrderDocuments({ orderId }: { orderId: string }) {
     onError: () => toast.error(t("common.error")),
   });
 
+  const download = useMutation({
+    mutationFn: (doc: { path: string; name: string }) =>
+      getOrderDocumentUrl({ data: { path: doc.path, download: doc.name || true } }),
+    onSuccess: (res) => {
+      if (!res.url) {
+        toast.error(t("common.error"));
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = res.url;
+      a.rel = "noopener";
+      a.click();
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
+  const rows = docs.data ?? [];
+
   return (
     <div>
-      <p className="mb-1 text-xs text-muted-foreground">{t("order.docs")}</p>
-      {docs.data && docs.data.length > 0 ? (
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground">{t("order.docs")}</p>
+        {rows.length > 1 ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={download.isPending}
+            onClick={() => {
+              rows.forEach((d, i) => {
+                window.setTimeout(
+                  () =>
+                    download.mutate({
+                      path: d.file_path,
+                      name: d.file_name ?? `${d.doc_key || "document"}`,
+                    }),
+                  i * 400,
+                );
+              });
+            }}
+          >
+            {t("order.docs.downloadAll")}
+          </Button>
+        ) : null}
+      </div>
+      {rows.length > 0 ? (
         <ul className="space-y-1.5">
-          {docs.data.map((d) => (
+          {rows.map((d) => (
             <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
               <span className="truncate">{lang === "ar" ? d.label_ar : d.label_en}</span>
-              <Button size="sm" variant="outline" onClick={() => open.mutate(d.file_path)}>
-                {t("order.docs.view")}
-              </Button>
+              <span className="flex shrink-0 gap-2">
+                <Button size="sm" variant="outline" onClick={() => open.mutate(d.file_path)}>
+                  {t("order.docs.view")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={download.isPending}
+                  onClick={() =>
+                    download.mutate({
+                      path: d.file_path,
+                      name: d.file_name ?? `${d.doc_key || "document"}`,
+                    })
+                  }
+                >
+                  {t("order.docs.download")}
+                </Button>
+              </span>
             </li>
           ))}
         </ul>
