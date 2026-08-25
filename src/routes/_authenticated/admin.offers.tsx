@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { OfferForm, emptyOffer, type OfferDraft } from "@/components/admin/OfferForm";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
+import { archiveOffer, listOffersAdmin } from "@/lib/offers.functions";
+import { normalizeDocs } from "@/lib/offer-docs";
+
+export const Route = createFileRoute("/_authenticated/admin/offers")({
+  head: () => ({
+    meta: [
+      { title: "Offers & Services — Gunited Travel ERP" },
+      {
+        name: "description",
+        content:
+          "Create and manage Gunited Travel offers: pricing, gallery, allowed payment methods and required customer documents.",
+      },
+      { property: "og:title", content: "Offers & Services — Gunited Travel ERP" },
+      {
+        property: "og:description",
+        content: "Publish travel offers with pricing, documents and payment rules.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: AdminOffersPage,
+  errorComponent: ({ error }) => (
+    <p className="surface-card p-6 text-sm text-destructive">{error.message}</p>
+  ),
+  notFoundComponent: () => <p className="surface-card p-6 text-sm">404</p>,
+});
+
+function toDraft(row: Record<string, unknown>): OfferDraft {
+  return {
+    id: String(row["id"]),
+    slug: (row["slug"] as string) ?? "",
+    title_ar: (row["title_ar"] as string) ?? "",
+    title_en: (row["title_en"] as string) ?? "",
+    description_ar: (row["description_ar"] as string) ?? "",
+    description_en: (row["description_en"] as string) ?? "",
+    category: (row["category"] as string) ?? "package",
+    base_price_usd: String(row["base_price_usd"] ?? ""),
+    tax_percent: String(row["tax_percent"] ?? 0),
+    fee_amount_usd: String(row["fee_amount_usd"] ?? 0),
+    discount_percent: String(row["discount_percent"] ?? 0),
+    duration_ar: (row["duration_ar"] as string) ?? "",
+    duration_en: (row["duration_en"] as string) ?? "",
+    expiry_date: (row["expiry_date"] as string) ?? "",
+    status: ((row["status"] as OfferDraft["status"]) ?? "active"),
+    features: Array.isArray(row["features"]) ? (row["features"] as string[]) : [],
+    images: Array.isArray(row["images"]) ? (row["images"] as string[]) : [],
+    allowed_payment_methods: Array.isArray(row["allowed_payment_methods"])
+      ? (row["allowed_payment_methods"] as string[])
+      : [],
+    required_documents: normalizeDocs(row["required_documents"]),
+  };
+}
+
+function AdminOffersPage() {
+  const { t, lang } = useI18n();
+  const qc = useQueryClient();
+  const [editing, setEditing] = useState<OfferDraft | null>(null);
+
+  const offers = useQuery({ queryKey: ["admin-offers"], queryFn: () => listOffersAdmin() });
+
+  const archive = useMutation({
+    mutationFn: (id: string) => archiveOffer({ data: { id } }),
+    onSuccess: () => {
+      toast.success(t("admin.offers.archived"));
+      void qc.invalidateQueries({ queryKey: ["admin-offers"] });
+      void qc.invalidateQueries({ queryKey: ["catalog"] });
+    },
+    onError: (e) => toast.error(t("common.error"), { description: String(e.message ?? e) }),
+  });
+
+  return (
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-forest-deep">{t("admin.offers.title")}</h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            {t("admin.offers.subtitle")}
+          </p>
+        </div>
+        <Button
+          className="bg-forest text-white hover:bg-forest-deep"
+          onClick={() => setEditing({ ...emptyOffer })}
+        >
+          <Plus className="size-4" /> {t("admin.offers.new")}
+        </Button>
+      </header>
+
+      {editing ? (
+        <OfferForm
+          initial={editing}
+          onSaved={() => setEditing(null)}
+          onCancel={() => setEditing(null)}
+        />
+      ) : null}
+
+      <section className="surface-card overflow-hidden">
+        {offers.data && offers.data.length > 0 ? (
+          <ul className="divide-y divide-border/60">
+            {offers.data.map((row: Record<string, unknown>) => (
+              <li key={String(row["id"])} className="flex flex-wrap items-center gap-3 p-4">
+                <div className="min-w-[14rem] flex-1">
+                  <p className="font-semibold text-forest-deep">
+                    {lang === "ar" ? String(row["title_ar"]) : String(row["title_en"])}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t(`category.${String(row["category"])}`)} · ${Number(row["base_price_usd"]).toFixed(2)} ·{" "}
+                    {normalizeDocs(row["required_documents"]).length} {t("checkout.docs")}
+                  </p>
+                </div>
+                <Badge className={row["status"] === "active" ? "bg-forest text-cream" : "bg-secondary"}>
+                  {t(`admin.offers.status.${String(row["status"])}`)}
+                </Badge>
+                <Button variant="outline" size="sm" onClick={() => setEditing(toDraft(row))}>
+                  <Pencil className="size-4" /> {t("admin.offers.edit")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive"
+                  onClick={() => archive.mutate(String(row["id"]))}
+                >
+                  <Trash2 className="size-4" /> {t("admin.offers.archive")}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="p-6 text-sm text-muted-foreground">{t("admin.offers.empty")}</p>
+        )}
+      </section>
+    </div>
+  );
+}
