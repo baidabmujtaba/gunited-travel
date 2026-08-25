@@ -292,6 +292,53 @@ export type Database = {
         }
         Relationships: []
       }
+      order_documents: {
+        Row: {
+          created_at: string
+          doc_key: string
+          file_name: string | null
+          file_path: string
+          id: string
+          label_ar: string
+          label_en: string
+          order_id: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_key?: string
+          file_name?: string | null
+          file_path: string
+          id?: string
+          label_ar?: string
+          label_en?: string
+          order_id: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_key?: string
+          file_name?: string | null
+          file_path?: string
+          id?: string
+          label_ar?: string
+          label_en?: string
+          order_id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_documents_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_status_history: {
         Row: {
           actor_id: string | null
@@ -440,6 +487,7 @@ export type Database = {
       }
       service_offers: {
         Row: {
+          allowed_payment_methods: string[]
           base_price_usd: number
           category: string
           commission_percent: number
@@ -457,6 +505,7 @@ export type Database = {
           id: string
           images: Json
           primary_image: string | null
+          required_documents: Json
           slug: string | null
           status: Database["public"]["Enums"]["offer_status"]
           tax_percent: number
@@ -465,6 +514,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_payment_methods?: string[]
           base_price_usd: number
           category?: string
           commission_percent?: number
@@ -482,6 +532,7 @@ export type Database = {
           id?: string
           images?: Json
           primary_image?: string | null
+          required_documents?: Json
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
@@ -490,6 +541,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_payment_methods?: string[]
           base_price_usd?: number
           category?: string
           commission_percent?: number
@@ -507,6 +559,7 @@ export type Database = {
           id?: string
           images?: Json
           primary_image?: string | null
+          required_documents?: Json
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
@@ -533,6 +586,7 @@ export type Database = {
           internal_notes: string | null
           offer_id: string | null
           payment_method_id: string | null
+          payment_notified_at: string | null
           receipt_path: string | null
           status: Database["public"]["Enums"]["order_status"]
           tracking_id: string | null
@@ -556,6 +610,7 @@ export type Database = {
           internal_notes?: string | null
           offer_id?: string | null
           payment_method_id?: string | null
+          payment_notified_at?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tracking_id?: string | null
@@ -579,6 +634,7 @@ export type Database = {
           internal_notes?: string | null
           offer_id?: string | null
           payment_method_id?: string | null
+          payment_notified_at?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tracking_id?: string | null
