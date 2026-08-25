@@ -157,6 +157,69 @@ export type Database = {
           },
         ]
       }
+      flight_bookings: {
+        Row: {
+          amadeus_order_id: string
+          created_at: string
+          created_by: string | null
+          currency_code: string
+          customer_email: string | null
+          departure_date: string | null
+          destination: string | null
+          environment: string
+          id: string
+          itinerary: Json
+          origin: string | null
+          raw_order: Json | null
+          reference: string | null
+          return_date: string | null
+          status: string
+          total_amount: number
+          travelers: Json
+          updated_at: string
+        }
+        Insert: {
+          amadeus_order_id: string
+          created_at?: string
+          created_by?: string | null
+          currency_code?: string
+          customer_email?: string | null
+          departure_date?: string | null
+          destination?: string | null
+          environment?: string
+          id?: string
+          itinerary?: Json
+          origin?: string | null
+          raw_order?: Json | null
+          reference?: string | null
+          return_date?: string | null
+          status?: string
+          total_amount?: number
+          travelers?: Json
+          updated_at?: string
+        }
+        Update: {
+          amadeus_order_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency_code?: string
+          customer_email?: string | null
+          departure_date?: string | null
+          destination?: string | null
+          environment?: string
+          id?: string
+          itinerary?: Json
+          origin?: string | null
+          raw_order?: Json | null
+          reference?: string | null
+          return_date?: string | null
+          status?: string
+          total_amount?: number
+          travelers?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       integration_credentials: {
         Row: {
           client_id: string | null
