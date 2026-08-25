@@ -5,6 +5,7 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useSession, useSignOut } from "@/lib/session";
 
 const TABS = [
   { to: "/admin", key: "admin.tab.sales", exact: true },
