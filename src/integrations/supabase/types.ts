@@ -157,6 +157,39 @@ export type Database = {
           },
         ]
       }
+      integration_credentials: {
+        Row: {
+          client_id: string | null
+          client_secret: string | null
+          config: Json
+          created_at: string
+          environment: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          client_secret?: string | null
+          config?: Json
+          created_at?: string
+          environment?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          client_secret?: string | null
+          config?: Json
+          created_at?: string
+          environment?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           created_at: string
