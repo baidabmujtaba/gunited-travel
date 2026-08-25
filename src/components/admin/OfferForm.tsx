@@ -220,7 +220,7 @@ export function OfferForm({
               <SelectContent>
                 {CATEGORIES.map((c) => (
                   <SelectItem key={c} value={c}>
-                    {t(`cat.${c}`)}
+                    {t(`category.${c}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
