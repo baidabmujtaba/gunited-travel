@@ -1,8 +1,8 @@
-export type { RequiredDocument };
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { normalizeCurrency } from "./currency";
 import { normalizeDocs, type RequiredDocument } from "./offer-docs";
+export type { RequiredDocument } from "./offer-docs";
 import { computePrice, type PriceBreakdown } from "./pricing";
 import { getPublicClient } from "./public-client.server";
 
