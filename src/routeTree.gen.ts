@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin.finance'
+import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin.flights'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin.offers'
 import { Route as AuthenticatedAdminPartnersRouteImport } from './routes/_authenticated/admin.partners'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -103,6 +104,12 @@ const AuthenticatedAdminFinanceRoute =
     path: '/finance',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminFlightsRoute =
+  AuthenticatedAdminFlightsRouteImport.update({
+    id: '/flights',
+    path: '/flights',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminOffersRoute =
   AuthenticatedAdminOffersRouteImport.update({
     id: '/offers',
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
+  '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
+  '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
+  '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/_authenticated/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin/partners': typeof AuthenticatedAdminPartnersRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/dashboard'
     | '/admin/finance'
+    | '/admin/flights'
     | '/admin/offers'
     | '/admin/partners'
     | '/admin/settings'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/dashboard'
     | '/admin/finance'
+    | '/admin/flights'
     | '/admin/offers'
     | '/admin/partners'
     | '/admin/settings'
@@ -271,6 +283,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/finance'
+    | '/_authenticated/admin/flights'
     | '/_authenticated/admin/offers'
     | '/_authenticated/admin/partners'
     | '/_authenticated/admin/settings'
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFinanceRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/flights': {
+      id: '/_authenticated/admin/flights'
+      path: '/flights'
+      fullPath: '/admin/flights'
+      preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/offers': {
       id: '/_authenticated/admin/offers'
       path: '/offers'
@@ -449,6 +469,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminFinanceRoute: typeof AuthenticatedAdminFinanceRoute
+  AuthenticatedAdminFlightsRoute: typeof AuthenticatedAdminFlightsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPartnersRoute: typeof AuthenticatedAdminPartnersRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -462,6 +483,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminFinanceRoute: AuthenticatedAdminFinanceRoute,
+  AuthenticatedAdminFlightsRoute: AuthenticatedAdminFlightsRoute,
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
   AuthenticatedAdminPartnersRoute: AuthenticatedAdminPartnersRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
