@@ -1,8 +1,33 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type StaffRole = "super_admin" | "admin" | "booking_agent" | "accountant" | "client";
+export type StaffRole =
+  | "super_admin"
+  | "admin"
+  | "booking_agent"
+  | "accountant"
+  | "client"
+  | "travel_agency";
+
+const STAFF_ROLES: StaffRole[] = ["super_admin", "admin", "booking_agent", "accountant"];
+
+export function isStaffRole(role: StaffRole) {
+  return STAFF_ROLES.includes(role);
+}
+
+/** Landing page after sign-in: staff go to the ERP hub, customers to the catalog. */
+export function landingPathForRoles(roles: StaffRole[]) {
+  return roles.some(isStaffRole) ? "/admin/dashboard" : "/catalog";
+}
+
+/** Reads the signed-in user's roles directly (used right after sign-in). */
+export async function fetchLandingPath(userId: string) {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  return landingPathForRoles((data ?? []).map((r) => r.role as StaffRole));
+}
 
 /** Single client-side session hook, kept in sync with auth state changes. */
 export function useSession() {
@@ -46,7 +71,21 @@ export function useRoles() {
     };
   }, [session?.user?.id]);
 
-  const isStaff = roles.some((r) => r !== "client");
+  const isStaff = roles.some(isStaffRole);
   const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  return { roles, isStaff, isAdmin };
+  const isAgency = roles.includes("travel_agency");
+  return { roles, isStaff, isAdmin, isAgency };
+}
+
+/** Clears cached data + the Supabase session, then returns to the sign-in page. */
+export function useSignOut() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return useCallback(async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/auth", replace: true });
+  }, [navigate, queryClient]);
 }
