@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
@@ -40,6 +41,11 @@ const AccountRoute = AccountRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogRoute = CatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackRoute = TrackRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/catalog': typeof CatalogRoute
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/catalog': typeof CatalogRoute
   '/track': typeof TrackRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/catalog': typeof CatalogRoute
   '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/auth'
+    | '/catalog'
     | '/track'
     | '/admin'
     | '/checkout/$slug'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/auth'
+    | '/catalog'
     | '/track'
     | '/checkout/$slug'
     | '/offers/$slug'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/account'
     | '/auth'
+    | '/catalog'
     | '/track'
     | '/_authenticated/admin'
     | '/checkout/$slug'
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccountRoute: typeof AccountRoute
   AuthRoute: typeof AuthRoute
+  CatalogRoute: typeof CatalogRoute
   TrackRoute: typeof TrackRoute
   CheckoutSlugRoute: typeof CheckoutSlugRoute
   OffersSlugRoute: typeof OffersSlugRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalog': {
+      id: '/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof CatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track': {
@@ -319,6 +339,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccountRoute: AccountRoute,
   AuthRoute: AuthRoute,
+  CatalogRoute: CatalogRoute,
   TrackRoute: TrackRoute,
   CheckoutSlugRoute: CheckoutSlugRoute,
   OffersSlugRoute: OffersSlugRoute,
