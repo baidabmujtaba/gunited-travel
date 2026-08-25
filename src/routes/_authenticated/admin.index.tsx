@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getOrderDocumentUrl, listOrderDocuments } from "@/lib/order-docs.functions";
+import {
+  deleteOrderDocument,
+  getOrderDocumentUrl,
+  listOrderDocumentHistory,
+  listOrderDocuments,
+  replaceOrderDocument,
+} from "@/lib/order-docs.functions";
 import { toast } from "sonner";
 import { KpiCard, StatusBadge } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/button";
