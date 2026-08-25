@@ -200,6 +200,16 @@ function OrderPanel({ row }: { row: any }) {
     onError: () => toast.error(t("common.error")),
   });
 
+  const archiveMutation = useMutation({
+    mutationFn: () => archiveOrder({ data: { orderId: row.id, reason: note || undefined } }),
+    onSuccess: () => {
+      toast.success(t("admin.orders.archived"));
+      void queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
+    onError: () => toast.error(t("common.error")),
+  });
+
   const receiptMutation = useMutation({
     mutationFn: () => getReceiptUrl({ data: { path: row.receipt_path } }),
     onSuccess: (res) => {
