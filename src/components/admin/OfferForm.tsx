@@ -96,7 +96,11 @@ export function OfferForm({
         if (!data) return;
         setPreviews((prev) => ({
           ...prev,
-          ...Object.fromEntries(data.map((d) => [d.path ?? "", d.signedUrl])),
+          ...Object.fromEntries(
+            data
+              .filter((d) => d.path && d.signedUrl)
+              .map((d) => [String(d.path), d.signedUrl]),
+          ),
         }));
       });
   }, [draft.images]);

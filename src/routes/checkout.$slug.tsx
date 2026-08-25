@@ -141,8 +141,14 @@ function Checkout() {
 
   function onPickDoc(key: string, f: File | null) {
     if (!f) return;
-    if (!ALLOWED.includes(f.type)) return toast.error(t("checkout.filetype"));
-    if (f.size > MAX_BYTES) return toast.error(t("checkout.filesize"));
+    if (!ALLOWED.includes(f.type)) {
+      toast.error(t("checkout.filetype"));
+      return;
+    }
+    if (f.size > MAX_BYTES) {
+      toast.error(t("checkout.filesize"));
+      return;
+    }
     setDocFiles((prev) => ({ ...prev, [key]: f }));
   }
 
