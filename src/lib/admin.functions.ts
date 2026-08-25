@@ -10,16 +10,15 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const sb = context.supabase;
 
     const [{ data: orders }, { data: offers }, { data: profiles }] = await Promise.all([
-      sb
-        .from("service_orders")
-        .select("id,status,amount_usd,created_at")
-        .is("deleted_at", null),
+      sb.from("service_orders").select("id,status,amount_usd,created_at,deleted_at"),
       sb.from("service_offers").select("id,status").is("deleted_at", null),
       sb.from("profiles").select("id,is_agency,created_at"),
     ]);
 
-    const all = orders ?? [];
-    const revenueUsd = all
+    // Archived orders drop out of the queue but stay in revenue.
+    const every = orders ?? [];
+    const all = every.filter((o: any) => !o.deleted_at);
+    const revenueUsd = every
       .filter((o: any) => ["payment_confirmed", "processing", "completed"].includes(o.status))
       .reduce((s: number, o: any) => s + Number(o.amount_usd), 0);
     const pipelineUsd = all
