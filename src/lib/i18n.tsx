@@ -253,7 +253,14 @@ type I18nValue = {
   fmt: (n: number, currency?: string) => string;
 };
 
-const I18nContext = createContext<I18nValue | null>(null);
+// Keep a single context instance even if this module is evaluated more than once
+// (route code-splitting can otherwise produce two contexts and a false "no provider" error).
+const globalScope = globalThis as typeof globalThis & {
+  __gtI18nContext?: React.Context<I18nValue | null>;
+};
+const I18nContext: React.Context<I18nValue | null> =
+  globalScope.__gtI18nContext ?? createContext<I18nValue | null>(null);
+globalScope.__gtI18nContext = I18nContext;
 const STORAGE_KEY = "gt-lang";
 
 export function I18nProvider({ children }: { children: ReactNode }) {
