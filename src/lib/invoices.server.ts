@@ -15,7 +15,7 @@ export type InvoiceResult = {
   invoiceNumber: string;
   created: boolean;
   emailSent: boolean;
-  emailError?: string;
+  emailError?: string | undefined;
 };
 
 /**

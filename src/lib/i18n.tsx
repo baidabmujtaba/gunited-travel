@@ -283,7 +283,6 @@ export const messages: Dict = {
   "common.cancel": { ar: "إلغاء", en: "Cancel" },
   "common.edit": { ar: "تعديل", en: "Edit" },
   "common.delete": { ar: "حذف", en: "Delete" },
-  "common.error": { ar: "حدث خطأ. حاول مرة أخرى.", en: "Something went wrong. Try again." },
   "invoice.title": { ar: "فاتورة", en: "Invoice" },
   "invoice.notfound": { ar: "لم يتم العثور على الفاتورة.", en: "Invoice not found." },
   "invoice.billto": { ar: "الفاتورة إلى", en: "Billed to" },

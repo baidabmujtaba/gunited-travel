@@ -162,7 +162,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     });
 
     // Completing an order automatically issues + emails the archived invoice.
-    let invoice: { invoiceNumber: string; emailSent: boolean; emailError?: string } | null = null;
+    let invoice: { invoiceNumber: string; emailSent: boolean; emailError?: string | undefined } | null = null;
     if (data.status === "completed" && current.status !== "completed") {
       try {
         const { issueInvoiceForOrder } = await import("./invoices.server");
