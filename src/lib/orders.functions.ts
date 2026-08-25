@@ -216,5 +216,24 @@ export const getMyOrders = createServerFn({ method: "GET" })
       .eq("customer_id", context.userId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
-    return data ?? [];
+
+    const orders = data ?? [];
+    if (orders.length === 0) return [];
+
+    // Attach the issued invoice (if any) so the dashboard can link to it directly.
+    const { data: invoices } = await context.supabase
+      .from("invoices")
+      .select("order_id,invoice_number,total_display,currency_code,status")
+      .in(
+        "order_id",
+        orders.map((o: { id: string }) => o.id),
+      )
+      .is("deleted_at", null);
+
+    const byOrder = new Map((invoices ?? []).map((inv: any) => [inv.order_id, inv]));
+
+    return orders.map((o: any) => ({
+      ...o,
+      invoice: byOrder.get(o.id) ?? null,
+    }));
   });
