@@ -315,3 +315,66 @@ export const getFinanceBoard = createServerFn({ method: "GET" })
       methods: (methods ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
     };
   });
+
+/**
+ * Archive a finished order (completed/cancelled/rejected). The row is soft-deleted so it
+ * disappears from the operational queue, while invoices and revenue figures stay intact.
+ */
+export const archiveOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ orderId: z.string().uuid(), reason: z.string().max(400).optional() }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context);
+    const sb = context.supabase;
+
+    const { data: order, error } = await sb
+      .from("service_orders")
+      .select("id,tracking_id,status,amount_usd,currency_code,customer_email,deleted_at")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!order) throw new Error("ORDER_NOT_FOUND");
+    if (order.deleted_at) return { ok: true };
+    if (!["completed", "cancelled", "rejected"].includes(order.status)) {
+      throw new Error("ORDER_NOT_FINISHED");
+    }
+
+    const { error: upErr } = await sb
+      .from("service_orders")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", order.id);
+    if (upErr) throw new Error(upErr.message);
+
+    const { data: profile } = await sb
+      .from("profiles")
+      .select("email,full_name")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    await sb.from("order_status_history").insert({
+      order_id: order.id,
+      previous_status: order.status,
+      new_status: order.status,
+      note: `Order archived${data.reason ? `: ${data.reason}` : ""} — financial records retained`,
+      actor_id: context.userId,
+      actor_name: profile?.full_name ?? profile?.email ?? null,
+    });
+
+    await sb.from("audit_logs").insert({
+      actor_id: context.userId,
+      actor_email: profile?.email ?? null,
+      action: "order.archive",
+      entity: "service_orders",
+      entity_id: order.id,
+      before_data: { status: order.status, deleted_at: null },
+      after_data: {
+        tracking_id: order.tracking_id,
+        amount_usd: order.amount_usd,
+        reason: data.reason ?? null,
+      },
+    });
+
+    return { ok: true };
+  });
