@@ -382,9 +382,9 @@ function OrderDocuments({ orderId }: { orderId: string }) {
       {rows.length > 0 ? (
         <ul className="space-y-1.5">
           {rows.map((d) => (
-            <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
+            <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <span className="truncate">{lang === "ar" ? d.label_ar : d.label_en}</span>
-              <span className="flex shrink-0 gap-2">
+              <span className="flex shrink-0 flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => open.mutate(d.file_path)}>
                   {t("order.docs.view")}
                 </Button>
@@ -401,6 +401,38 @@ function OrderDocuments({ orderId }: { orderId: string }) {
                 >
                   {t("order.docs.download")}
                 </Button>
+                <label>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      setBusyId(d.id);
+                      replace.mutate({ documentId: d.id, file });
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                    disabled={replace.isPending && busyId === d.id}
+                  >
+                    <span className="cursor-pointer">{t("order.docs.replace")}</span>
+                  </Button>
+                </label>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive"
+                  disabled={remove.isPending}
+                  onClick={() => {
+                    if (window.confirm(t("order.docs.deleteConfirm"))) remove.mutate(d.id);
+                  }}
+                >
+                  {t("order.docs.delete")}
+                </Button>
               </span>
             </li>
           ))}
@@ -408,6 +440,29 @@ function OrderDocuments({ orderId }: { orderId: string }) {
       ) : (
         <p className="text-sm text-muted-foreground">{t("order.docs.empty")}</p>
       )}
+
+      {history.data && history.data.length > 0 ? (
+        <div className="mt-3 rounded-lg border border-border/70 bg-muted/40 p-3">
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+            {t("order.docs.history")}
+          </p>
+          <ul className="space-y-1 text-xs text-muted-foreground">
+            {history.data.map((h: any) => (
+              <li key={h.id}>
+                <span className="font-medium text-foreground">
+                  {h.action === "order_document.delete"
+                    ? t("order.docs.delete")
+                    : t("order.docs.replace")}
+                </span>{" "}
+                · {String(h.before_data?.file_name ?? h.before_data?.doc_key ?? "—")}
+                {h.after_data?.file_name ? ` → ${String(h.after_data.file_name)}` : ""} ·{" "}
+                {h.actor_email ?? "—"} ·{" "}
+                {new Date(h.created_at).toLocaleString(lang === "ar" ? "ar-EG" : "en-GB")}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
