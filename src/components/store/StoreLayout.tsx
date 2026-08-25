@@ -107,6 +107,18 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                   >
                     {session ? t("nav.dashboard") : t("nav.login")}
                   </Link>
+                  {session ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                      }}
+                      className="rounded-lg px-3 py-2.5 text-start text-sm font-medium hover:bg-secondary"
+                    >
+                      {t("nav.logout")}
+                    </button>
+                  ) : null}
                 </div>
               </SheetContent>
             </Sheet>
