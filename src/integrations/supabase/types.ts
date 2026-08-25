@@ -611,6 +611,7 @@ export type Database = {
         | "booking_agent"
         | "accountant"
         | "client"
+        | "travel_agency"
       offer_status: "active" | "draft" | "archived"
       order_status:
         | "submitted"
@@ -753,6 +754,7 @@ export const Constants = {
         "booking_agent",
         "accountant",
         "client",
+        "travel_agency",
       ],
       offer_status: ["active", "draft", "archived"],
       order_status: [
