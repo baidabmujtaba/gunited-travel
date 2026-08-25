@@ -52,11 +52,26 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                 <Link to="/admin">{t("nav.admin")}</Link>
               </Button>
             ) : null}
-            <Button asChild variant={session ? "outline" : "default"} size="sm" className="hidden sm:inline-flex">
-              <Link to={session ? "/account" : "/auth"}>
-                {session ? t("nav.dashboard") : t("nav.login")}
-              </Link>
-            </Button>
+            {session ? (
+              <>
+                <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                  <Link to="/account">{t("nav.dashboard")}</Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:inline-flex"
+                  onClick={() => void signOut()}
+                >
+                  <LogOut className="me-1.5 size-4" />
+                  {t("nav.logout")}
+                </Button>
+              </>
+            ) : (
+              <Button asChild size="sm" className="hidden sm:inline-flex">
+                <Link to="/auth">{t("nav.login")}</Link>
+              </Button>
+            )}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden" aria-label={t("nav.home")}>
