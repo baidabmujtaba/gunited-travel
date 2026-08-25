@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { LogOut, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { AssistantWidget } from "@/components/AssistantWidget";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
@@ -139,6 +140,8 @@ export function StoreLayout({ children }: { children: ReactNode }) {
           </p>
         </div>
       </footer>
+
+      <AssistantWidget mode="client" />
     </div>
   );
 }
