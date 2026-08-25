@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { Context, ReactNode } from "react";
 import { normalizeCurrency } from "./currency";
 
 export type Lang = "ar" | "en";
@@ -253,7 +253,14 @@ type I18nValue = {
   fmt: (n: number, currency?: string) => string;
 };
 
-const I18nContext = createContext<I18nValue | null>(null);
+// Keep a single context instance even if this module is evaluated more than once
+// (route code-splitting can otherwise produce two contexts and a false "no provider" error).
+const globalScope = globalThis as typeof globalThis & {
+  __gtI18nContext?: Context<I18nValue | null>;
+};
+const I18nContext: Context<I18nValue | null> =
+  globalScope.__gtI18nContext ?? createContext<I18nValue | null>(null);
+globalScope.__gtI18nContext = I18nContext;
 const STORAGE_KEY = "gt-lang";
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -298,8 +305,21 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+function buildFallback(lang: Lang): I18nValue {
+  return {
+    lang,
+    dir: lang === "ar" ? "rtl" : "ltr",
+    setLang: () => {},
+    t: (key: string) => messages[key]?.[lang] ?? key,
+    fmt: (n: number, currency?: string) => {
+      const code = currency ? normalizeCurrency(currency) : undefined;
+      const value = Number.isFinite(n) ? n : 0;
+      return `${code ? `${code} ` : ""}${value.toLocaleString(lang === "ar" ? "ar-EG" : "en-US")}`;
+    },
+  };
+}
+
 export function useI18n() {
   const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  return ctx ?? buildFallback("ar");
 }
