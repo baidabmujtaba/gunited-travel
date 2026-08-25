@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin.finance'
 import { Route as AuthenticatedAdminPartnersRouteImport } from './routes/_authenticated/admin.partners'
+import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
 import { Route as AuthenticatedAdminCustomerIdRouteImport } from './routes/_authenticated/admin.customer.$id'
 
@@ -105,6 +106,12 @@ const AuthenticatedAdminPartnersRoute =
     path: '/partners',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedInvoiceNumberRoute =
+  AuthenticatedInvoiceNumberRouteImport.update({
+    id: '/invoice/$number',
+    path: '/invoice/$number',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAgencyIdRoute =
   AuthenticatedAdminAgencyIdRouteImport.update({
     id: '/agency/$id',
@@ -132,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
@@ -149,6 +157,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
@@ -169,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
   '/_authenticated/admin/partners': typeof AuthenticatedAdminPartnersRoute
+  '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/_authenticated/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/finance'
     | '/admin/partners'
+    | '/invoice/$number'
     | '/admin/'
     | '/admin/agency/$id'
     | '/admin/customer/$id'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/finance'
     | '/admin/partners'
+    | '/invoice/$number'
     | '/admin'
     | '/admin/agency/$id'
     | '/admin/customer/$id'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/finance'
     | '/_authenticated/admin/partners'
+    | '/_authenticated/invoice/$number'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/agency/$id'
     | '/_authenticated/admin/customer/$id'
@@ -349,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPartnersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/invoice/$number': {
+      id: '/_authenticated/invoice/$number'
+      path: '/invoice/$number'
+      fullPath: '/invoice/$number'
+      preLoaderRoute: typeof AuthenticatedInvoiceNumberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/agency/$id': {
       id: '/_authenticated/admin/agency/$id'
       path: '/agency/$id'
@@ -391,10 +411,12 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedInvoiceNumberRoute: typeof AuthenticatedInvoiceNumberRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedInvoiceNumberRoute: AuthenticatedInvoiceNumberRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
