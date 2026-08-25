@@ -10,6 +10,14 @@ import { useI18n } from "@/lib/i18n";
 import { getMyOrders } from "@/lib/orders.functions";
 import { useSession } from "@/lib/session";
 
+const STAGES = [
+  "submitted",
+  "payment_pending",
+  "payment_confirmed",
+  "processing",
+  "completed",
+] as const;
+
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
@@ -48,6 +56,9 @@ function AccountPage() {
     const channel = supabase
       .channel("my-orders")
       .on("postgres_changes", { event: "*", schema: "public", table: "service_orders" }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "invoices" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["my-orders"] });
       })
       .subscribe();
