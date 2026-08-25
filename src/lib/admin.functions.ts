@@ -161,7 +161,25 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       after_data: { status: data.status, note: data.note ?? null },
     });
 
-    return { ok: true };
+    // Completing an order automatically issues + emails the archived invoice.
+    let invoice: { invoiceNumber: string; emailSent: boolean; emailError?: string } | null = null;
+    if (data.status === "completed" && current.status !== "completed") {
+      try {
+        const { issueInvoiceForOrder } = await import("./invoices.server");
+        const result = await issueInvoiceForOrder(sb, context.userId, data.orderId);
+        if (result) {
+          invoice = {
+            invoiceNumber: result.invoiceNumber,
+            emailSent: result.emailSent,
+            emailError: result.emailError,
+          };
+        }
+      } catch (err) {
+        console.error("invoice_generation_failed", err);
+      }
+    }
+
+    return { ok: true, invoice };
   });
 
 export const saveOrderNotes = createServerFn({ method: "POST" })

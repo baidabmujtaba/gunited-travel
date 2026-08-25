@@ -3,6 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { KpiCard } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExchangeRatePanel } from "@/components/admin/ExchangeRatePanel";
+import { PaymentMethodsPanel } from "@/components/admin/PaymentMethodsPanel";
+import { InvoiceArchive } from "@/components/admin/InvoiceArchive";
 import { getFinanceBoard } from "@/lib/admin.functions";
 import { useI18n } from "@/lib/i18n";
 
@@ -40,6 +44,25 @@ function FinanceHub() {
         <KpiCard label={t("admin.fin.methods")} value={String(d.methods.length)} />
       </div>
 
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="overview">{t("admin.fin.tab.overview")}</TabsTrigger>
+          <TabsTrigger value="invoices">{t("admin.fin.tab.invoices")}</TabsTrigger>
+          <TabsTrigger value="methods">{t("admin.fin.tab.methods")}</TabsTrigger>
+          <TabsTrigger value="rates">{t("admin.fin.tab.rates")}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="invoices">
+          <InvoiceArchive />
+        </TabsContent>
+        <TabsContent value="methods">
+          <PaymentMethodsPanel />
+        </TabsContent>
+        <TabsContent value="rates">
+          <ExchangeRatePanel />
+        </TabsContent>
+
+        <TabsContent value="overview" className="space-y-6">
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="surface-card p-5">
           <h2 className="text-lg font-semibold">{t("admin.fin.monthly")}</h2>
@@ -134,6 +157,8 @@ function FinanceHub() {
           </div>
         )}
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
