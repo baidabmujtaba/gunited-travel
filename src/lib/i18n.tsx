@@ -507,6 +507,11 @@ export const messages: Dict = {
     en: "Amadeus request failed right now.",
   },
   "admin.tab.users": { ar: "المستخدمون", en: "Users" },
+  "admin.tab.agencies": { ar: "الوكالات", en: "Agencies" },
+  "admin.tab.payments": { ar: "المدفوعات", en: "Payments" },
+  "admin.tab.balances": { ar: "الأرصدة والكشوف", en: "Balances" },
+  "admin.tab.reports": { ar: "التقارير", en: "Reports" },
+
 
   "admin.tab.settings": { ar: "الإعدادات", en: "Settings" },
   "admin.users.title": { ar: "المستخدمون والأدوار", en: "Users & roles" },
