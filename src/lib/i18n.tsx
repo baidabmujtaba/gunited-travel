@@ -16,6 +16,7 @@ export const messages: Dict = {
   "nav.track": { ar: "تتبع طلبي", en: "Track My Order" },
   "nav.dashboard": { ar: "حسابي", en: "My Account" },
   "nav.admin": { ar: "لوحة الإدارة", en: "Admin Panel" },
+  "nav.agency": { ar: "بوابة الوكالة", en: "Agency Portal" },
   "nav.login": { ar: "تسجيل الدخول", en: "Sign in" },
   "nav.logout": { ar: "تسجيل الخروج", en: "Sign out" },
 
