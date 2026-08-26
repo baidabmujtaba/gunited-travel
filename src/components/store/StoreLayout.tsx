@@ -14,7 +14,7 @@ import { useRoles, useSession, useSignOut } from "@/lib/session";
 export function StoreLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const { session } = useSession();
-  const { isStaff } = useRoles();
+  const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
 
@@ -53,6 +53,11 @@ export function StoreLayout({ children }: { children: ReactNode }) {
             {isStaff ? (
               <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
                 <Link to="/admin">{t("nav.admin")}</Link>
+              </Button>
+            ) : null}
+            {isAgency ? (
+              <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
+                <Link to="/agency">{t("nav.agency")}</Link>
               </Button>
             ) : null}
             {session ? (

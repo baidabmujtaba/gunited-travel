@@ -163,7 +163,7 @@ export const listAgencyOrders = createServerFn({ method: "GET" })
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .range(from, from + data.pageSize - 1);
-    if (data.status) q = q.eq("status", data.status);
+    if (data.status) q = q.eq("status", data.status as any);
     if (data.search)
       q = q.or(`tracking_id.ilike.%${data.search}%,customer_name.ilike.%${data.search}%`);
     const { data: rows, count, error } = await q;

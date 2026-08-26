@@ -366,7 +366,7 @@ export const getPaymentReceipt = createServerFn({ method: "GET" })
     const { data: entries } = await sb
       .from("agency_ledger")
       .select("debit,credit,created_at,payment_id")
-      .eq("agency_id", payment.agency_id)
+      .eq("agency_id", payment.agency_id ?? "")
       .eq("currency_code", "USD")
       .order("created_at", { ascending: true });
 
