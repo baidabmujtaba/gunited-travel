@@ -108,7 +108,9 @@ export const createOrder = createServerFn({ method: "POST" })
       .insert({
         offer_id: offer.id,
         customer_id: userId,
+        agency_id: profile?.agency_id ?? null,
         customer_name: data.customerName,
+
         customer_email: data.customerEmail,
         whatsapp: data.whatsapp,
         currency_code: data.currency,
