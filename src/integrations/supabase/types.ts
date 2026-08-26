@@ -465,6 +465,7 @@ export type Database = {
       }
       notifications: {
         Row: {
+          agency_id: string | null
           audience: string
           body_ar: string | null
           body_en: string | null
@@ -472,11 +473,13 @@ export type Database = {
           id: string
           is_read: boolean
           link: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
           title_ar: string
           title_en: string
           user_id: string | null
         }
         Insert: {
+          agency_id?: string | null
           audience?: string
           body_ar?: string | null
           body_en?: string | null
@@ -484,11 +487,13 @@ export type Database = {
           id?: string
           is_read?: boolean
           link?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
           title_ar: string
           title_en: string
           user_id?: string | null
         }
         Update: {
+          agency_id?: string | null
           audience?: string
           body_ar?: string | null
           body_en?: string | null
@@ -496,11 +501,20 @@ export type Database = {
           id?: string
           is_read?: boolean
           link?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
           title_ar?: string
           title_en?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_documents: {
         Row: {
