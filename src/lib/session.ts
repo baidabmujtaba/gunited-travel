@@ -81,7 +81,7 @@ export function useRoles() {
 
   const isStaff = roles.some(isStaffRole);
   const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  const isAgency = roles.includes("travel_agency");
+  const isAgency = roles.some(isAgencyRole);
   return { roles, isStaff, isAdmin, isAgency };
 }
 
