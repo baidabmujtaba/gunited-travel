@@ -1,4 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { AssistantWidget } from "@/components/AssistantWidget";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
@@ -36,6 +38,21 @@ function AgencyLayout() {
   const { session } = useSession();
   const { roles, isAgency, isStaff } = useRoles();
   const signOut = useSignOut();
+
+  // The portal reads everything from the caller's linked agency; without a link
+  // every server fn throws NO_AGENCY, so show a clear notice instead.
+  const { data: linked, isPending: linkPending } = useQuery({
+    queryKey: ["my-agency-link", session?.user?.id],
+    enabled: Boolean(session?.user?.id),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("agency_id")
+        .eq("id", session!.user.id)
+        .maybeSingle();
+      return data?.agency_id ?? null;
+    },
+  });
 
   const NAV = [
     { to: "/agency", label: l("الرئيسية", "Home"), exact: true },
@@ -114,7 +131,26 @@ function AgencyLayout() {
           </div>
         </header>
         <main className="min-w-0 flex-1 px-5 py-6">
-          <Outlet />
+          {linkPending ? (
+            <Skeleton className="h-64 w-full" />
+          ) : linked ? (
+            <Outlet />
+          ) : (
+            <div className="surface-card mx-auto max-w-lg p-10 text-center">
+              <p className="text-sm font-semibold text-forest-deep">
+                {l("حسابك غير مرتبط بوكالة", "Your account is not linked to an agency")}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {l(
+                  "يرجى التواصل مع الإدارة لربط حسابك بملف وكالة حتى تظهر لك العملاء والطلبات والرصيد.",
+                  "Ask an administrator to link your account to an agency profile so customers, orders and balance appear here.",
+                )}
+              </p>
+              <Button asChild className="mt-5">
+                <Link to="/catalog">{l("تصفح الخدمات", "Browse services")}</Link>
+              </Button>
+            </div>
+          )}
         </main>
       </div>
       <AssistantWidget mode="client" />
