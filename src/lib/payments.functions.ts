@@ -120,7 +120,8 @@ async function writePayment(
   const { data: members } = await sb.from("profiles").select("id").eq("agency_id", agency.id);
   await sb.from("notifications").insert([
     {
-      audience: "staff",
+      audience: "role",
+      role: "accountant",
       title_en: type === "external" ? "External payment recorded" : "Payment recorded",
       title_ar: type === "external" ? "تم تسجيل دفعة خارجية" : "تم تسجيل دفعة",
       body_en: `${agency.agency_name}: ${input.amount} ${currency} (${payment.payment_number}).`,

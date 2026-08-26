@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { autoLinkMyAgency } from "@/lib/agency-link.functions";
 
 export type StaffRole =
   | "super_admin"
@@ -31,8 +32,14 @@ export function landingPathForRoles(roles: StaffRole[]) {
   return "/catalog";
 }
 
-/** Reads the signed-in user's roles directly (used right after sign-in). */
+/** Reads the signed-in user's roles directly (used right after sign-in).
+ *  Also attaches the account to a matching agency record when one exists. */
 export async function fetchLandingPath(userId: string) {
+  try {
+    await autoLinkMyAgency();
+  } catch {
+    // Linking is best-effort; never block sign-in on it.
+  }
   const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
   return landingPathForRoles((data ?? []).map((r) => r.role as StaffRole));
 }

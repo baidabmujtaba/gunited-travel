@@ -148,7 +148,8 @@ export async function notifyBalanceState(
 
   await supabase.from("notifications").insert([
     {
-      audience: "staff",
+      audience: "role",
+      role: "accountant",
       title_en: titleEn,
       title_ar: titleAr,
       body_en: bodyEn,
