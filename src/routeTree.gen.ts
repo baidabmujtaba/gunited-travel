@@ -20,6 +20,7 @@ import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersSlugRouteImport } from './routes/offers.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAgenciesRouteImport } from './routes/_authenticated/admin.agencies'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin.finance'
@@ -86,6 +87,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAgenciesRoute =
+  AuthenticatedAdminAgenciesRouteImport.update({
+    id: '/agencies',
+    path: '/agencies',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCustomersRoute =
   AuthenticatedAdminCustomersRouteImport.update({
     id: '/customers',
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
   '/offers/': typeof OffersIndexRoute
+  '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
   '/offers': typeof OffersIndexRoute
+  '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -209,6 +218,7 @@ export interface FileRoutesById {
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
   '/offers/': typeof OffersIndexRoute
+  '/_authenticated/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/checkout/$slug'
     | '/offers/$slug'
     | '/offers/'
+    | '/admin/agencies'
     | '/admin/customers'
     | '/admin/dashboard'
     | '/admin/finance'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/checkout/$slug'
     | '/offers/$slug'
     | '/offers'
+    | '/admin/agencies'
     | '/admin/customers'
     | '/admin/dashboard'
     | '/admin/finance'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/checkout/$slug'
     | '/offers/$slug'
     | '/offers/'
+    | '/_authenticated/admin/agencies'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/finance'
@@ -385,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/agencies': {
+      id: '/_authenticated/admin/agencies'
+      path: '/agencies'
+      fullPath: '/admin/agencies'
+      preLoaderRoute: typeof AuthenticatedAdminAgenciesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/customers': {
       id: '/_authenticated/admin/customers'
       path: '/customers'
@@ -466,6 +486,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAgenciesRoute: typeof AuthenticatedAdminAgenciesRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminFinanceRoute: typeof AuthenticatedAdminFinanceRoute
@@ -480,6 +501,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAgenciesRoute: AuthenticatedAdminAgenciesRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminFinanceRoute: AuthenticatedAdminFinanceRoute,
