@@ -13,9 +13,14 @@ const TABS = [
   { to: "/admin", key: "admin.tab.sales", exact: true },
   { to: "/admin/offers", key: "admin.tab.offers", exact: false },
   { to: "/admin/customers", key: "admin.tab.customers", exact: false },
+  { to: "/admin/agencies", key: "admin.tab.agencies", exact: false },
   { to: "/admin/partners", key: "admin.tab.partners", exact: false },
   { to: "/admin/finance", key: "admin.tab.finance", exact: false },
+  { to: "/admin/payments", key: "admin.tab.payments", exact: false },
+  { to: "/admin/balances", key: "admin.tab.balances", exact: false },
+  { to: "/admin/reports", key: "admin.tab.reports", exact: false },
   { to: "/admin/flights", key: "admin.tab.flights", exact: false },
+
   { to: "/admin/users", key: "admin.tab.users", exact: false },
   { to: "/admin/settings", key: "admin.tab.settings", exact: false },
 ] as const;
