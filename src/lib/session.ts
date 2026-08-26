@@ -12,15 +12,23 @@ export type StaffRole =
   | "client"
   | "travel_agency";
 
-const STAFF_ROLES: StaffRole[] = ["super_admin", "admin", "booking_agent", "accountant"];
+/** Booking agents are agency-side users: they use the agency portal, never the admin hub. */
+const STAFF_ROLES: StaffRole[] = ["super_admin", "admin", "accountant"];
+const AGENCY_ROLES: StaffRole[] = ["travel_agency", "booking_agent"];
 
 export function isStaffRole(role: StaffRole) {
   return STAFF_ROLES.includes(role);
 }
 
-/** Landing page after sign-in: staff go to the ERP hub, customers to the catalog. */
+export function isAgencyRole(role: StaffRole) {
+  return AGENCY_ROLES.includes(role);
+}
+
+/** Landing page after sign-in: staff → ERP hub, agencies/booking agents → agency portal. */
 export function landingPathForRoles(roles: StaffRole[]) {
-  return roles.some(isStaffRole) ? "/admin/dashboard" : "/catalog";
+  if (roles.some(isStaffRole)) return "/admin/dashboard";
+  if (roles.some(isAgencyRole)) return "/agency";
+  return "/catalog";
 }
 
 /** Reads the signed-in user's roles directly (used right after sign-in). */
