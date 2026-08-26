@@ -37,6 +37,21 @@ function AgencyLayout() {
   const { roles, isAgency, isStaff } = useRoles();
   const signOut = useSignOut();
 
+  // The portal reads everything from the caller's linked agency; without a link
+  // every server fn throws NO_AGENCY, so show a clear notice instead.
+  const { data: linked, isPending: linkPending } = useQuery({
+    queryKey: ["my-agency-link", session?.user?.id],
+    enabled: Boolean(session?.user?.id),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("agency_id")
+        .eq("id", session!.user.id)
+        .maybeSingle();
+      return data?.agency_id ?? null;
+    },
+  });
+
   const NAV = [
     { to: "/agency", label: l("الرئيسية", "Home"), exact: true },
     { to: "/agency/customers", label: l("عملائي", "My customers"), exact: false },
