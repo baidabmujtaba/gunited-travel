@@ -37,6 +37,7 @@ function AdminLayout() {
   }
 
   if (!isStaff) {
+    if (isAgency) return <Navigate to="/agency" replace />;
     return (
       <AdminShell>
         <div className="surface-card mx-auto max-w-md p-10 text-center">
