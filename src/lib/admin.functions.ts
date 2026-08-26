@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertStaff, statusEnum } from "./admin.shared";
+import { agencyBalance, chargeOrder, notifyBalanceState } from "./ledger.server";
 
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -111,7 +112,9 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
 
     const { data: current, error: curErr } = await sb
       .from("service_orders")
-      .select("id,status,tracking_id,customer_id,customer_email")
+      .select(
+        "id,status,tracking_id,customer_id,customer_email,agency_id,amount_usd,currency_code,frozen_rate",
+      )
       .eq("id", data.orderId)
       .maybeSingle();
     if (curErr) throw new Error(curErr.message);
@@ -122,6 +125,31 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       .update({ status: data.status })
       .eq("id", data.orderId);
     if (error) throw new Error(error.message);
+
+    // Approving an order creates the agency receivable (idempotent per order).
+    if (
+      current.agency_id &&
+      ["payment_confirmed", "processing", "completed"].includes(data.status)
+    ) {
+      await chargeOrder(sb, context.userId, {
+        id: current.id,
+        agency_id: current.agency_id,
+        amount_usd: Number(current.amount_usd),
+        currency_code: current.currency_code,
+        frozen_rate: Number(current.frozen_rate),
+        tracking_id: current.tracking_id,
+      });
+      const { data: agency } = await sb
+        .from("travel_agencies")
+        .select("id,agency_name,credit_limit_usd,warning_percent")
+        .eq("id", current.agency_id)
+        .maybeSingle();
+      if (agency) {
+        const bal = await agencyBalance(sb, current.agency_id);
+        await notifyBalanceState(sb, agency as any, bal.outstanding);
+      }
+    }
+
 
     const { data: actor } = await sb
       .from("profiles")

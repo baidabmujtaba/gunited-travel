@@ -73,30 +73,44 @@ export const createOrder = createServerFn({ method: "POST" })
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("is_agency,discount_tier")
+      .select("is_agency,discount_tier,agency_id")
       .eq("id", userId)
+      .maybeSingle();
+
+    const audience = profile?.agency_id ? "agency" : "customer";
+
+    // Agency and customer prices are separate rows; fall back to the base price.
+    const { data: tierPrice } = await supabase
+      .from("service_prices")
+      .select("price_usd")
+      .eq("offer_id", offer.id)
+      .eq("audience", audience)
       .maybeSingle();
 
     const price = computePrice(
       {
-        basePriceUsd: Number(offer.base_price_usd),
+        basePriceUsd: Number(tierPrice?.price_usd ?? offer.base_price_usd),
         taxPercent: offer.tax_percent,
         feeAmountUsd: offer.fee_amount_usd,
         discountPercent: offer.discount_percent,
         commissionPercent: offer.commission_percent,
-        agencyDiscountPercent: profile?.is_agency ? Number(profile.discount_tier) : 0,
+        agencyDiscountPercent:
+          profile?.is_agency && !tierPrice ? Number(profile.discount_tier) : 0,
       },
       data.currency,
       rate,
       currency?.decimals ?? 2,
     );
 
+
     const { data: order, error } = await supabase
       .from("service_orders")
       .insert({
         offer_id: offer.id,
         customer_id: userId,
+        agency_id: profile?.agency_id ?? null,
         customer_name: data.customerName,
+
         customer_email: data.customerEmail,
         whatsapp: data.whatsapp,
         currency_code: data.currency,

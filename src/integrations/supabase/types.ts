@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      agency_ledger: {
+        Row: {
+          agency_id: string
+          created_at: string
+          created_by: string | null
+          credit: number
+          currency_code: string
+          debit: number
+          description: string | null
+          entry_type: string
+          exchange_rate: number
+          id: string
+          invoice_id: string | null
+          order_id: string | null
+          payment_id: string | null
+          payment_method: string | null
+          reference: string | null
+          reverses_entry_id: string | null
+        }
+        Insert: {
+          agency_id: string
+          created_at?: string
+          created_by?: string | null
+          credit?: number
+          currency_code?: string
+          debit?: number
+          description?: string | null
+          entry_type: string
+          exchange_rate?: number
+          id?: string
+          invoice_id?: string | null
+          order_id?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          reference?: string | null
+          reverses_entry_id?: string | null
+        }
+        Update: {
+          agency_id?: string
+          created_at?: string
+          created_by?: string | null
+          credit?: number
+          currency_code?: string
+          debit?: number
+          description?: string | null
+          entry_type?: string
+          exchange_rate?: number
+          id?: string
+          invoice_id?: string | null
+          order_id?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          reference?: string | null
+          reverses_entry_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_ledger_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agency_ledger_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agency_ledger_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agency_ledger_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agency_ledger_reverses_entry_id_fkey"
+            columns: ["reverses_entry_id"]
+            isOneToOne: false
+            referencedRelation: "agency_ledger"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -82,6 +175,7 @@ export type Database = {
       }
       customers: {
         Row: {
+          agency_id: string | null
           city: string | null
           created_at: string
           created_by: string | null
@@ -95,6 +189,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          agency_id?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -108,6 +203,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          agency_id?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -120,7 +216,15 @@ export type Database = {
           updated_at?: string
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customers_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       exchange_rates: {
         Row: {
@@ -255,6 +359,7 @@ export type Database = {
       }
       invoices: {
         Row: {
+          agency_id: string | null
           created_at: string
           currency_code: string
           customer_email: string | null
@@ -281,6 +386,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_id?: string | null
           created_at?: string
           currency_code?: string
           customer_email?: string | null
@@ -307,6 +413,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_id?: string | null
           created_at?: string
           currency_code?: string
           customer_email?: string | null
@@ -333,6 +440,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_order_id_fkey"
             columns: ["order_id"]
@@ -527,8 +641,105 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          agency_id: string | null
+          amount: number
+          amount_usd: number
+          created_at: string
+          currency_code: string
+          customer_id: string | null
+          description: string | null
+          frozen_rate: number
+          id: string
+          notes: string | null
+          order_id: string | null
+          payer_name: string | null
+          payment_date: string
+          payment_method: string
+          payment_number: string | null
+          payment_type: string
+          receipt_number: string | null
+          receipt_path: string | null
+          recorded_by: string | null
+          reversed_by: string | null
+          sending_institution: string | null
+          status: string
+          transaction_reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          agency_id?: string | null
+          amount: number
+          amount_usd?: number
+          created_at?: string
+          currency_code?: string
+          customer_id?: string | null
+          description?: string | null
+          frozen_rate?: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payer_name?: string | null
+          payment_date?: string
+          payment_method?: string
+          payment_number?: string | null
+          payment_type?: string
+          receipt_number?: string | null
+          receipt_path?: string | null
+          recorded_by?: string | null
+          reversed_by?: string | null
+          sending_institution?: string | null
+          status?: string
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string | null
+          amount?: number
+          amount_usd?: number
+          created_at?: string
+          currency_code?: string
+          customer_id?: string | null
+          description?: string | null
+          frozen_rate?: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payer_name?: string | null
+          payment_date?: string
+          payment_method?: string
+          payment_number?: string | null
+          payment_type?: string
+          receipt_number?: string | null
+          receipt_path?: string | null
+          recorded_by?: string | null
+          reversed_by?: string | null
+          sending_institution?: string | null
+          status?: string
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          agency_id: string | null
           created_at: string
           discount_tier: number
           email: string | null
@@ -546,6 +757,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          agency_id?: string | null
           created_at?: string
           discount_tier?: number
           email?: string | null
@@ -563,6 +775,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          agency_id?: string | null
           created_at?: string
           discount_tier?: number
           email?: string | null
@@ -579,7 +792,15 @@ export type Database = {
           updated_at?: string
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_offers: {
         Row: {
@@ -667,6 +888,7 @@ export type Database = {
       }
       service_orders: {
         Row: {
+          agency_id: string | null
           amount_display: number
           amount_usd: number
           assigned_to: string | null
@@ -691,6 +913,7 @@ export type Database = {
           whatsapp: string
         }
         Insert: {
+          agency_id?: string | null
           amount_display?: number
           amount_usd?: number
           assigned_to?: string | null
@@ -715,6 +938,7 @@ export type Database = {
           whatsapp: string
         }
         Update: {
+          agency_id?: string | null
           amount_display?: number
           amount_usd?: number
           assigned_to?: string | null
@@ -740,6 +964,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "service_orders_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "service_orders_currency_code_fkey"
             columns: ["currency_code"]
             isOneToOne: false
@@ -758,6 +989,41 @@ export type Database = {
             columns: ["payment_method_id"]
             isOneToOne: false
             referencedRelation: "payment_method_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_prices: {
+        Row: {
+          audience: string
+          created_at: string
+          id: string
+          offer_id: string
+          price_usd: number
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          created_at?: string
+          id?: string
+          offer_id: string
+          price_usd?: number
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          id?: string
+          offer_id?: string
+          price_usd?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_prices_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
             referencedColumns: ["id"]
           },
         ]
@@ -787,12 +1053,19 @@ export type Database = {
           contact_name: string | null
           created_at: string
           created_by: string | null
+          credit_limit_usd: number
+          currency_code: string
+          deleted_at: string | null
           email: string | null
+          financial_hold: boolean
           id: string
+          is_active: boolean
           license_number: string | null
           notes: string | null
           phone: string | null
           updated_at: string
+          user_id: string | null
+          warning_percent: number
           whatsapp: string | null
         }
         Insert: {
@@ -801,12 +1074,19 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           created_by?: string | null
+          credit_limit_usd?: number
+          currency_code?: string
+          deleted_at?: string | null
           email?: string | null
+          financial_hold?: boolean
           id?: string
+          is_active?: boolean
           license_number?: string | null
           notes?: string | null
           phone?: string | null
           updated_at?: string
+          user_id?: string | null
+          warning_percent?: number
           whatsapp?: string | null
         }
         Update: {
@@ -815,12 +1095,19 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           created_by?: string | null
+          credit_limit_usd?: number
+          currency_code?: string
+          deleted_at?: string | null
           email?: string | null
+          financial_hold?: boolean
           id?: string
+          is_active?: boolean
           license_number?: string | null
           notes?: string | null
           phone?: string | null
           updated_at?: string
+          user_id?: string | null
+          warning_percent?: number
           whatsapp?: string | null
         }
         Relationships: []
@@ -848,9 +1135,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_agency_balances: {
+        Row: {
+          agency_id: string | null
+          currency_code: string | null
+          last_movement_at: string | null
+          outstanding: number | null
+          total_due: number | null
+          total_paid: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_ledger_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      agency_balance: {
+        Args: { _agency_id: string; _currency?: string }
+        Returns: number
+      }
+      current_agency_id: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
