@@ -18,7 +18,9 @@ const offerSchema = z.object({
   description_ar: z.string().max(4000).default(""),
   description_en: z.string().max(4000).default(""),
   category: z.string().min(2).max(40).default("package"),
-  base_price_usd: z.number().nonnegative(),
+  // Two independent, manually entered prices — no automatic relation between them.
+  customer_price_usd: z.number().positive(),
+  agency_price_usd: z.number().positive(),
   tax_percent: z.number().min(0).max(100).default(0),
   fee_amount_usd: z.number().min(0).default(0),
   discount_percent: z.number().min(0).max(100).default(0),
