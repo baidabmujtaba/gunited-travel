@@ -10,7 +10,27 @@ import GunitedTicketCard from "@/components/GunitedTicketCard";
  * settled state (handled in styles.css).
  */
 export function PlaneHero() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const isAr = lang === "ar";
+
+  const sampleCard = {
+    locale: isAr ? ("ar" as const) : ("en" as const),
+    from: {
+      city: isAr ? "الخرطوم" : "Khartoum",
+      country: "SD",
+      code: "KRT",
+      time: "08:40",
+    },
+    to: {
+      city: isAr ? "إسطنبول" : "Istanbul",
+      country: "TR",
+      code: "IST",
+      time: "13:15",
+    },
+    bookingRef: "GUT-2026-0917",
+    travelClass: isAr ? "درجة اقتصادية" : "Economy",
+    passenger: isAr ? "أحمد محمد" : "Ahmed Mohamed",
+  };
 
   return (
     <section className="relative overflow-hidden bg-beige">
@@ -42,23 +62,29 @@ export function PlaneHero() {
       </svg>
 
       <div className="relative mx-auto w-full max-w-6xl px-5 pt-16 pb-28 sm:pt-24 sm:pb-36">
-        <div className="max-w-2xl">
-          <p className="gt-reveal text-sm font-semibold tracking-wide text-sage">
-            {t("brand.name")} · {t("brand.tagline")}
-          </p>
-          <h1 className="gt-reveal mt-4 text-4xl leading-tight font-bold sm:text-6xl">
-            {t("hero.title")}
-          </h1>
-          <p className="gt-reveal-late mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {t("hero.subtitle")}
-          </p>
-          <div className="gt-reveal-late mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to="/offers">{t("hero.cta.browse")}</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/track">{t("hero.cta.track")}</Link>
-            </Button>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="max-w-2xl">
+            <p className="gt-reveal text-sm font-semibold tracking-wide text-sage">
+              {t("brand.name")} · {t("brand.tagline")}
+            </p>
+            <h1 className="gt-reveal mt-4 text-4xl leading-tight font-bold sm:text-6xl">
+              {t("hero.title")}
+            </h1>
+            <p className="gt-reveal-late mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("hero.subtitle")}
+            </p>
+            <div className="gt-reveal-late mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link to="/offers">{t("hero.cta.browse")}</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/track">{t("hero.cta.track")}</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="gt-reveal-late flex justify-center lg:justify-end">
+            <GunitedTicketCard {...sampleCard} />
           </div>
         </div>
       </div>
