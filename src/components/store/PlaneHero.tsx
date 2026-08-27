@@ -130,8 +130,11 @@ export function PlaneHero() {
             </div>
           </div>
 
-          <div className="gt-reveal-late flex justify-center lg:justify-end">
-            <GunitedTicketCard {...sampleCard} />
+          <div className="gt-reveal-late flex flex-col items-center gap-2 lg:items-end">
+            <p className="text-xs font-semibold tracking-wide text-sage">
+              {isReal ? t("hero.ticket.latest") : t("hero.ticket.sample")}
+            </p>
+            <GunitedTicketCard {...ticketCard} />
           </div>
         </div>
       </div>
