@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import GunitedTicketCard from "@/components/GunitedTicketCard";
 
 /**
  * Signature hero: a realistic airliner taxis along the dashed runway, rotates
