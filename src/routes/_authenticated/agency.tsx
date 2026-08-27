@@ -145,7 +145,7 @@ function AgencyLayout() {
             ) : null}
           </div>
         </header>
-        <main className="min-w-0 flex-1 px-5 py-6">
+        <main className="min-w-0 flex-1 px-3 py-4 sm:px-5 sm:py-6">
           {linkPending ? (
             <Skeleton className="h-64 w-full" />
           ) : linked ? (
