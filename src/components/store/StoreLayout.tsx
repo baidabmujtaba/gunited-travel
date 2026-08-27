@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { session } = useSession();
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
