@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { session } = useSession();
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
@@ -24,6 +24,11 @@ export function StoreLayout({ children }: { children: ReactNode }) {
     { to: "/offers", label: t("nav.offers") },
     { to: "/track", label: t("nav.track") },
   ] as const;
+
+  // Quick link label is shorter and friendlier for the header button.
+  const agencyLabel = lang === "ar" ? "وكالتي" : "My agency";
+  const accountLabel = lang === "ar" ? "حسابي" : "My account";
+
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -58,13 +63,13 @@ export function StoreLayout({ children }: { children: ReactNode }) {
             ) : null}
             {isAgency ? (
               <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
-                <Link to="/agency">{t("nav.agency")}</Link>
+                <Link to="/agency">{agencyLabel}</Link>
               </Button>
             ) : null}
             {session ? (
               <>
                 <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-                  <Link to="/account">{t("nav.dashboard")}</Link>
+                  <Link to="/account">{accountLabel}</Link>
                 </Button>
                 <Button
                   variant="ghost"
@@ -109,12 +114,21 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                       {t("nav.admin")}
                     </Link>
                   ) : null}
+                  {isAgency ? (
+                    <Link
+                      to="/agency"
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
+                      {agencyLabel}
+                    </Link>
+                  ) : null}
                   <Link
                     to={session ? "/account" : "/auth"}
                     onClick={() => setOpen(false)}
                     className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
                   >
-                    {session ? t("nav.dashboard") : t("nav.login")}
+                    {session ? accountLabel : t("nav.login")}
                   </Link>
                   {session ? (
                     <button
