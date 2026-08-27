@@ -30,7 +30,7 @@ export async function issueInvoiceForOrder(
   const { data: order, error: orderErr } = await sb
     .from("service_orders")
     .select(
-      "id,tracking_id,offer_id,customer_id,customer_name,customer_email,currency_code,frozen_rate,amount_usd,amount_display,payment_method_id,status",
+      "id,tracking_id,offer_id,customer_id,customer_name,customer_email,currency_code,frozen_rate,amount_usd,amount_display,applied_price_usd,price_context,payment_method_id,status",
     )
     .eq("id", orderId)
     .maybeSingle();
