@@ -25,6 +25,11 @@ export function StoreLayout({ children }: { children: ReactNode }) {
     { to: "/track", label: t("nav.track") },
   ] as const;
 
+  // Quick link label is shorter and friendlier for the header button.
+  const agencyLabel = lang === "ar" ? "وكالتي" : "My agency";
+  const accountLabel = lang === "ar" ? "حسابي" : "My account";
+
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
