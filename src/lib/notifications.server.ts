@@ -457,7 +457,7 @@ const MAX_RETRIES = 3;
  * Each item is retried at most 3 times with exponential backoff.
  */
 export async function processEmailQueue(limit = 20) {
-  const { sendEmail } = await import("./email.server");
+  const { sendManagedEmail } = await import("./email.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const sb = supabaseAdmin as Sb;
 
