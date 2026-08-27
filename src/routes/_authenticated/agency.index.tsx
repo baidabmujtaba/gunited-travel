@@ -16,9 +16,19 @@ function AgencyHome() {
   const l = useL();
   const { fmt } = useI18n();
   const overview = useServerFn(getAgencyOverview);
-  const { data, isPending } = useQuery({ queryKey: ["agency-overview"], queryFn: () => overview() });
+  const { data, isPending, isError } = useQuery({ queryKey: ["agency-overview"], queryFn: () => overview() });
 
-  if (isPending || !data) return <Skeleton className="h-96 w-full" />;
+  if (isPending) return <Skeleton className="h-96 w-full" />;
+  // Never leave an endless skeleton when the request fails.
+  if (isError || !data)
+    return (
+      <div className="surface-card mx-auto max-w-lg p-10 text-center text-sm text-muted-foreground">
+        {l(
+          "تعذر تحميل بيانات الوكالة. يرجى تحديث الصفحة أو التواصل مع الإدارة إذا استمرت المشكلة.",
+          "Could not load your agency data. Refresh the page, or contact an administrator if this continues.",
+        )}
+      </div>
+    );
 
   return (
     <div className="space-y-6">
