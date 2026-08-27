@@ -31,6 +31,7 @@ import {
   updateOrderStatus,
 } from "@/lib/admin.functions";
 import { useI18n } from "@/lib/i18n";
+import { getOrderNotificationHistory } from "@/lib/email-monitor.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: SalesHub,
