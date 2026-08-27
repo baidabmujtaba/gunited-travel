@@ -106,9 +106,9 @@ export const getCatalog = createServerFn({ method: "GET" })
 
     const today = new Date().toISOString().slice(0, 10);
     const offers = await Promise.all(
-      (rows ?? [])
+      ((rows ?? []) as unknown as OfferRow[])
         .filter((r) => !r.expiry_date || r.expiry_date >= today)
-        .map((r) => withSignedImages(mapOffer(r as OfferRow, selected))),
+        .map((r) => withSignedImages(mapOffer(r, selected))),
     );
 
     return { offers, currencies };
@@ -137,7 +137,7 @@ export const getOffer = createServerFn({ method: "GET" })
       .is("deleted_at", null)
       .maybeSingle();
     return {
-      offer: row ? await withSignedImages(mapOffer(row as OfferRow, selected)) : null,
+      offer: row ? await withSignedImages(mapOffer(row as unknown as OfferRow, selected)) : null,
       currencies,
     };
   });
