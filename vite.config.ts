@@ -18,9 +18,10 @@ export default defineConfig({
         filename: "sw.js",
         // The manifest is a hand-maintained static file in public/.
         manifest: false,
+        outDir: "dist/client",
         devOptions: { enabled: false },
         workbox: {
-          globDirectory: ".output/public",
+          globDirectory: "dist/client",
           globPatterns: ["**/*.{js,css,woff,woff2,svg,png,ico}"],
           globIgnores: ["**/sw.js", "**/workbox-*.js"],
           navigateFallback: "/offline.html",
