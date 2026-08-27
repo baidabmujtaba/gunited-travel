@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { KpiCard, StatusBadge } from "@/components/admin/AdminShell";
+import { BadgeDollarSign, ShoppingBag, Users, Wallet } from "lucide-react";
+import { StatusBadge } from "@/components/admin/AdminShell";
 import { FinancialStateBadge, Section, TableWrap, useL } from "@/components/admin/Bilingual";
+import {
+  DashboardSkeleton,
+  PageHeader,
+  StatGrid,
+  StatTile,
+  StatusBreakdownCard,
+  TrendCard,
+} from "@/components/admin/DashboardKit";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { getAgencyOverview } from "@/lib/agency.functions";
 
@@ -16,9 +24,13 @@ function AgencyHome() {
   const l = useL();
   const { fmt } = useI18n();
   const overview = useServerFn(getAgencyOverview);
-  const { data, isPending, isError } = useQuery({ queryKey: ["agency-overview"], queryFn: () => overview() });
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["agency-overview"],
+    queryFn: () => overview(),
+    staleTime: 60_000,
+  });
 
-  if (isPending) return <Skeleton className="h-96 w-full" />;
+  if (isPending) return <DashboardSkeleton />;
   // Never leave an endless skeleton when the request fails.
   if (isError || !data)
     return (
@@ -30,35 +42,68 @@ function AgencyHome() {
       </div>
     );
 
+  const usage = data.kpis.creditLimit
+    ? (data.kpis.outstanding / data.kpis.creditLimit) * 100
+    : undefined;
+
   return (
-    <div className="space-y-6">
-      <div className="surface-card flex flex-wrap items-center gap-3 p-5">
-        <div>
-          <h1 className="text-xl font-bold text-forest-deep">{data.agency.name}</h1>
-          <p className="text-xs text-muted-foreground">
-            {l("بوابة الوكالة — بياناتك معزولة تماماً عن الوكالات الأخرى.", "Agency portal — your data is fully isolated from other agencies.")}
-          </p>
-        </div>
-        <div className="ms-auto flex items-center gap-2">
-          <FinancialStateBadge state={data.state} />
+    <div className="space-y-4 sm:space-y-6">
+      <PageHeader
+        title={data.agency.name}
+        subtitle={l(
+          "بوابة الوكالة — بياناتك معزولة تماماً عن الوكالات الأخرى.",
+          "Agency portal — your data is fully isolated from other agencies.",
+        )}
+        badge={<FinancialStateBadge state={data.state} />}
+        actions={
           <Button asChild size="sm" variant="outline">
             <Link to="/catalog">{l("اطلب خدمة", "Order a service")}</Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label={l("عملائي", "My customers")} value={String(data.kpis.customers)} />
-        <KpiCard
+      <StatGrid>
+        <StatTile
+          label={l("عملائي", "My customers")}
+          value={String(data.kpis.customers)}
+          icon={Users}
+          tone="sage"
+        />
+        <StatTile
           label={l("الطلبات", "Orders")}
           value={String(data.kpis.orders)}
-          hint={`${data.kpis.ordersCompleted} ${l("مكتمل", "completed")}`}
+          hint={`${data.kpis.ordersCompleted} ${l("مكتمل", "completed")} · ${data.kpis.ordersNew} ${l("جديد", "new")}`}
+          icon={ShoppingBag}
+          tone="forest"
         />
-        <KpiCard label={l("مبيعاتي", "My sales")} value={fmt(data.kpis.salesUsd, "USD")} />
-        <KpiCard
+        <StatTile
+          label={l("مبيعاتي", "My sales")}
+          value={fmt(data.kpis.salesUsd, "USD")}
+          icon={BadgeDollarSign}
+          tone="mint"
+        />
+        <StatTile
           label={l("المستحق عليّ", "Outstanding")}
           value={fmt(data.kpis.outstanding, "USD")}
           hint={`${l("المتاح", "Available")}: ${fmt(data.kpis.creditAvailable, "USD")}`}
+          icon={Wallet}
+          tone={usage !== undefined && usage >= 90 ? "destructive" : "gold"}
+          {...(usage !== undefined ? { progress: usage } : {})}
+        />
+      </StatGrid>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <TrendCard
+          title={l("مبيعاتي الشهرية", "Monthly sales")}
+          subtitle={l("آخر 6 أشهر (دولار)", "Last 6 months (USD)")}
+          data={data.monthlySales}
+          empty={l("لا توجد مبيعات بعد.", "No sales yet.")}
+        />
+        <StatusBreakdownCard
+          title={l("توزيع الطلبات", "Orders by status")}
+          subtitle={l("الحالة الحالية لطلباتك", "Current state of your orders")}
+          byStatus={data.byStatus}
+          empty={l("لا توجد طلبات بعد.", "No orders yet.")}
         />
       </div>
 
@@ -75,10 +120,12 @@ function AgencyHome() {
             </thead>
             <tbody>
               {data.recentOrders.map((o: any) => (
-                <tr key={o.id} className="border-t border-border/60">
+                <tr key={o.id} className="border-t border-border/60 transition-colors hover:bg-beige/50">
                   <td className="px-3 py-2 font-mono text-xs">{o.tracking_id}</td>
                   <td className="px-3 py-2">{o.customer_name}</td>
-                  <td className="px-3 py-2">{fmt(Number(o.amount_display), o.currency_code)}</td>
+                  <td className="px-3 py-2 tabular-nums">
+                    {fmt(Number(o.amount_display), o.currency_code)}
+                  </td>
                   <td className="px-3 py-2">
                     <StatusBadge status={o.status} />
                   </td>
@@ -102,9 +149,9 @@ function AgencyHome() {
             </thead>
             <tbody>
               {data.recentPayments.map((p: any) => (
-                <tr key={p.id} className="border-t border-border/60">
+                <tr key={p.id} className="border-t border-border/60 transition-colors hover:bg-beige/50">
                   <td className="px-3 py-2 font-mono text-xs">{p.payment_number ?? "—"}</td>
-                  <td className="px-3 py-2">{fmt(Number(p.amount), p.currency_code)}</td>
+                  <td className="px-3 py-2 tabular-nums">{fmt(Number(p.amount), p.currency_code)}</td>
                   <td className="px-3 py-2">{p.payment_method}</td>
                   <td className="px-3 py-2">{p.payment_date}</td>
                 </tr>
