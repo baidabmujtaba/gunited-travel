@@ -42,7 +42,7 @@ export function StatTile({
   /** 0–100; renders a thin usage bar under the value. */
   progress?: number;
 }) {
-  const t = TONE[tone] ?? TONE.forest!;
+  const t = TONE[tone] ?? TONE['forest']!;
   return (
     <div className="surface-card group relative overflow-hidden p-4 transition-shadow hover:shadow-md sm:p-5">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
@@ -81,7 +81,7 @@ function ChartCard({
   children,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
