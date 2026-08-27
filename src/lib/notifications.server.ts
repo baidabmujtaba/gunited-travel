@@ -457,7 +457,7 @@ const MAX_RETRIES = 3;
  * Each item is retried at most 3 times with exponential backoff.
  */
 export async function processEmailQueue(limit = 20) {
-  const { sendEmail } = await import("./email.server");
+  const { sendManagedEmail } = await import("./email.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const sb = supabaseAdmin as Sb;
 
@@ -485,10 +485,11 @@ export async function processEmailQueue(limit = 20) {
       .maybeSingle();
     if (!claimed) continue;
 
-    const result = await sendEmail({
+    const result = await sendManagedEmail({
       to: item.recipient,
       subject: item.subject,
       html: item.html,
+      idempotencyKey: item.idempotency_key,
     });
 
     if (result.sent) {
@@ -511,12 +512,11 @@ export async function processEmailQueue(limit = 20) {
     }
 
     const retry = Number(item.retry_count) + 1;
-    // Client-side rejections (invalid address, unverified sender) never succeed
-    // on retry; only 429 and 5xx are worth backing off.
-    const code = Number(/^RESEND_(\d{3})/.exec(result.error ?? "")?.[1] ?? 0);
-    const terminalStatus = code >= 400 && code < 500 && code !== 429;
+    // Rejections such as a suppressed recipient or an unverified sender domain
+    // never succeed on retry; only rate limits and 5xx are worth backing off.
+    const err = result.error ?? "";
     const permanent =
-      result.error === "RESEND_API_KEY_MISSING" || terminalStatus || retry >= MAX_RETRIES;
+      err.startsWith("EMAIL_PERMANENT") || err === "EMAIL_API_KEY_MISSING" || retry >= MAX_RETRIES;
 
     if (permanent) {
       failed += 1;

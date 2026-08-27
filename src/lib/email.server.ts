@@ -19,6 +19,59 @@ export function bytesToBase64(bytes: Uint8Array) {
   return toBase64(bytes);
 }
 
+const SITE_NAME = "Gunited Travel";
+const SENDER_DOMAIN = "notify.gunitedtravel.com";
+
+/**
+ * Notification emails go through the platform's managed email service:
+ * delivery, retries, suppression and unsubscribe are handled there.
+ * HTML/text are already rendered per recipient language by the queue.
+ */
+export async function sendManagedEmail(
+  input: { to: string; subject: string; html: string; idempotencyKey?: string },
+): Promise<SendEmailResult> {
+  const apiKey = process.env["LOVABLE_API_KEY"];
+  if (!apiKey) return { sent: false, error: "EMAIL_API_KEY_MISSING" };
+
+  const { EmailAPIError, sendLovableEmail } = await import("@lovable.dev/email-js");
+  const text = input.html
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  try {
+    const res = await sendLovableEmail(
+      {
+        to: input.to,
+        from: `${SITE_NAME} <noreply@${SENDER_DOMAIN}>`,
+        sender_domain: SENDER_DOMAIN,
+        subject: input.subject,
+        html: input.html,
+        text,
+        purpose: "transactional",
+        label: "order-status",
+        idempotency_key: input.idempotencyKey || crypto.randomUUID(),
+      },
+      { apiKey, sendUrl: process.env["LOVABLE_SEND_URL"] },
+    );
+    return res?.message_id ? { sent: true, messageId: res.message_id } : { sent: true };
+  } catch (err) {
+    if (err instanceof EmailAPIError) {
+      const retryable = err.code === "rate_limited" || (err.status ?? 0) >= 500;
+      console.error("managed_email_error", err.code, err.status, err.message);
+      return {
+        sent: false,
+        error: `${retryable ? "EMAIL_RETRY" : "EMAIL_PERMANENT"}_${err.code ?? err.status ?? "UNKNOWN"}${
+          err.message ? `: ${err.message.slice(0, 200)}` : ""
+        }`,
+      };
+    }
+    console.error("managed_email_exception", err);
+    return { sent: false, error: "EMAIL_RETRY_REQUEST_FAILED" };
+  }
+}
+
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   const apiKey = process.env["RESEND_API_KEY"];
   if (!apiKey) return { sent: false, error: "RESEND_API_KEY_MISSING" };
