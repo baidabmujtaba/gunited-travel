@@ -23,7 +23,9 @@ const TABS = [
 
   { to: "/admin/links", key: "admin.tab.links", exact: false },
   { to: "/admin/users", key: "admin.tab.users", exact: false },
+  { to: "/admin/email-notifications", key: "admin.tab.emails", exact: false },
   { to: "/admin/settings", key: "admin.tab.settings", exact: false },
+
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
