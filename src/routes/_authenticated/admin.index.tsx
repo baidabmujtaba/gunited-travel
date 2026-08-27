@@ -9,7 +9,16 @@ import {
   replaceOrderDocument,
 } from "@/lib/order-docs.functions";
 import { toast } from "sonner";
-import { KpiCard, StatusBadge } from "@/components/admin/AdminShell";
+import { StatusBadge } from "@/components/admin/AdminShell";
+import { BadgeDollarSign, Clock, ShoppingBag, TrendingUp } from "lucide-react";
+import {
+  DashboardSkeleton,
+  PageHeader,
+  StatGrid,
+  StatTile,
+  StatusBreakdownCard,
+  TrendCard,
+} from "@/components/admin/DashboardKit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -141,7 +150,7 @@ function SalesHub() {
               className="w-full sm:w-56"
             />
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder={t("admin.orders.filter")} />
               </SelectTrigger>
               <SelectContent>
