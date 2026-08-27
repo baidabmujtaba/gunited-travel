@@ -63,13 +63,13 @@ export function StoreLayout({ children }: { children: ReactNode }) {
             ) : null}
             {isAgency ? (
               <Button asChild variant="secondary" size="sm" className="hidden sm:inline-flex">
-                <Link to="/agency">{t("nav.agency")}</Link>
+                <Link to="/agency">{agencyLabel}</Link>
               </Button>
             ) : null}
             {session ? (
               <>
                 <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-                  <Link to="/account">{t("nav.dashboard")}</Link>
+                  <Link to="/account">{accountLabel}</Link>
                 </Button>
                 <Button
                   variant="ghost"
