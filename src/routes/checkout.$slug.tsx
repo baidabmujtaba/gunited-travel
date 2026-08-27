@@ -14,7 +14,8 @@ import { getOffer, getPaymentMethods } from "@/lib/catalog.functions";
 import { normalizeCurrency } from "@/lib/currency";
 import { useI18n } from "@/lib/i18n";
 import { createOrder } from "@/lib/orders.functions";
-import { useSession } from "@/lib/session";
+import { useRoles, useSession } from "@/lib/session";
+import { getAgencyOffer } from "@/lib/agency-catalog.functions";
 
 const ALLOWED = ["image/png", "image/jpeg", "application/pdf"];
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -46,9 +47,15 @@ function Checkout() {
   const { session, loading } = useSession();
   const navigate = useNavigate();
 
+  const { isAgency } = useRoles();
+  // Agency users get the agency price; the customer price is never fetched for them.
   const offerQuery = useQuery({
-    queryKey: ["offer", slug, currency],
-    queryFn: () => getOffer({ data: { slug, currency } }),
+    queryKey: ["checkout-offer", isAgency ? "agency" : "customer", slug, currency],
+    enabled: !loading,
+    queryFn: () =>
+      isAgency
+        ? getAgencyOffer({ data: { slug, currency } })
+        : getOffer({ data: { slug, currency } }),
   });
   const methodsQuery = useQuery({ queryKey: ["payment-methods"], queryFn: () => getPaymentMethods() });
 
