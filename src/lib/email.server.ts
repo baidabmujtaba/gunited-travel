@@ -47,7 +47,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       return { sent: false, error: `RESEND_${res.status}` };
     }
     const body = (await res.json().catch(() => null)) as { id?: string } | null;
-    return { sent: true, messageId: body?.id };
+    return body?.id ? { sent: true, messageId: body.id } : { sent: true };
 
   } catch (err) {
     console.error("resend_exception", err);
