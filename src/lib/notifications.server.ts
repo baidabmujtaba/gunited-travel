@@ -485,10 +485,11 @@ export async function processEmailQueue(limit = 20) {
       .maybeSingle();
     if (!claimed) continue;
 
-    const result = await sendEmail({
+    const result = await sendManagedEmail({
       to: item.recipient,
       subject: item.subject,
       html: item.html,
+      idempotencyKey: item.idempotency_key,
     });
 
     if (result.sent) {
