@@ -77,36 +77,68 @@ function SalesHub() {
   const o = overview.data;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-forest-deep">{t("admin.tab.sales")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("admin.subtitle")}</p>
-      </div>
+    <div className="space-y-4 sm:space-y-6">
+      <PageHeader title={t("admin.tab.sales")} subtitle={t("admin.subtitle")} />
 
       {overview.isPending || !o ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 w-full" />
-          ))}
-        </div>
+        <DashboardSkeleton />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label={t("admin.kpi.orders")} value={String(o.totalOrders)} />
-          <KpiCard label={t("admin.kpi.review")} value={String(o.awaitingReview)} />
-          <KpiCard label={t("admin.kpi.revenue")} value={fmt(o.revenueUsd, "USD")} />
-          <KpiCard label={t("admin.kpi.pipeline")} value={fmt(o.pipelineUsd, "USD")} />
-        </div>
+        <>
+          <StatGrid>
+            <StatTile
+              label={t("admin.kpi.orders")}
+              value={String(o.totalOrders)}
+              icon={ShoppingBag}
+              tone="forest"
+            />
+            <StatTile
+              label={t("admin.kpi.review")}
+              value={String(o.awaitingReview)}
+              icon={Clock}
+              tone={o.awaitingReview > 0 ? "gold" : "sage"}
+            />
+            <StatTile
+              label={t("admin.kpi.revenue")}
+              value={fmt(o.revenueUsd, "USD")}
+              icon={BadgeDollarSign}
+              tone="mint"
+            />
+            <StatTile
+              label={t("admin.kpi.pipeline")}
+              value={fmt(o.pipelineUsd, "USD")}
+              icon={TrendingUp}
+              tone="gold"
+            />
+          </StatGrid>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <TrendCard
+              title={lang === "ar" ? "الإيرادات الشهرية" : "Monthly revenue"}
+              subtitle={lang === "ar" ? "آخر 6 أشهر (دولار)" : "Last 6 months (USD)"}
+              data={o.monthlyRevenue}
+              empty={lang === "ar" ? "لا توجد إيرادات بعد." : "No revenue yet."}
+            />
+            <StatusBreakdownCard
+              title={lang === "ar" ? "توزيع الطلبات" : "Orders by status"}
+              subtitle={lang === "ar" ? "حالة خط العمل الحالي" : "Current pipeline state"}
+              byStatus={o.byStatus}
+              empty={lang === "ar" ? "لا توجد طلبات بعد." : "No orders yet."}
+            />
+          </div>
+        </>
       )}
 
-      <div className="surface-card p-5">
-        <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-lg font-semibold">{t("admin.orders.title")}</h2>
-          <div className="ms-auto flex flex-wrap items-center gap-2">
+      <div className="surface-card p-4 sm:p-5">
+        <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
+          <h2 className="truncate text-base font-bold text-forest-deep sm:text-lg">
+            {t("admin.orders.title")}
+          </h2>
+          <div className="grid grid-cols-1 gap-2 sm:ms-auto sm:flex sm:flex-wrap sm:items-center">
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("admin.orders.search")}
-              className="w-56"
+              className="w-full sm:w-56"
             />
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger className="w-48">
