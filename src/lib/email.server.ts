@@ -43,8 +43,17 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     });
     if (!res.ok) {
       const detail = await res.text();
-      console.error("resend_error", res.status, detail);
-      return { sent: false, error: `RESEND_${res.status}` };
+      console.error("resend_error", res.status, detail, "from:", from);
+      let reason = "";
+      try {
+        reason = (JSON.parse(detail) as { message?: string })?.message ?? "";
+      } catch {
+        reason = detail;
+      }
+      return {
+        sent: false,
+        error: `RESEND_${res.status}${reason ? `: ${reason.slice(0, 220)}` : ""}`,
+      };
     }
     const body = (await res.json().catch(() => null)) as { id?: string } | null;
     return body?.id ? { sent: true, messageId: body.id } : { sent: true };

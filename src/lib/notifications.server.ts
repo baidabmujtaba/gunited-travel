@@ -513,7 +513,7 @@ export async function processEmailQueue(limit = 20) {
     const retry = Number(item.retry_count) + 1;
     // Client-side rejections (invalid address, unverified sender) never succeed
     // on retry; only 429 and 5xx are worth backing off.
-    const code = Number(/^RESEND_(\d{3})$/.exec(result.error ?? "")?.[1] ?? 0);
+    const code = Number(/^RESEND_(\d{3})/.exec(result.error ?? "")?.[1] ?? 0);
     const terminalStatus = code >= 400 && code < 500 && code !== 429;
     const permanent =
       result.error === "RESEND_API_KEY_MISSING" || terminalStatus || retry >= MAX_RETRIES;
