@@ -507,6 +507,7 @@ export const messages: Dict = {
     ar: "تعذر الاتصال بـ Amadeus حالياً.",
     en: "Amadeus request failed right now.",
   },
+  "admin.tab.links": { ar: "ربط الوكالات", en: "Agency links" },
   "admin.tab.users": { ar: "المستخدمون", en: "Users" },
   "admin.tab.agencies": { ar: "الوكالات", en: "Agencies" },
   "admin.tab.payments": { ar: "المدفوعات", en: "Payments" },
