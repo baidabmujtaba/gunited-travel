@@ -70,6 +70,7 @@ function AgencyLayout() {
 
   const NAV = [
     { to: "/agency", label: l("الرئيسية", "Home"), exact: true },
+    { to: "/agency/offers", label: l("العروض", "Offers"), exact: false },
     { to: "/agency/customers", label: l("عملائي", "My customers"), exact: false },
     { to: "/agency/orders", label: l("طلباتي", "My orders"), exact: false },
     { to: "/agency/balance", label: l("رصيدي", "My balance"), exact: false },

@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAgencyIndexRouteImport } from './routes/_authenticated/agency.index'
 import { Route as AuthenticatedAgencyBalanceRouteImport } from './routes/_authenticated/agency.balance'
 import { Route as AuthenticatedAgencyCustomersRouteImport } from './routes/_authenticated/agency.customers'
+import { Route as AuthenticatedAgencyOffersRouteImport } from './routes/_authenticated/agency.offers'
 import { Route as AuthenticatedAgencyOrdersRouteImport } from './routes/_authenticated/agency.orders'
 import { Route as AuthenticatedAgencyStatementRouteImport } from './routes/_authenticated/agency.statement'
 import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
@@ -196,6 +197,12 @@ const AuthenticatedAgencyCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedAgencyRoute,
   } as any)
+const AuthenticatedAgencyOffersRoute =
+  AuthenticatedAgencyOffersRouteImport.update({
+    id: '/offers',
+    path: '/offers',
+    getParentRoute: () => AuthenticatedAgencyRoute,
+  } as any)
 const AuthenticatedAgencyOrdersRoute =
   AuthenticatedAgencyOrdersRouteImport.update({
     id: '/orders',
@@ -253,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/agency/balance': typeof AuthenticatedAgencyBalanceRoute
   '/agency/customers': typeof AuthenticatedAgencyCustomersRoute
+  '/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/agency/balance': typeof AuthenticatedAgencyBalanceRoute
   '/agency/customers': typeof AuthenticatedAgencyCustomersRoute
+  '/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
@@ -321,6 +330,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/agency/balance': typeof AuthenticatedAgencyBalanceRoute
   '/_authenticated/agency/customers': typeof AuthenticatedAgencyCustomersRoute
+  '/_authenticated/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/_authenticated/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/_authenticated/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
@@ -357,6 +367,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/agency/balance'
     | '/agency/customers'
+    | '/agency/offers'
     | '/agency/orders'
     | '/agency/statement'
     | '/invoice/$number'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/agency/balance'
     | '/agency/customers'
+    | '/agency/offers'
     | '/agency/orders'
     | '/agency/statement'
     | '/invoice/$number'
@@ -424,6 +436,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/agency/balance'
     | '/_authenticated/agency/customers'
+    | '/_authenticated/agency/offers'
     | '/_authenticated/agency/orders'
     | '/_authenticated/agency/statement'
     | '/_authenticated/invoice/$number'
@@ -643,6 +656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgencyCustomersRouteImport
       parentRoute: typeof AuthenticatedAgencyRoute
     }
+    '/_authenticated/agency/offers': {
+      id: '/_authenticated/agency/offers'
+      path: '/offers'
+      fullPath: '/agency/offers'
+      preLoaderRoute: typeof AuthenticatedAgencyOffersRouteImport
+      parentRoute: typeof AuthenticatedAgencyRoute
+    }
     '/_authenticated/agency/orders': {
       id: '/_authenticated/agency/orders'
       path: '/orders'
@@ -725,6 +745,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedAgencyRouteChildren {
   AuthenticatedAgencyBalanceRoute: typeof AuthenticatedAgencyBalanceRoute
   AuthenticatedAgencyCustomersRoute: typeof AuthenticatedAgencyCustomersRoute
+  AuthenticatedAgencyOffersRoute: typeof AuthenticatedAgencyOffersRoute
   AuthenticatedAgencyOrdersRoute: typeof AuthenticatedAgencyOrdersRoute
   AuthenticatedAgencyStatementRoute: typeof AuthenticatedAgencyStatementRoute
   AuthenticatedAgencyIndexRoute: typeof AuthenticatedAgencyIndexRoute
@@ -733,6 +754,7 @@ interface AuthenticatedAgencyRouteChildren {
 const AuthenticatedAgencyRouteChildren: AuthenticatedAgencyRouteChildren = {
   AuthenticatedAgencyBalanceRoute: AuthenticatedAgencyBalanceRoute,
   AuthenticatedAgencyCustomersRoute: AuthenticatedAgencyCustomersRoute,
+  AuthenticatedAgencyOffersRoute: AuthenticatedAgencyOffersRoute,
   AuthenticatedAgencyOrdersRoute: AuthenticatedAgencyOrdersRoute,
   AuthenticatedAgencyStatementRoute: AuthenticatedAgencyStatementRoute,
   AuthenticatedAgencyIndexRoute: AuthenticatedAgencyIndexRoute,

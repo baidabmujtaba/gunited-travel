@@ -32,7 +32,8 @@ export type OfferDraft = {
   description_ar: string;
   description_en: string;
   category: string;
-  base_price_usd: string;
+  customer_price_usd: string;
+  agency_price_usd: string;
   tax_percent: string;
   fee_amount_usd: string;
   discount_percent: string;
@@ -52,7 +53,8 @@ export const emptyOffer: OfferDraft = {
   description_ar: "",
   description_en: "",
   category: "package",
-  base_price_usd: "",
+  customer_price_usd: "",
+  agency_price_usd: "",
   tax_percent: "0",
   fee_amount_usd: "0",
   discount_percent: "0",
@@ -115,7 +117,8 @@ export function OfferForm({
           description_ar: draft.description_ar,
           description_en: draft.description_en,
           category: draft.category,
-          base_price_usd: Number(draft.base_price_usd || 0),
+          customer_price_usd: Number(draft.customer_price_usd || 0),
+          agency_price_usd: Number(draft.agency_price_usd || 0),
           tax_percent: Number(draft.tax_percent || 0),
           fee_amount_usd: Number(draft.fee_amount_usd || 0),
           discount_percent: Number(draft.discount_percent || 0),
@@ -184,8 +187,13 @@ export function OfferForm({
       className="space-y-8"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!draft.title_ar.trim() || !draft.title_en.trim() || !Number(draft.base_price_usd)) {
+        if (!draft.title_ar.trim() || !draft.title_en.trim()) {
           toast.error(t("checkout.required"));
+          return;
+        }
+        // Both prices are mandatory and independent: no automatic derivation.
+        if (!(Number(draft.customer_price_usd) > 0) || !(Number(draft.agency_price_usd) > 0)) {
+          toast.error(t("admin.offers.prices.required"));
           return;
         }
         save.mutate();
@@ -230,13 +238,23 @@ export function OfferForm({
               </SelectContent>
             </Select>
           </Row>
-          <Row label={t("admin.offers.price")}>
+          <Row label={t("admin.offers.price.customer")}>
             <Input
               type="number"
-              min="0"
+              min="0.01"
               step="0.01"
-              value={draft.base_price_usd}
-              onChange={(e) => set("base_price_usd", e.target.value)}
+              value={draft.customer_price_usd}
+              onChange={(e) => set("customer_price_usd", e.target.value)}
+              required
+            />
+          </Row>
+          <Row label={t("admin.offers.price.agency")}>
+            <Input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={draft.agency_price_usd}
+              onChange={(e) => set("agency_price_usd", e.target.value)}
               required
             />
           </Row>

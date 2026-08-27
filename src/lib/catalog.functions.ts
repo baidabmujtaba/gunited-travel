@@ -38,6 +38,16 @@ const currencyInput = z.object({
   currency: z.unknown().transform(normalizeCurrency).default("USD"),
 });
 
+/**
+ * Public storefront projection. `agency_price_usd` is deliberately absent so the
+ * agency price never leaves the database for customer/visitor contexts.
+ */
+const PUBLIC_OFFER_COLUMNS =
+  "id,slug,title_en,title_ar,description_en,description_ar,category,base_price_usd," +
+  "customer_price_usd,duration_en,duration_ar,expiry_date,features,images,primary_image," +
+  "tax_percent,fee_amount_usd,discount_percent,commission_percent,allowed_payment_methods," +
+  "required_documents,status";
+
 async function loadCurrencies() {
   const sb = getPublicClient();
   const [{ data: currencies }, { data: rates }] = await Promise.all([
@@ -88,7 +98,7 @@ export const getCatalog = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await sb
       .from("service_offers")
-      .select("*")
+      .select(PUBLIC_OFFER_COLUMNS)
       .eq("status", "active")
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
@@ -96,9 +106,9 @@ export const getCatalog = createServerFn({ method: "GET" })
 
     const today = new Date().toISOString().slice(0, 10);
     const offers = await Promise.all(
-      (rows ?? [])
+      ((rows ?? []) as unknown as OfferRow[])
         .filter((r) => !r.expiry_date || r.expiry_date >= today)
-        .map((r) => withSignedImages(mapOffer(r as OfferRow, selected))),
+        .map((r) => withSignedImages(mapOffer(r, selected))),
     );
 
     return { offers, currencies };
@@ -121,13 +131,13 @@ export const getOffer = createServerFn({ method: "GET" })
       currencies.find((c) => c.code === "USD")!;
     const { data: row } = await sb
       .from("service_offers")
-      .select("*")
+      .select(PUBLIC_OFFER_COLUMNS)
       .eq("slug", data.slug)
       .eq("status", "active")
       .is("deleted_at", null)
       .maybeSingle();
     return {
-      offer: row ? await withSignedImages(mapOffer(row as OfferRow, selected)) : null,
+      offer: row ? await withSignedImages(mapOffer(row as unknown as OfferRow, selected)) : null,
       currencies,
     };
   });
@@ -153,6 +163,7 @@ type OfferRow = {
   description_ar: string | null;
   category: string;
   base_price_usd: number;
+  customer_price_usd: number | null;
   duration_en: string | null;
   duration_ar: string | null;
   expiry_date: string | null;
@@ -191,7 +202,7 @@ function mapOffer(
     required_documents: normalizeDocs(r.required_documents),
     price: computePrice(
       {
-        basePriceUsd: Number(r.base_price_usd),
+        basePriceUsd: Number(r.customer_price_usd ?? r.base_price_usd),
         taxPercent: r.tax_percent,
         feeAmountUsd: r.fee_amount_usd,
         discountPercent: r.discount_percent,

@@ -818,12 +818,14 @@ export type Database = {
       }
       service_offers: {
         Row: {
+          agency_price_usd: number | null
           allowed_payment_methods: string[]
           base_price_usd: number
           category: string
           commission_percent: number
           created_at: string
           created_by: string | null
+          customer_price_usd: number
           deleted_at: string | null
           description_ar: string | null
           description_en: string | null
@@ -845,12 +847,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           base_price_usd: number
           category?: string
           commission_percent?: number
           created_at?: string
           created_by?: string | null
+          customer_price_usd?: number
           deleted_at?: string | null
           description_ar?: string | null
           description_en?: string | null
@@ -872,12 +876,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           base_price_usd?: number
           category?: string
           commission_percent?: number
           created_at?: string
           created_by?: string | null
+          customer_price_usd?: number
           deleted_at?: string | null
           description_ar?: string | null
           description_en?: string | null
@@ -905,6 +911,7 @@ export type Database = {
           agency_id: string | null
           amount_display: number
           amount_usd: number
+          applied_price_usd: number | null
           assigned_to: string | null
           created_at: string
           currency_code: string
@@ -919,6 +926,7 @@ export type Database = {
           offer_id: string | null
           payment_method_id: string | null
           payment_notified_at: string | null
+          price_context: string | null
           receipt_path: string | null
           status: Database["public"]["Enums"]["order_status"]
           tracking_id: string | null
@@ -930,6 +938,7 @@ export type Database = {
           agency_id?: string | null
           amount_display?: number
           amount_usd?: number
+          applied_price_usd?: number | null
           assigned_to?: string | null
           created_at?: string
           currency_code?: string
@@ -944,6 +953,7 @@ export type Database = {
           offer_id?: string | null
           payment_method_id?: string | null
           payment_notified_at?: string | null
+          price_context?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tracking_id?: string | null
@@ -955,6 +965,7 @@ export type Database = {
           agency_id?: string | null
           amount_display?: number
           amount_usd?: number
+          applied_price_usd?: number | null
           assigned_to?: string | null
           created_at?: string
           currency_code?: string
@@ -969,6 +980,7 @@ export type Database = {
           offer_id?: string | null
           payment_method_id?: string | null
           payment_notified_at?: string | null
+          price_context?: string | null
           receipt_path?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tracking_id?: string | null

@@ -18,7 +18,9 @@ const offerSchema = z.object({
   description_ar: z.string().max(4000).default(""),
   description_en: z.string().max(4000).default(""),
   category: z.string().min(2).max(40).default("package"),
-  base_price_usd: z.number().nonnegative(),
+  // Two independent, manually entered prices — no automatic relation between them.
+  customer_price_usd: z.number().positive(),
+  agency_price_usd: z.number().positive(),
   tax_percent: z.number().min(0).max(100).default(0),
   fee_amount_usd: z.number().min(0).default(0),
   discount_percent: z.number().min(0).max(100).default(0),
@@ -70,7 +72,10 @@ export const saveOffer = createServerFn({ method: "POST" })
       description_ar: data.description_ar,
       description_en: data.description_en,
       category: data.category,
-      base_price_usd: data.base_price_usd,
+      // base_price_usd is kept in sync with the customer price for legacy readers.
+      base_price_usd: data.customer_price_usd,
+      customer_price_usd: data.customer_price_usd,
+      agency_price_usd: data.agency_price_usd,
       tax_percent: data.tax_percent,
       fee_amount_usd: data.fee_amount_usd,
       discount_percent: data.discount_percent,

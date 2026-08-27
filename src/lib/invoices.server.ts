@@ -30,7 +30,7 @@ export async function issueInvoiceForOrder(
   const { data: order, error: orderErr } = await sb
     .from("service_orders")
     .select(
-      "id,tracking_id,offer_id,customer_id,customer_name,customer_email,currency_code,frozen_rate,amount_usd,amount_display,payment_method_id,status",
+      "id,tracking_id,offer_id,customer_id,customer_name,customer_email,currency_code,frozen_rate,amount_usd,amount_display,applied_price_usd,price_context,payment_method_id,status",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -70,7 +70,11 @@ export async function issueInvoiceForOrder(
   const totalDisplay = Number(order.amount_display) || totalUsd * rate;
   const taxPercent = Number(offer?.tax_percent) || 0;
   const feesUsd = Number(offer?.fee_amount_usd) || 0;
-  const netUsd = Math.max(0, totalUsd - feesUsd - (totalUsd * taxPercent) / (100 + taxPercent));
+  // The historical price applied at order time wins over the offer's current price.
+  const appliedPriceUsd = Number((order as { applied_price_usd?: number | null }).applied_price_usd);
+  const netUsd = Number.isFinite(appliedPriceUsd) && appliedPriceUsd > 0
+    ? appliedPriceUsd
+    : Math.max(0, totalUsd - feesUsd - (totalUsd * taxPercent) / (100 + taxPercent));
   const taxUsd = Math.max(0, totalUsd - feesUsd - netUsd);
 
   let invoiceId = existing?.id ?? null;

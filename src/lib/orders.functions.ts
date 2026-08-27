@@ -38,7 +38,7 @@ export const createOrder = createServerFn({ method: "POST" })
     const { data: offer, error: offerErr } = await supabase
       .from("service_offers")
       .select(
-        "id,base_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
+        "id,base_price_usd,customer_price_usd,agency_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
       )
       .eq("id", data.offerId)
       .maybeSingle();
@@ -77,25 +77,23 @@ export const createOrder = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
 
-    const audience = profile?.agency_id ? "agency" : "customer";
-
-    // Agency and customer prices are separate rows; fall back to the base price.
-    const { data: tierPrice } = await supabase
-      .from("service_prices")
-      .select("price_usd")
-      .eq("offer_id", offer.id)
-      .eq("audience", audience)
-      .maybeSingle();
+    // Price context is derived on the server from the caller's profile only.
+    const priceContext: "agency" | "customer" = profile?.agency_id ? "agency" : "customer";
+    const customerPriceUsd = Number(offer.customer_price_usd ?? offer.base_price_usd);
+    const agencyPriceUsd =
+      offer.agency_price_usd === null || offer.agency_price_usd === undefined
+        ? null
+        : Number(offer.agency_price_usd);
+    if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
+    const appliedPriceUsd = priceContext === "agency" ? agencyPriceUsd! : customerPriceUsd;
 
     const price = computePrice(
       {
-        basePriceUsd: Number(tierPrice?.price_usd ?? offer.base_price_usd),
+        basePriceUsd: appliedPriceUsd,
         taxPercent: offer.tax_percent,
         feeAmountUsd: offer.fee_amount_usd,
         discountPercent: offer.discount_percent,
         commissionPercent: offer.commission_percent,
-        agencyDiscountPercent:
-          profile?.is_agency && !tierPrice ? Number(profile.discount_tier) : 0,
       },
       data.currency,
       rate,
@@ -116,6 +114,9 @@ export const createOrder = createServerFn({ method: "POST" })
         currency_code: data.currency,
         frozen_rate: price.rate,
         amount_usd: price.totalUsd,
+        // Historical record: survives later edits to the offer's prices.
+        applied_price_usd: appliedPriceUsd,
+        price_context: priceContext,
         amount_display: price.total,
         payment_method_id: data.paymentMethodId,
         transaction_reference: data.transactionReference,
