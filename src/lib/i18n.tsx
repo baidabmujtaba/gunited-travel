@@ -27,6 +27,8 @@ export const messages: Dict = {
   },
   "hero.cta.browse": { ar: "تصفح العروض", en: "Browse offers" },
   "hero.cta.track": { ar: "تتبع طلبي", en: "Track my order" },
+  "hero.ticket.latest": { ar: "آخر حجز لك", en: "Your latest booking" },
+  "hero.ticket.sample": { ar: "نموذج بطاقة الحجز", en: "Sample boarding pass" },
 
   "catalog.title": { ar: "العروض والخدمات", en: "Offers & Services" },
   "catalog.subtitle": {
