@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
+import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
@@ -79,6 +80,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto w-full max-w-7xl flex-1 px-3 py-5 sm:px-5 sm:py-8">{children}</main>
       <AssistantWidget mode="admin" />
+      <InstallAppPrompt audience="staff" />
     </div>
   );
 }

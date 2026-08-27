@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AssistantWidget } from "@/components/AssistantWidget";
+import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
@@ -169,6 +170,7 @@ function AgencyLayout() {
         </main>
       </div>
       <AssistantWidget mode="client" />
+      <InstallAppPrompt audience="agency" />
     </div>
   );
 }
