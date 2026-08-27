@@ -63,10 +63,17 @@ function SalesHub() {
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const overview = useQuery({ queryKey: ["admin-overview"], queryFn: () => getAdminOverview() });
+  const overview = useQuery({
+    queryKey: ["admin-overview"],
+    queryFn: () => getAdminOverview(),
+    staleTime: 60_000,
+  });
   const orders = useQuery({
     queryKey: ["admin-orders", status, search],
     queryFn: () => listAdminOrders({ data: { status, search } }),
+    staleTime: 30_000,
+    // Keep the previous page visible while filters change instead of flashing skeletons.
+    placeholderData: (prev) => prev,
   });
 
   useEffect(() => {
