@@ -38,15 +38,16 @@ function AdminLayout() {
 
   if (!isStaff) {
     if (isAgency) return <Navigate to="/agency" replace />;
+    // Non-staff never see the ERP navigation, only a plain notice.
     return (
-      <AdminShell>
-        <div className="surface-card mx-auto max-w-md p-10 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-cream p-6">
+        <div className="surface-card max-w-md p-10 text-center">
           <p className="text-sm text-muted-foreground">{t("admin.forbidden")}</p>
           <Button asChild className="mt-5">
             <Link to="/">{t("admin.backstore")}</Link>
           </Button>
         </div>
-      </AdminShell>
+      </div>
     );
   }
 

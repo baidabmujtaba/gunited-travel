@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useL } from "@/components/admin/Bilingual";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
+import { autoLinkMyAgency } from "@/lib/agency-link.functions";
 
 export const Route = createFileRoute("/_authenticated/agency")({
   head: () => ({
@@ -45,12 +46,25 @@ function AgencyLayout() {
     queryKey: ["my-agency-link", session?.user?.id],
     enabled: Boolean(session?.user?.id),
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("agency_id")
-        .eq("id", session!.user.id)
-        .maybeSingle();
-      return data?.agency_id ?? null;
+      const read = async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("agency_id")
+          .eq("id", session!.user.id)
+          .maybeSingle();
+        return (data?.agency_id as string | null) ?? null;
+      };
+      const current = await read();
+      if (current) return current;
+      // Direct visits (bookmark / refresh) skip the sign-in hook, so retry the
+      // automatic link here before telling the user they are unlinked.
+      try {
+        const res = await autoLinkMyAgency();
+        if (res?.agencyId) return res.agencyId;
+      } catch {
+        // best-effort
+      }
+      return await read();
     },
   });
 
