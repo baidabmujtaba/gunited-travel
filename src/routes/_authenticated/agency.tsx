@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useL } from "@/components/admin/Bilingual";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
+import { autoLinkMyAgency } from "@/lib/agency-link.functions";
 
 export const Route = createFileRoute("/_authenticated/agency")({
   head: () => ({
