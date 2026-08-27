@@ -72,7 +72,10 @@ export const saveOffer = createServerFn({ method: "POST" })
       description_ar: data.description_ar,
       description_en: data.description_en,
       category: data.category,
-      base_price_usd: data.base_price_usd,
+      // base_price_usd is kept in sync with the customer price for legacy readers.
+      base_price_usd: data.customer_price_usd,
+      customer_price_usd: data.customer_price_usd,
+      agency_price_usd: data.agency_price_usd,
       tax_percent: data.tax_percent,
       fee_amount_usd: data.fee_amount_usd,
       discount_percent: data.discount_percent,
