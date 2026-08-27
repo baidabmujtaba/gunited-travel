@@ -41,6 +41,7 @@ import { Route as AuthenticatedAgencyOffersRouteImport } from './routes/_authent
 import { Route as AuthenticatedAgencyOrdersRouteImport } from './routes/_authenticated/agency.orders'
 import { Route as AuthenticatedAgencyStatementRouteImport } from './routes/_authenticated/agency.statement'
 import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
+import { Route as ApiPublicEmailDispatchRouteImport } from './routes/api/public/email-dispatch'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
 import { Route as AuthenticatedAdminCustomerIdRouteImport } from './routes/_authenticated/admin.customer.$id'
 
@@ -221,6 +222,11 @@ const AuthenticatedInvoiceNumberRoute =
     path: '/invoice/$number',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicEmailDispatchRoute = ApiPublicEmailDispatchRouteImport.update({
+  id: '/api/public/email-dispatch',
+  path: '/api/public/email-dispatch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminAgencyIdRoute =
   AuthenticatedAdminAgencyIdRouteImport.update({
     id: '/agency/$id',
@@ -264,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
+  '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/agency/': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByTo {
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
+  '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/agency': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/_authenticated/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/_authenticated/agency/statement': typeof AuthenticatedAgencyStatementRoute
   '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
+  '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/agency/': typeof AuthenticatedAgencyIndexRoute
   '/_authenticated/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/agency/orders'
     | '/agency/statement'
     | '/invoice/$number'
+    | '/api/public/email-dispatch'
     | '/admin/'
     | '/agency/'
     | '/admin/agency/$id'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/agency/orders'
     | '/agency/statement'
     | '/invoice/$number'
+    | '/api/public/email-dispatch'
     | '/admin'
     | '/agency'
     | '/admin/agency/$id'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agency/orders'
     | '/_authenticated/agency/statement'
     | '/_authenticated/invoice/$number'
+    | '/api/public/email-dispatch'
     | '/_authenticated/admin/'
     | '/_authenticated/agency/'
     | '/_authenticated/admin/agency/$id'
@@ -456,6 +468,7 @@ export interface RootRouteChildren {
   CheckoutSlugRoute: typeof CheckoutSlugRoute
   OffersSlugRoute: typeof OffersSlugRoute
   OffersIndexRoute: typeof OffersIndexRoute
+  ApiPublicEmailDispatchRoute: typeof ApiPublicEmailDispatchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -684,6 +697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvoiceNumberRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/email-dispatch': {
+      id: '/api/public/email-dispatch'
+      path: '/api/public/email-dispatch'
+      fullPath: '/api/public/email-dispatch'
+      preLoaderRoute: typeof ApiPublicEmailDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/agency/$id': {
       id: '/_authenticated/admin/agency/$id'
       path: '/agency/$id'
@@ -788,6 +808,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutSlugRoute: CheckoutSlugRoute,
   OffersSlugRoute: OffersSlugRoute,
   OffersIndexRoute: OffersIndexRoute,
+  ApiPublicEmailDispatchRoute: ApiPublicEmailDispatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
