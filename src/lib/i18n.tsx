@@ -530,7 +530,9 @@ export const messages: Dict = {
   "admin.tab.reports": { ar: "التقارير", en: "Reports" },
 
 
+  "admin.tab.emails": { ar: "إشعارات البريد", en: "Emails" },
   "admin.tab.settings": { ar: "الإعدادات", en: "Settings" },
+
   "admin.users.title": { ar: "المستخدمون والأدوار", en: "Users & roles" },
   "admin.users.subtitle": {
     ar: "كل المستخدمين المسجلين وأدوارهم. تعديل الدور متاح للمشرف الأعلى فقط.",

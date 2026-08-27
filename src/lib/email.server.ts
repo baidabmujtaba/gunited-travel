@@ -7,7 +7,7 @@ export type SendEmailInput = {
   attachment?: { filename: string; content: string };
 };
 
-export type SendEmailResult = { sent: boolean; error?: string };
+export type SendEmailResult = { sent: boolean; error?: string; messageId?: string };
 
 function toBase64(bytes: Uint8Array) {
   let binary = "";
@@ -46,7 +46,9 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       console.error("resend_error", res.status, detail);
       return { sent: false, error: `RESEND_${res.status}` };
     }
-    return { sent: true };
+    const body = (await res.json().catch(() => null)) as { id?: string } | null;
+    return body?.id ? { sent: true, messageId: body.id } : { sent: true };
+
   } catch (err) {
     console.error("resend_exception", err);
     return { sent: false, error: "RESEND_REQUEST_FAILED" };

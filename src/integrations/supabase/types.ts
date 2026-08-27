@@ -226,6 +226,174 @@ export type Database = {
           },
         ]
       }
+      email_logs: {
+        Row: {
+          agency_id: string | null
+          created_at: string
+          customer_id: string | null
+          error: string | null
+          id: string
+          idempotency_key: string
+          new_status: string | null
+          notification_type: string
+          order_id: string | null
+          previous_status: string | null
+          recipient: string | null
+          resend_message_id: string | null
+          retry_count: number
+          sent_at: string | null
+          status: string
+          status_change_event_id: string | null
+          template: string | null
+          updated_at: string
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key: string
+          new_status?: string | null
+          notification_type: string
+          order_id?: string | null
+          previous_status?: string | null
+          recipient?: string | null
+          resend_message_id?: string | null
+          retry_count?: number
+          sent_at?: string | null
+          status?: string
+          status_change_event_id?: string | null
+          template?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string
+          new_status?: string | null
+          notification_type?: string
+          order_id?: string | null
+          previous_status?: string | null
+          recipient?: string | null
+          resend_message_id?: string | null
+          retry_count?: number
+          sent_at?: string | null
+          status?: string
+          status_change_event_id?: string | null
+          template?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_queue: {
+        Row: {
+          agency_id: string | null
+          created_at: string
+          customer_id: string | null
+          html: string
+          id: string
+          idempotency_key: string
+          language: string
+          last_error: string | null
+          locked_at: string | null
+          new_status: string | null
+          next_attempt_at: string
+          notification_type: string
+          order_id: string | null
+          payload: Json
+          previous_status: string | null
+          recipient: string
+          retry_count: number
+          status: string
+          status_change_event_id: string | null
+          subject: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          html: string
+          id?: string
+          idempotency_key: string
+          language?: string
+          last_error?: string | null
+          locked_at?: string | null
+          new_status?: string | null
+          next_attempt_at?: string
+          notification_type: string
+          order_id?: string | null
+          payload?: Json
+          previous_status?: string | null
+          recipient: string
+          retry_count?: number
+          status?: string
+          status_change_event_id?: string | null
+          subject: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          html?: string
+          id?: string
+          idempotency_key?: string
+          language?: string
+          last_error?: string | null
+          locked_at?: string | null
+          new_status?: string | null
+          next_attempt_at?: string
+          notification_type?: string
+          order_id?: string | null
+          payload?: Json
+          previous_status?: string | null
+          recipient?: string
+          retry_count?: number
+          status?: string
+          status_change_event_id?: string | null
+          subject?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_queue_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_queue_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exchange_rates: {
         Row: {
           created_at: string
@@ -1187,6 +1355,7 @@ export type Database = {
         Returns: number
       }
       current_agency_id: { Args: never; Returns: string }
+      dispatch_email_queue: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

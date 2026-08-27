@@ -120,11 +120,17 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     if (curErr) throw new Error(curErr.message);
     if (!current) throw new Error("ORDER_NOT_FOUND");
 
+    // No real transition -> no history event, no notification, no email.
+    if (current.status === data.status) {
+      return { ok: true, unchanged: true, invoice: null };
+    }
+
     const { error } = await sb
       .from("service_orders")
       .update({ status: data.status })
       .eq("id", data.orderId);
     if (error) throw new Error(error.message);
+
 
     // Approving an order creates the agency receivable (idempotent per order).
     if (
@@ -157,26 +163,31 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       .eq("id", context.userId)
       .maybeSingle();
 
-    await sb.from("order_status_history").insert({
-      order_id: data.orderId,
-      previous_status: current.status,
-      new_status: data.status,
-      note: data.note ?? null,
-      actor_id: context.userId,
-      actor_name: actor?.full_name || actor?.email || "Staff",
-    });
+    // The history row id IS the status_change_event_id used for idempotency.
+    const { data: event } = await sb
+      .from("order_status_history")
+      .insert({
+        order_id: data.orderId,
+        previous_status: current.status,
+        new_status: data.status,
+        note: data.note ?? null,
+        actor_id: context.userId,
+        actor_name: actor?.full_name || actor?.email || "Staff",
+      })
+      .select("id")
+      .maybeSingle();
 
-    if (current.customer_id) {
-      await sb.from("notifications").insert({
-        user_id: current.customer_id,
-        audience: "user",
-        title_en: "Order status updated",
-        title_ar: "تم تحديث حالة طلبك",
-        body_en: `Order ${current.tracking_id} is now: ${data.status.replace("_", " ")}.`,
-        body_ar: `طلبك ${current.tracking_id} أصبح في حالة: ${data.status}.`,
-        link: `/track?ref=${current.tracking_id}`,
+    if (event?.id) {
+      const { queueStatusChangeEmails } = await import("./notifications.server");
+      await queueStatusChangeEmails(sb, {
+        eventId: event.id,
+        orderId: data.orderId,
+        previousStatus: current.status,
+        newStatus: data.status,
+        note: data.note ?? null,
       });
     }
+
 
     await sb.from("audit_logs").insert({
       actor_id: context.userId,
