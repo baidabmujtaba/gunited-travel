@@ -202,7 +202,7 @@ function mapOffer(
     required_documents: normalizeDocs(r.required_documents),
     price: computePrice(
       {
-        basePriceUsd: Number(r.base_price_usd),
+        basePriceUsd: Number(r.customer_price_usd ?? r.base_price_usd),
         taxPercent: r.tax_percent,
         feeAmountUsd: r.fee_amount_usd,
         discountPercent: r.discount_percent,
