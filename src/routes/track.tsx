@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Check, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import GunitedTicketCard from "@/components/GunitedTicketCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,6 +100,21 @@ function TrackPage() {
                   {fmt(Number(order.amount_display), order.currency_code)}
                 </p>
               </div>
+            </div>
+
+            <div className="flex justify-center">
+              <GunitedTicketCard
+                locale={lang}
+                bookingRef={order.tracking_id}
+                passenger={order.customer_name}
+                travelClass={
+                  query.data?.offerTitle
+                    ? lang === "ar"
+                      ? query.data.offerTitle.ar
+                      : query.data.offerTitle.en
+                    : null
+                }
+              />
             </div>
 
             <ol className="surface-card space-y-1 p-6">
