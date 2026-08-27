@@ -38,7 +38,7 @@ export const createOrder = createServerFn({ method: "POST" })
     const { data: offer, error: offerErr } = await supabase
       .from("service_offers")
       .select(
-        "id,base_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
+        "id,base_price_usd,customer_price_usd,agency_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
       )
       .eq("id", data.offerId)
       .maybeSingle();
