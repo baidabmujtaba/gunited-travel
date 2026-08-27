@@ -121,7 +121,7 @@ export const getOffer = createServerFn({ method: "GET" })
       currencies.find((c) => c.code === "USD")!;
     const { data: row } = await sb
       .from("service_offers")
-      .select("*")
+      .select(PUBLIC_OFFER_COLUMNS)
       .eq("slug", data.slug)
       .eq("status", "active")
       .is("deleted_at", null)
