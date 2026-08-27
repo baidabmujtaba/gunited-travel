@@ -70,7 +70,11 @@ export async function issueInvoiceForOrder(
   const totalDisplay = Number(order.amount_display) || totalUsd * rate;
   const taxPercent = Number(offer?.tax_percent) || 0;
   const feesUsd = Number(offer?.fee_amount_usd) || 0;
-  const netUsd = Math.max(0, totalUsd - feesUsd - (totalUsd * taxPercent) / (100 + taxPercent));
+  // The historical price applied at order time wins over the offer's current price.
+  const appliedPriceUsd = Number((order as { applied_price_usd?: number | null }).applied_price_usd);
+  const netUsd = Number.isFinite(appliedPriceUsd) && appliedPriceUsd > 0
+    ? appliedPriceUsd
+    : Math.max(0, totalUsd - feesUsd - (totalUsd * taxPercent) / (100 + taxPercent));
   const taxUsd = Math.max(0, totalUsd - feesUsd - netUsd);
 
   let invoiceId = existing?.id ?? null;
