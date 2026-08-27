@@ -252,3 +252,37 @@ export const getMyOrders = createServerFn({ method: "GET" })
       invoice: byOrder.get(o.id) ?? null,
     }));
   });
+
+/** Latest active booking of the signed-in customer, for the home hero ticket card. */
+export const getMyLatestTicket = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: order } = await context.supabase
+      .from("service_orders")
+      .select("id,tracking_id,status,customer_name,created_at,offer_id")
+      .eq("customer_id", context.userId)
+      .is("deleted_at", null)
+      .not("status", "in", "(cancelled,rejected)")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!order) return null;
+
+    let offerTitle: { en: string; ar: string } | null = null;
+    if (order.offer_id) {
+      const { data: offer } = await context.supabase
+        .from("service_offers")
+        .select("title_en,title_ar")
+        .eq("id", order.offer_id)
+        .maybeSingle();
+      if (offer) offerTitle = { en: offer.title_en, ar: offer.title_ar };
+    }
+
+    return {
+      trackingId: order.tracking_id ?? null,
+      status: order.status as string,
+      customerName: order.customer_name ?? null,
+      offerTitle,
+    };
+  });
