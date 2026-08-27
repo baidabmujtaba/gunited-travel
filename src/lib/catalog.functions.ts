@@ -163,6 +163,7 @@ type OfferRow = {
   description_ar: string | null;
   category: string;
   base_price_usd: number;
+  customer_price_usd: number | null;
   duration_en: string | null;
   duration_ar: string | null;
   expiry_date: string | null;
