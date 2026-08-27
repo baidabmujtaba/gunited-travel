@@ -77,25 +77,23 @@ export const createOrder = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
 
-    const audience = profile?.agency_id ? "agency" : "customer";
-
-    // Agency and customer prices are separate rows; fall back to the base price.
-    const { data: tierPrice } = await supabase
-      .from("service_prices")
-      .select("price_usd")
-      .eq("offer_id", offer.id)
-      .eq("audience", audience)
-      .maybeSingle();
+    // Price context is derived on the server from the caller's profile only.
+    const priceContext: "agency" | "customer" = profile?.agency_id ? "agency" : "customer";
+    const customerPriceUsd = Number(offer.customer_price_usd ?? offer.base_price_usd);
+    const agencyPriceUsd =
+      offer.agency_price_usd === null || offer.agency_price_usd === undefined
+        ? null
+        : Number(offer.agency_price_usd);
+    if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
+    const appliedPriceUsd = priceContext === "agency" ? agencyPriceUsd! : customerPriceUsd;
 
     const price = computePrice(
       {
-        basePriceUsd: Number(tierPrice?.price_usd ?? offer.base_price_usd),
+        basePriceUsd: appliedPriceUsd,
         taxPercent: offer.tax_percent,
         feeAmountUsd: offer.fee_amount_usd,
         discountPercent: offer.discount_percent,
         commissionPercent: offer.commission_percent,
-        agencyDiscountPercent:
-          profile?.is_agency && !tierPrice ? Number(profile.discount_tier) : 0,
       },
       data.currency,
       rate,
