@@ -105,7 +105,7 @@ function TrackPage() {
             <div className="flex justify-center">
               <GunitedTicketCard
                 locale={lang}
-                bookingRef={order.tracking_id}
+                bookingRef={order.tracking_id ?? ref ?? "—"}
                 passenger={order.customer_name}
                 travelClass={
                   query.data?.offerTitle
