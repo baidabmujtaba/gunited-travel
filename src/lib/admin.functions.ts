@@ -29,7 +29,19 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const byStatus: Record<string, number> = {};
     for (const o of all) byStatus[o.status] = (byStatus[o.status] ?? 0) + 1;
 
+    // Last 6 months of confirmed revenue, for the dashboard trend chart.
+    const monthlyMap: Record<string, number> = {};
+    for (const o of every) {
+      if (!["payment_confirmed", "processing", "completed"].includes(o.status)) continue;
+      const key = String(o.created_at).slice(0, 7);
+      monthlyMap[key] = (monthlyMap[key] ?? 0) + Number(o.amount_usd);
+    }
+    const monthlyRevenue = Object.entries(monthlyMap)
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .slice(-6) as Array<[string, number]>;
+
     return {
+      monthlyRevenue,
       totalOrders: all.length,
       awaitingReview: all.filter((o: any) => ["submitted", "payment_pending"].includes(o.status))
         .length,

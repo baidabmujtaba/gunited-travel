@@ -54,7 +54,22 @@ export const getAgencyOverview = createServerFn({ method: "GET" })
     const limit = Number(agency.credit_limit_usd) || 0;
     const all = orders ?? [];
 
+    // Last 6 months of confirmed sales, for the portal trend chart.
+    const monthlyMap: Record<string, number> = {};
+    for (const o of all) {
+      if (!CONFIRMED.includes(o.status)) continue;
+      const key = String(o.created_at).slice(0, 7);
+      monthlyMap[key] = (monthlyMap[key] ?? 0) + Number(o.amount_usd);
+    }
+    const monthlySales = Object.entries(monthlyMap)
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .slice(-6) as Array<[string, number]>;
+    const byStatus: Record<string, number> = {};
+    for (const o of all) byStatus[o.status] = (byStatus[o.status] ?? 0) + 1;
+
     return {
+      monthlySales,
+      byStatus,
       agency: {
         id: agency.id,
         name: agency.agency_name,

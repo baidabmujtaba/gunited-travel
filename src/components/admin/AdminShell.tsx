@@ -35,8 +35,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      <header className="border-b border-border/70 bg-forest-deep text-cream">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-3 px-5 py-4">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-forest-deep text-cream shadow-sm">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2 px-3 py-3 sm:gap-3 sm:px-5 sm:py-4">
           <Link to="/admin" className="flex items-center gap-2.5">
             <BrandMark />
             <Wordmark />
@@ -63,13 +63,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             )}
           </div>
         </div>
-        <nav className="mx-auto flex w-full max-w-7xl gap-1 overflow-x-auto px-5">
+        <nav className="no-scrollbar mx-auto flex w-full max-w-7xl gap-1 overflow-x-auto px-3 sm:px-5">
           {TABS.map((tab) => (
             <Link
               key={tab.to}
               to={tab.to}
               activeOptions={{ exact: tab.exact }}
-              className="whitespace-nowrap rounded-t-lg px-4 py-3 text-sm font-semibold text-cream/70 transition-colors hover:text-cream"
+              className="whitespace-nowrap rounded-t-lg px-3 py-2.5 text-[13px] font-semibold text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream sm:px-4 sm:py-3 sm:text-sm"
               activeProps={{ className: "bg-cream text-forest-deep" }}
             >
               {t(tab.key)}
@@ -77,7 +77,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-3 py-5 sm:px-5 sm:py-8">{children}</main>
       <AssistantWidget mode="admin" />
     </div>
   );

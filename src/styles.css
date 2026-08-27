@@ -160,6 +160,14 @@
   }
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility surface-card {
   background-color: var(--card);
   border: 1px solid var(--border);
