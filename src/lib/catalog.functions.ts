@@ -88,7 +88,7 @@ export const getCatalog = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await sb
       .from("service_offers")
-      .select("*")
+      .select(PUBLIC_OFFER_COLUMNS)
       .eq("status", "active")
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
