@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
 import { StoreLayout } from "@/components/store/StoreLayout";
@@ -23,47 +24,77 @@ export const Route = createFileRoute("/offers/")({
       },
     ],
   }),
-  loader: () => getCatalog({ data: { currency: "USD" } }),
   component: OffersPage,
+  errorComponent: ({ error, reset }) => (
+    <StoreLayout>
+      <div className="mx-auto max-w-lg px-5 py-20 text-center">
+        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <button
+          className="mt-4 rounded-md bg-forest px-4 py-2 text-sm text-cream"
+          onClick={reset}
+        >
+          إعادة المحاولة / Try again
+        </button>
+      </div>
+    </StoreLayout>
+  ),
 });
 
 function OffersPage() {
-  const initial = Route.useLoaderData();
   const [currency, setCurrency] = useState("USD");
   const { t } = useI18n();
+  const fetchCatalog = useServerFn(getCatalog);
 
+  // Fetched client-side (not in the route loader) so a transient network
+  // failure shows an inline retry instead of a blank screen.
   const query = useQuery({
     queryKey: ["catalog", currency],
-    queryFn: () => getCatalog({ data: { currency } }),
-    initialData: currency === "USD" ? initial : undefined,
+    queryFn: () => fetchCatalog({ data: { currency } }),
+    retry: 2,
   });
+  const refetch = query.refetch;
 
   useEffect(() => {
     const channel = supabase
       .channel("offers-page")
-      .on("postgres_changes", { event: "*", schema: "public", table: "service_offers" }, () =>
-        query.refetch(),
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "service_offers" }, () => {
+        void refetch();
+      })
       .subscribe();
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [query]);
+  }, [refetch]);
 
-  const data = query.data ?? initial;
+  const data = query.data;
 
   return (
     <StoreLayout>
       <div className="mx-auto w-full max-w-6xl px-5 py-12">
         <h1 className="text-3xl font-bold sm:text-4xl">{t("catalog.title")}</h1>
         <p className="mt-2 mb-8 text-sm text-muted-foreground">{t("catalog.subtitle")}</p>
-        <CatalogGrid
-          offers={data.offers}
-          currencies={data.currencies}
-          currency={currency}
-          onCurrencyChange={setCurrency}
-          loading={query.isFetching && !query.data}
-        />
+        {query.isError ? (
+          <div className="surface-card p-8 text-center text-sm text-muted-foreground">
+            <p>
+              تعذر تحميل العروض. تحقق من الاتصال وحاول مرة أخرى. / Could not load offers. Check your
+              connection and try again.
+            </p>
+            <button
+              className="mt-4 rounded-md bg-forest px-4 py-2 text-sm text-cream"
+              onClick={() => void query.refetch()}
+            >
+              إعادة المحاولة / Try again
+            </button>
+          </div>
+        ) : (
+          <CatalogGrid
+            offers={data?.offers ?? []}
+            currencies={data?.currencies ?? []}
+            currency={currency}
+            onCurrencyChange={setCurrency}
+            loading={query.isPending}
+          />
+        )}
       </div>
     </StoreLayout>
   );
