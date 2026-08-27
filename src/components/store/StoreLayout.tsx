@@ -3,6 +3,7 @@ import { LogOut, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
+import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
@@ -149,6 +150,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
       </footer>
 
       <AssistantWidget mode="client" />
+      <InstallAppPrompt audience={isStaff ? "staff" : isAgency ? "agency" : "client"} />
     </div>
   );
 }
