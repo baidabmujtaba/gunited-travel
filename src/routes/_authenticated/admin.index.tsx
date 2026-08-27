@@ -307,10 +307,64 @@ function OrderPanel({ row }: { row: any }) {
             </Button>
           </div>
         ) : null}
+
+        <OrderNotificationHistory orderId={row.id} />
       </div>
     </div>
   );
 }
+
+/** Read-only trail of the automatic emails the backend sent for this order. */
+function OrderNotificationHistory({ orderId }: { orderId: string }) {
+  const { lang } = useI18n();
+  const ar = lang === "ar";
+  const q = useQuery({
+    queryKey: ["order-notifications", orderId],
+    queryFn: () => getOrderNotificationHistory({ data: { orderId } }),
+  });
+
+  return (
+    <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
+      <p className="text-xs font-semibold text-forest-deep">
+        {ar ? "سجل الإشعارات التلقائية" : "Automatic notification history"}
+      </p>
+      {q.isLoading ? (
+        <p className="mt-1 text-xs text-muted-foreground">{ar ? "جارٍ التحميل…" : "Loading…"}</p>
+      ) : (q.data ?? []).length === 0 ? (
+        <p className="mt-1 text-xs text-muted-foreground">
+          {ar ? "لا توجد إشعارات لهذا الطلب." : "No notifications for this order."}
+        </p>
+      ) : (
+        <ul className="mt-2 space-y-1.5 text-xs">
+          {(q.data ?? []).map((l: any) => (
+            <li key={l.id} className="flex flex-wrap items-center gap-2">
+              <span className="font-medium">{l.recipient ?? "—"}</span>
+              <span className="text-muted-foreground">
+                {(l.previous_status ?? "—") + " → " + l.new_status}
+              </span>
+              <span
+                className={
+                  l.status === "sent"
+                    ? "text-forest"
+                    : l.status === "pending"
+                      ? "text-muted-foreground"
+                      : "text-destructive"
+                }
+              >
+                {l.status}
+                {l.retry_count ? ` (${l.retry_count})` : ""}
+              </span>
+              <span className="text-muted-foreground">
+                {new Date(l.sent_at ?? l.created_at).toLocaleString(ar ? "ar-EG" : "en-GB")}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 
 /** Documents the customer uploaded for this order, opened via short-lived links. */
 function OrderDocuments({ orderId }: { orderId: string }) {
