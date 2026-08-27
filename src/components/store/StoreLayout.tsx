@@ -114,12 +114,21 @@ export function StoreLayout({ children }: { children: ReactNode }) {
                       {t("nav.admin")}
                     </Link>
                   ) : null}
+                  {isAgency ? (
+                    <Link
+                      to="/agency"
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
+                      {agencyLabel}
+                    </Link>
+                  ) : null}
                   <Link
                     to={session ? "/account" : "/auth"}
                     onClick={() => setOpen(false)}
                     className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-secondary"
                   >
-                    {session ? t("nav.dashboard") : t("nav.login")}
+                    {session ? accountLabel : t("nav.login")}
                   </Link>
                   {session ? (
                     <button
