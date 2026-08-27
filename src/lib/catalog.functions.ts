@@ -38,6 +38,16 @@ const currencyInput = z.object({
   currency: z.unknown().transform(normalizeCurrency).default("USD"),
 });
 
+/**
+ * Public storefront projection. `agency_price_usd` is deliberately absent so the
+ * agency price never leaves the database for customer/visitor contexts.
+ */
+const PUBLIC_OFFER_COLUMNS =
+  "id,slug,title_en,title_ar,description_en,description_ar,category,base_price_usd," +
+  "customer_price_usd,duration_en,duration_ar,expiry_date,features,images,primary_image," +
+  "tax_percent,fee_amount_usd,discount_percent,commission_percent,allowed_payment_methods," +
+  "required_documents,status";
+
 async function loadCurrencies() {
   const sb = getPublicClient();
   const [{ data: currencies }, { data: rates }] = await Promise.all([
