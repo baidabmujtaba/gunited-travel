@@ -1,7 +1,12 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import GunitedTicketCard from "@/components/GunitedTicketCard";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyLatestTicket } from "@/lib/orders.functions";
 
 /**
  * Signature hero: a realistic airliner taxis along the dashed runway, rotates
@@ -12,6 +17,31 @@ import GunitedTicketCard from "@/components/GunitedTicketCard";
 export function PlaneHero() {
   const { t, lang } = useI18n();
   const isAr = lang === "ar";
+
+  // Only signed-in visitors get their own booking on the card; guests see the sample.
+  const [hasSession, setHasSession] = useState(false);
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setHasSession(Boolean(data.session));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setHasSession(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const fetchLatest = useServerFn(getMyLatestTicket);
+  const { data: latest } = useQuery({
+    queryKey: ["hero-latest-ticket"],
+    queryFn: () => fetchLatest(),
+    enabled: hasSession,
+    staleTime: 60_000,
+    retry: false,
+  });
 
   const sampleCard = {
     locale: isAr ? ("ar" as const) : ("en" as const),
@@ -31,6 +61,23 @@ export function PlaneHero() {
     travelClass: isAr ? "درجة اقتصادية" : "Economy",
     passenger: isAr ? "أحمد محمد" : "Ahmed Mohamed",
   };
+
+  const isReal = Boolean(latest?.trackingId);
+  const ticketCard = isReal
+    ? {
+        locale: isAr ? ("ar" as const) : ("en" as const),
+        from: null,
+        to: null,
+        bookingRef: latest!.trackingId as string,
+        travelClass: latest!.offerTitle
+          ? isAr
+            ? latest!.offerTitle.ar
+            : latest!.offerTitle.en
+          : null,
+        passenger: latest!.customerName,
+      }
+    : sampleCard;
+
 
   return (
     <section className="relative overflow-hidden bg-beige">
