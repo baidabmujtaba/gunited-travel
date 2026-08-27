@@ -44,7 +44,8 @@ function toDraft(row: Record<string, unknown>): OfferDraft {
     description_ar: (row["description_ar"] as string) ?? "",
     description_en: (row["description_en"] as string) ?? "",
     category: (row["category"] as string) ?? "package",
-    base_price_usd: String(row["base_price_usd"] ?? ""),
+    customer_price_usd: String(row["customer_price_usd"] ?? row["base_price_usd"] ?? ""),
+    agency_price_usd: String(row["agency_price_usd"] ?? ""),
     tax_percent: String(row["tax_percent"] ?? 0),
     fee_amount_usd: String(row["fee_amount_usd"] ?? 0),
     discount_percent: String(row["discount_percent"] ?? 0),
@@ -113,8 +114,14 @@ function AdminOffersPage() {
                     {lang === "ar" ? String(row["title_ar"]) : String(row["title_en"])}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {t(`category.${String(row["category"])}`)} · ${Number(row["base_price_usd"]).toFixed(2)} ·{" "}
-                    {normalizeDocs(row["required_documents"]).length} {t("checkout.docs")}
+                    {t(`category.${String(row["category"])}`)} ·{" "}
+                    {t("admin.offers.price.customer")}: $
+                    {Number(row["customer_price_usd"] ?? row["base_price_usd"] ?? 0).toFixed(2)} ·{" "}
+                    {t("admin.offers.price.agency")}:{" "}
+                    {row["agency_price_usd"] == null
+                      ? "—"
+                      : `$${Number(row["agency_price_usd"]).toFixed(2)}`}{" "}
+                    · {normalizeDocs(row["required_documents"]).length} {t("checkout.docs")}
                   </p>
                 </div>
                 <Badge className={row["status"] === "active" ? "bg-forest text-cream" : "bg-secondary"}>
