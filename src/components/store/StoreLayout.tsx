@@ -13,7 +13,8 @@ import { useI18n } from "@/lib/i18n";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
 
 export function StoreLayout({ children }: { children: ReactNode }) {
-  const { t, lang } = useI18n();
+  const i18n = useI18n();
+  const { t } = i18n;
   const { session } = useSession();
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
@@ -26,8 +27,8 @@ export function StoreLayout({ children }: { children: ReactNode }) {
   ] as const;
 
   // Quick link label is shorter and friendlier for the header button.
-  const agencyLabel = lang === "ar" ? "وكالتي" : "My agency";
-  const accountLabel = lang === "ar" ? "حسابي" : "My account";
+  const agencyLabel = i18n.lang === "ar" ? "وكالتي" : "My agency";
+  const accountLabel = i18n.lang === "ar" ? "حسابي" : "My account";
 
 
   return (
