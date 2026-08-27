@@ -45,6 +45,7 @@ import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authen
 import { Route as ApiPublicEmailDispatchRouteImport } from './routes/api/public/email-dispatch'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
 import { Route as AuthenticatedAdminCustomerIdRouteImport } from './routes/_authenticated/admin.customer.$id'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -246,6 +247,12 @@ const AuthenticatedAdminCustomerIdRoute =
     path: '/customer/$id',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/agency/': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -318,6 +326,7 @@ export interface FileRoutesByTo {
   '/agency': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -357,6 +366,7 @@ export interface FileRoutesById {
   '/_authenticated/agency/': typeof AuthenticatedAgencyIndexRoute
   '/_authenticated/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
   '/_authenticated/admin/customer/$id': typeof AuthenticatedAdminCustomerIdRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/agency/'
     | '/admin/agency/$id'
     | '/admin/customer/$id'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/agency'
     | '/admin/agency/$id'
     | '/admin/customer/$id'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
@@ -469,6 +481,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agency/'
     | '/_authenticated/admin/agency/$id'
     | '/_authenticated/admin/customer/$id'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -482,6 +495,7 @@ export interface RootRouteChildren {
   OffersSlugRoute: typeof OffersSlugRoute
   OffersIndexRoute: typeof OffersIndexRoute
   ApiPublicEmailDispatchRoute: typeof ApiPublicEmailDispatchRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -738,6 +752,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomerIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -832,6 +853,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersSlugRoute: OffersSlugRoute,
   OffersIndexRoute: OffersIndexRoute,
   ApiPublicEmailDispatchRoute: ApiPublicEmailDispatchRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
