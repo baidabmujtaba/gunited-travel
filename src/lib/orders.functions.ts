@@ -114,6 +114,9 @@ export const createOrder = createServerFn({ method: "POST" })
         currency_code: data.currency,
         frozen_rate: price.rate,
         amount_usd: price.totalUsd,
+        // Historical record: survives later edits to the offer's prices.
+        applied_price_usd: appliedPriceUsd,
+        price_context: priceContext,
         amount_display: price.total,
         payment_method_id: data.paymentMethodId,
         transaction_reference: data.transactionReference,
