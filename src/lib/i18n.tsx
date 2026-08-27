@@ -345,6 +345,21 @@ export const messages: Dict = {
   "admin.offers.desc_en": { ar: "الوصف (إنجليزي)", en: "Description (English)" },
   "admin.offers.category": { ar: "التصنيف", en: "Category" },
   "admin.offers.price": { ar: "السعر الأساسي (USD)", en: "Base price (USD)" },
+  "admin.offers.price.customer": { ar: "سعر العميل (USD)", en: "Customer price (USD)" },
+  "admin.offers.price.agency": { ar: "سعر الوكالة (USD)", en: "Agency price (USD)" },
+  "admin.offers.prices.required": {
+    ar: "يجب إدخال سعر العميل وسعر الوكالة (أرقام موجبة).",
+    en: "Both customer price and agency price are required (positive numbers).",
+  },
+  "agency.offers.title": { ar: "العروض والخدمات", en: "Offers & services" },
+  "agency.offers.subtitle": {
+    ar: "الأسعار المعروضة هنا هي أسعار الوكالة الخاصة بك.",
+    en: "Prices shown here are your agency prices.",
+  },
+  "agency.offers.missing": {
+    ar: "لم يحدد المشرف سعر وكالة لهذا العرض بعد.",
+    en: "An administrator has not set an agency price for this offer yet.",
+  },
   "admin.offers.status": { ar: "الحالة", en: "Status" },
   "admin.offers.status.active": { ar: "منشور", en: "Active" },
   "admin.offers.status.draft": { ar: "مسودة", en: "Draft" },
