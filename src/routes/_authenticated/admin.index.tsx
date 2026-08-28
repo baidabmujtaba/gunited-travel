@@ -144,6 +144,9 @@ function SalesHub() {
         </>
       )}
 
+      <OpsAlerts />
+
+
       <div className="surface-card p-4 sm:p-5">
         <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
           <h2 className="truncate text-base font-bold text-forest-deep sm:text-lg">
