@@ -19,6 +19,8 @@ import {
   StatusBreakdownCard,
   TrendCard,
 } from "@/components/admin/DashboardKit";
+import { OpsAlerts } from "@/components/admin/OpsAlerts";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -143,6 +145,9 @@ function SalesHub() {
           </div>
         </>
       )}
+
+      <OpsAlerts />
+
 
       <div className="surface-card p-4 sm:p-5">
         <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
