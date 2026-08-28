@@ -50,8 +50,8 @@ export const getAgencyCatalog = createServerFn({ method: "GET" })
 
       const today = new Date().toISOString().slice(0, 10);
       const offers = await Promise.all(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (rows ?? [])
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .filter((r: any) => !r.expiry_date || r.expiry_date >= today)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
