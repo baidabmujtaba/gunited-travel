@@ -100,8 +100,11 @@ export const getCatalog = createServerFn({ method: "GET" })
       .from("service_offers")
       .select(PUBLIC_OFFER_COLUMNS)
       .eq("status", "active")
+      // Security-approval templates have their own dedicated entry card.
+      .neq("category", "security_approval")
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
+
     if (error) throw new Error(error.message);
 
     const today = new Date().toISOString().slice(0, 10);
