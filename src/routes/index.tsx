@@ -4,7 +4,9 @@ import { BadgeCheck, MessageCircle, ShieldCheck, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
 import { PlaneHero } from "@/components/store/PlaneHero";
+import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
+
 import { Button } from "@/components/ui/button";
 import { getCatalog } from "@/lib/catalog.functions";
 import { useI18n } from "@/lib/i18n";
