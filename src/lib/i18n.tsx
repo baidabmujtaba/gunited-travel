@@ -47,6 +47,39 @@ export const messages: Dict = {
   "category.tour": { ar: "رحلات", en: "Tours" },
   "category.insurance": { ar: "تأمين السفر", en: "Insurance" },
   "category.other": { ar: "أخرى", en: "Other" },
+  "category.security_approval": { ar: "الموافقة الأمنية", en: "Security approval" },
+
+  "security.title": { ar: "الموافقة الأمنية", en: "Security Approval" },
+  "security.subtitle": {
+    ar: "اختر نوع الموافقة الأمنية وأكمل الطلب مع المستندات المطلوبة.",
+    en: "Pick your security approval type and submit the request with the required documents.",
+  },
+  "security.flight": { ar: "طيران", en: "Flight" },
+  "security.flight.hint": {
+    ar: "موافقة أمنية للسفر جواً — أرفق تذكرة الطيران إن وجدت.",
+    en: "Clearance for air travel — attach your ticket if available.",
+  },
+  "security.border": { ar: "معبر", en: "Border crossing" },
+  "security.border.hint": {
+    ar: "موافقة أمنية للسفر البري عبر المعابر.",
+    en: "Clearance for land travel through a border crossing.",
+  },
+  "security.border.choose": { ar: "اختر المعبر", en: "Choose the crossing" },
+  "security.border.argeen": { ar: "أرقين", en: "Argeen" },
+  "security.border.halfa": { ar: "حلفا", en: "Halfa" },
+
+  "ops.title": { ar: "مركز التنبيهات الذكية", en: "Smart operations inbox" },
+  "ops.subtitle": {
+    ar: "تنبيهات مرتبطة بالطلبات والفواتير وأرصدة الوكالات والعروض والإشعارات.",
+    en: "Cross-module alerts from orders, invoices, agency balances, offers and email delivery.",
+  },
+  "ops.empty": { ar: "لا توجد تنبيهات — كل شيء تحت السيطرة.", en: "No alerts — everything is on track." },
+  "ops.hint": {
+    ar: "يتم تحديث التنبيهات تلقائياً كل دقيقة.",
+    en: "Alerts refresh automatically every minute.",
+  },
+  "ops.open": { ar: "فتح", en: "Open" },
+
 
   "offer.duration": { ar: "المدة", en: "Duration" },
   "offer.includes": { ar: "يشمل", en: "Includes" },
