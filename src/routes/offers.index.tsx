@@ -70,9 +70,11 @@ function OffersPage() {
 
   return (
     <StoreLayout>
-      <div className="mx-auto w-full max-w-6xl px-5 py-12">
+      <SecurityClearanceCard />
+      <div className="mx-auto w-full max-w-6xl px-5 pb-12">
         <h1 className="text-3xl font-bold sm:text-4xl">{t("catalog.title")}</h1>
         <p className="mt-2 mb-8 text-sm text-muted-foreground">{t("catalog.subtitle")}</p>
+
         {query.isError ? (
           <div className="surface-card p-8 text-center text-sm text-muted-foreground">
             <p>
