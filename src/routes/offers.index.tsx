@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
+import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
+
 import { getCatalog } from "@/lib/catalog.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -70,9 +72,11 @@ function OffersPage() {
 
   return (
     <StoreLayout>
-      <div className="mx-auto w-full max-w-6xl px-5 py-12">
+      <SecurityClearanceCard />
+      <div className="mx-auto w-full max-w-6xl px-5 pb-12">
         <h1 className="text-3xl font-bold sm:text-4xl">{t("catalog.title")}</h1>
         <p className="mt-2 mb-8 text-sm text-muted-foreground">{t("catalog.subtitle")}</p>
+
         {query.isError ? (
           <div className="surface-card p-8 text-center text-sm text-muted-foreground">
             <p>

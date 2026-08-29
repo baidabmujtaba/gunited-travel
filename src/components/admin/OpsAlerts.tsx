@@ -64,7 +64,7 @@ export function OpsAlerts() {
                   </p>
                 </div>
                 <Link
-                  to={a.link}
+                  to={a.link as "/admin"}
                   className="inline-flex shrink-0 items-center gap-1 rounded-full bg-forest px-3 py-1.5 text-xs font-semibold text-cream"
                 >
                   {t("ops.open")}

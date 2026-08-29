@@ -4,7 +4,9 @@ import { BadgeCheck, MessageCircle, ShieldCheck, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
 import { PlaneHero } from "@/components/store/PlaneHero";
+import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
+
 import { Button } from "@/components/ui/button";
 import { getCatalog } from "@/lib/catalog.functions";
 import { useI18n } from "@/lib/i18n";
@@ -63,6 +65,9 @@ function Home() {
   return (
     <StoreLayout>
       <PlaneHero />
+
+      <SecurityClearanceCard />
+
 
       <section className="mx-auto w-full max-w-6xl px-5 py-14">
         <div className="grid gap-4 sm:grid-cols-3">

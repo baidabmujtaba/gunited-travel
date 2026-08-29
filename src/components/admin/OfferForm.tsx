@@ -20,7 +20,7 @@ import { useI18n } from "@/lib/i18n";
 import { saveOffer } from "@/lib/offers.functions";
 import { listPaymentMethodsAdmin } from "@/lib/finance.functions";
 
-const CATEGORIES = ["package", "visa", "flight", "tour", "insurance"] as const;
+const CATEGORIES = ["package", "visa", "flight", "tour", "insurance", "security_approval"] as const;
 const IMG_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_IMG = 5 * 1024 * 1024;
 
