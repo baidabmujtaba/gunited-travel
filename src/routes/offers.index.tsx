@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
+import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
+
 import { getCatalog } from "@/lib/catalog.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
