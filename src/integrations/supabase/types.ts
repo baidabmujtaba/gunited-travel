@@ -989,6 +989,7 @@ export type Database = {
           agency_price_usd: number | null
           allowed_payment_methods: string[]
           base_price_usd: number
+          border_point: string | null
           category: string
           commission_percent: number
           created_at: string
@@ -1007,6 +1008,7 @@ export type Database = {
           images: Json
           primary_image: string | null
           required_documents: Json
+          security_subtype: string | null
           slug: string | null
           status: Database["public"]["Enums"]["offer_status"]
           tax_percent: number
@@ -1018,6 +1020,7 @@ export type Database = {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           base_price_usd: number
+          border_point?: string | null
           category?: string
           commission_percent?: number
           created_at?: string
@@ -1036,6 +1039,7 @@ export type Database = {
           images?: Json
           primary_image?: string | null
           required_documents?: Json
+          security_subtype?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
@@ -1047,6 +1051,7 @@ export type Database = {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           base_price_usd?: number
+          border_point?: string | null
           category?: string
           commission_percent?: number
           created_at?: string
@@ -1065,6 +1070,7 @@ export type Database = {
           images?: Json
           primary_image?: string | null
           required_documents?: Json
+          security_subtype?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
