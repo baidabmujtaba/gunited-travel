@@ -64,6 +64,9 @@ function Home() {
     <StoreLayout>
       <PlaneHero />
 
+      <SecurityClearanceCard />
+
+
       <section className="mx-auto w-full max-w-6xl px-5 py-14">
         <div className="grid gap-4 sm:grid-cols-3">
           {[
