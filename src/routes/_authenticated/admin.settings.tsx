@@ -236,6 +236,93 @@ function AdminSettingsPage() {
           {t("common.save")}
         </Button>
       </section>
+
+      <ResetSection />
     </div>
   );
 }
+
+function ResetSection() {
+  const { t } = useI18n();
+  const qc = useQueryClient();
+  const [confirm, setConfirm] = useState("");
+  const [purgeFiles, setPurgeFiles] = useState(true);
+
+  const preview = useQuery({
+    queryKey: ["reset-preview"],
+    queryFn: () => getResetPreview(),
+    retry: false,
+  });
+
+  const reset = useMutation({
+    mutationFn: () => resetOperationalData({ data: { confirm, purgeFiles } }),
+    onSuccess: () => {
+      toast.success(t("admin.reset.done"));
+      setConfirm("");
+      void qc.invalidateQueries();
+    },
+    onError: (e: unknown) =>
+      toast.error(t("common.error"), { description: String((e as Error)?.message ?? e) }),
+  });
+
+  if (preview.isError) return null;
+
+  const stats: Array<[string, number | undefined]> = [
+    ["admin.reset.orders", preview.data?.orders],
+    ["admin.reset.invoices", preview.data?.invoices],
+    ["admin.reset.payments", preview.data?.payments],
+    ["admin.reset.ledger", preview.data?.ledger],
+    ["admin.reset.documents", preview.data?.documents],
+  ];
+
+  return (
+    <section className="surface-card space-y-4 border-destructive/40 p-5">
+      <div>
+        <h2 className="text-lg font-bold text-destructive">{t("admin.reset.title")}</h2>
+        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("admin.reset.subtitle")}</p>
+        <p className="mt-1 text-xs font-semibold text-destructive">{t("admin.reset.warning")}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {stats.map(([key, value]) => (
+          <div key={key} className="rounded-xl bg-beige/60 p-3">
+            <p className="text-xs text-muted-foreground">{t(key)}</p>
+            <p className="text-lg font-bold text-forest-deep">{value ?? "—"}</p>
+          </div>
+        ))}
+      </div>
+
+      <label className="flex items-center gap-2 text-sm text-forest-deep">
+        <input
+          type="checkbox"
+          checked={purgeFiles}
+          onChange={(e) => setPurgeFiles(e.target.checked)}
+          className="size-4 accent-[hsl(var(--destructive))]"
+        />
+        {t("admin.reset.files")}
+      </label>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold text-destructive">
+            {t("admin.reset.confirm_label")}
+          </Label>
+          <Input
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="RESET"
+            className="w-48 bg-white"
+          />
+        </div>
+        <Button
+          variant="destructive"
+          disabled={confirm.trim().toUpperCase() !== "RESET" || reset.isPending}
+          onClick={() => reset.mutate()}
+        >
+          {t("admin.reset.button")}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
