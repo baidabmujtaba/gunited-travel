@@ -640,7 +640,30 @@ export const messages: Dict = {
     ar: "العرض فقط — التعديل يحتاج صلاحية مشرف.",
     en: "Read-only — editing requires an admin role.",
   },
+  "admin.reset.title": { ar: "تصفير النظام", en: "Reset system data" },
+  "admin.reset.subtitle": {
+    ar: "حذف نهائي لجميع الطلبات وسجل الحالات والمستندات والفواتير والمدفوعات وحساب الوكالات والإشعارات وطوابير البريد. تبقى العروض والعملاء والوكالات والمستخدمون والإعدادات كما هي.",
+    en: "Permanently deletes all orders, status history, documents, invoices, payments, agency ledger, notifications and email queues. Offers, customers, agencies, users and settings are kept.",
+  },
+  "admin.reset.warning": {
+    ar: "لا يمكن التراجع عن هذه العملية. متاحة لمدير النظام الأعلى فقط.",
+    en: "This cannot be undone. Available to the super admin only.",
+  },
+  "admin.reset.files": { ar: "حذف الملفات المرفوعة أيضاً (الإيصالات، ملفات الفواتير، المستندات)", en: "Also delete uploaded files (receipts, invoice PDFs, documents)" },
+  "admin.reset.confirm_label": { ar: 'اكتب "RESET" للتأكيد', en: 'Type "RESET" to confirm' },
+  "admin.reset.button": { ar: "تصفير جميع البيانات", en: "Wipe all data" },
+  "admin.reset.done": { ar: "تم تصفير بيانات النظام.", en: "System data was reset." },
+  "admin.reset.forbidden": {
+    ar: "هذه الأداة متاحة لمدير النظام الأعلى فقط.",
+    en: "This tool is available to the super admin only.",
+  },
+  "admin.reset.orders": { ar: "الطلبات", en: "Orders" },
+  "admin.reset.invoices": { ar: "الفواتير", en: "Invoices" },
+  "admin.reset.payments": { ar: "المدفوعات", en: "Payments" },
+  "admin.reset.ledger": { ar: "قيود الوكالات", en: "Ledger entries" },
+  "admin.reset.documents": { ar: "المستندات", en: "Documents" },
 };
+
 
 type I18nValue = {
   lang: Lang;
