@@ -15,12 +15,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
+import { getResetPreview, resetOperationalData } from "@/lib/reset.functions";
 import {
   getPlatformSettings,
   saveAmadeusSettings,
   saveInvoiceSettings,
   saveSiteSettings,
 } from "@/lib/settings.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
