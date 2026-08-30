@@ -2,6 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertStaff } from "./admin.shared";
+import { DEFAULT_THEME, normalizeTheme, THEME_SETTINGS_KEY, type BrandTheme } from "./theme";
+
+const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
+const themeSchema = z.object({
+  forest: hex,
+  forest_deep: hex,
+  sage: hex,
+  mint: hex,
+  beige: hex,
+  beige_card: hex,
+  cream: hex,
+  gold: hex,
+});
 
 const siteSchema = z.object({
   name_en: z.string().min(2).max(160),
@@ -64,7 +77,7 @@ export const getPlatformSettings = createServerFn({ method: "GET" })
     await assertStaff(context);
     const sb = context.supabase;
     const [{ data: rows }, { data: isAdmin }] = await Promise.all([
-      sb.from("settings").select("key,value").in("key", ["company", "invoicing"]),
+      sb.from("settings").select("key,value").in("key", ["company", "invoicing", THEME_SETTINGS_KEY]),
       sb.rpc("is_admin", { _user_id: context.userId }),
     ]);
 
@@ -88,7 +101,9 @@ export const getPlatformSettings = createServerFn({ method: "GET" })
       }
     }
 
-    return { site, invoicing, amadeus, canManage: Boolean(isAdmin) };
+    const theme: BrandTheme = normalizeTheme(map.get(THEME_SETTINGS_KEY) ?? DEFAULT_THEME);
+
+    return { site, invoicing, amadeus, theme, canManage: Boolean(isAdmin) };
   });
 
 export const saveSiteSettings = createServerFn({ method: "POST" })
@@ -161,6 +176,27 @@ export const saveAmadeusSettings = createServerFn({ method: "POST" })
       entity: "integration_credentials",
       entity_id: "amadeus",
       after_data: { environment: data.environment, client_id_set: Boolean(data.client_id.trim()) } as any,
+    });
+    return { ok: true };
+  });
+
+export const saveThemeSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => themeSchema.parse(d))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("settings").upsert({
+      key: THEME_SETTINGS_KEY,
+      value: data as any,
+      updated_at: new Date().toISOString(),
+    } as any);
+    if (error) throw new Error(error.message);
+    await context.supabase.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: "settings.theme.update",
+      entity: "settings",
+      entity_id: THEME_SETTINGS_KEY,
+      after_data: data as any,
     });
     return { ok: true };
   });
