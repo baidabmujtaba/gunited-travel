@@ -21,6 +21,7 @@ import { Route as AuthenticatedAgencyRouteImport } from './routes/_authenticated
 import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersSlugRouteImport } from './routes/offers.$slug'
+import { Route as RequestSlugRouteImport } from './routes/request.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAgenciesRouteImport } from './routes/_authenticated/admin.agencies'
 import { Route as AuthenticatedAdminBalancesRouteImport } from './routes/_authenticated/admin.balances'
@@ -105,6 +106,11 @@ const OffersIndexRoute = OffersIndexRouteImport.update({
 const OffersSlugRoute = OffersSlugRouteImport.update({
   id: '/offers/$slug',
   path: '/offers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestSlugRoute = RequestSlugRouteImport.update({
+  id: '/request/$slug',
+  path: '/request/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -271,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers': typeof OffersIndexRoute
   '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -349,6 +357,7 @@ export interface FileRoutesById {
   '/_authenticated/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/_authenticated/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/_authenticated/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -390,6 +399,7 @@ export interface FileRouteTypes {
     | '/agency'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers/'
     | '/admin/agencies'
     | '/admin/balances'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers'
     | '/admin/agencies'
     | '/admin/balances'
@@ -467,6 +478,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agency'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers/'
     | '/_authenticated/admin/agencies'
     | '/_authenticated/admin/balances'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   TrackRoute: typeof TrackRoute
   CheckoutSlugRoute: typeof CheckoutSlugRoute
   OffersSlugRoute: typeof OffersSlugRoute
+  RequestSlugRoute: typeof RequestSlugRoute
   OffersIndexRoute: typeof OffersIndexRoute
   ApiPublicEmailDispatchRoute: typeof ApiPublicEmailDispatchRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -595,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/offers/$slug'
       fullPath: '/offers/$slug'
       preLoaderRoute: typeof OffersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request/$slug': {
+      id: '/request/$slug'
+      path: '/request/$slug'
+      fullPath: '/request/$slug'
+      preLoaderRoute: typeof RequestSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -872,6 +892,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrackRoute: TrackRoute,
   CheckoutSlugRoute: CheckoutSlugRoute,
   OffersSlugRoute: OffersSlugRoute,
+  RequestSlugRoute: RequestSlugRoute,
   OffersIndexRoute: OffersIndexRoute,
   ApiPublicEmailDispatchRoute: ApiPublicEmailDispatchRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
