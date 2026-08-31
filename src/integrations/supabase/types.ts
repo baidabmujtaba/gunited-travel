@@ -226,6 +226,39 @@ export type Database = {
           },
         ]
       }
+      destinations: {
+        Row: {
+          code: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name_ar: string
+          name_en: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name_ar: string
+          name_en: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name_ar?: string
+          name_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           agency_id: string | null
@@ -988,6 +1021,7 @@ export type Database = {
         Row: {
           agency_price_usd: number | null
           allowed_payment_methods: string[]
+          badge_color: string | null
           base_price_usd: number
           border_point: string | null
           category: string
@@ -999,11 +1033,13 @@ export type Database = {
           description_ar: string | null
           description_en: string | null
           discount_percent: number
+          display_order: number
           duration_ar: string | null
           duration_en: string | null
           expiry_date: string | null
           features: Json
           fee_amount_usd: number
+          icon: string | null
           id: string
           images: Json
           primary_image: string | null
@@ -1019,6 +1055,7 @@ export type Database = {
         Insert: {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
+          badge_color?: string | null
           base_price_usd: number
           border_point?: string | null
           category?: string
@@ -1030,11 +1067,13 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           discount_percent?: number
+          display_order?: number
           duration_ar?: string | null
           duration_en?: string | null
           expiry_date?: string | null
           features?: Json
           fee_amount_usd?: number
+          icon?: string | null
           id?: string
           images?: Json
           primary_image?: string | null
@@ -1050,6 +1089,7 @@ export type Database = {
         Update: {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
+          badge_color?: string | null
           base_price_usd?: number
           border_point?: string | null
           category?: string
@@ -1061,11 +1101,13 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           discount_percent?: number
+          display_order?: number
           duration_ar?: string | null
           duration_en?: string | null
           expiry_date?: string | null
           features?: Json
           fee_amount_usd?: number
+          icon?: string | null
           id?: string
           images?: Json
           primary_image?: string | null

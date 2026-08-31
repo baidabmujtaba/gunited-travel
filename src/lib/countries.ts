@@ -1,0 +1,31 @@
+/** Bilingual nationality list used by the guided request flow. */
+export type Country = { code: string; name_en: string; name_ar: string };
+
+export const NATIONALITIES: Country[] = [
+  { code: "SD", name_en: "Sudanese", name_ar: "سوداني" },
+  { code: "EG", name_en: "Egyptian", name_ar: "مصري" },
+  { code: "SA", name_en: "Saudi", name_ar: "سعودي" },
+  { code: "AE", name_en: "Emirati", name_ar: "إماراتي" },
+  { code: "QA", name_en: "Qatari", name_ar: "قطري" },
+  { code: "KW", name_en: "Kuwaiti", name_ar: "كويتي" },
+  { code: "BH", name_en: "Bahraini", name_ar: "بحريني" },
+  { code: "OM", name_en: "Omani", name_ar: "عماني" },
+  { code: "JO", name_en: "Jordanian", name_ar: "أردني" },
+  { code: "SY", name_en: "Syrian", name_ar: "سوري" },
+  { code: "LB", name_en: "Lebanese", name_ar: "لبناني" },
+  { code: "IQ", name_en: "Iraqi", name_ar: "عراقي" },
+  { code: "YE", name_en: "Yemeni", name_ar: "يمني" },
+  { code: "LY", name_en: "Libyan", name_ar: "ليبي" },
+  { code: "TN", name_en: "Tunisian", name_ar: "تونسي" },
+  { code: "DZ", name_en: "Algerian", name_ar: "جزائري" },
+  { code: "MA", name_en: "Moroccan", name_ar: "مغربي" },
+  { code: "ER", name_en: "Eritrean", name_ar: "إريتري" },
+  { code: "ET", name_en: "Ethiopian", name_ar: "إثيوبي" },
+  { code: "SS", name_en: "South Sudanese", name_ar: "جنوب سوداني" },
+  { code: "TD", name_en: "Chadian", name_ar: "تشادي" },
+  { code: "KE", name_en: "Kenyan", name_ar: "كيني" },
+  { code: "TR", name_en: "Turkish", name_ar: "تركي" },
+  { code: "GB", name_en: "British", name_ar: "بريطاني" },
+  { code: "US", name_en: "American", name_ar: "أمريكي" },
+  { code: "OTHER", name_en: "Other", name_ar: "أخرى" },
+];

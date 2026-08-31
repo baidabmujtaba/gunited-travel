@@ -14,12 +14,14 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as SelectRouteImport } from './routes/select'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAgencyRouteImport } from './routes/_authenticated/agency'
 import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersSlugRouteImport } from './routes/offers.$slug'
+import { Route as RequestSlugRouteImport } from './routes/request.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAgenciesRouteImport } from './routes/_authenticated/admin.agencies'
 import { Route as AuthenticatedAdminBalancesRouteImport } from './routes/_authenticated/admin.balances'
@@ -71,6 +73,11 @@ const CatalogRoute = CatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SelectRoute = SelectRouteImport.update({
+  id: '/select',
+  path: '/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
@@ -99,6 +106,11 @@ const OffersIndexRoute = OffersIndexRouteImport.update({
 const OffersSlugRoute = OffersSlugRouteImport.update({
   id: '/offers/$slug',
   path: '/offers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestSlugRoute = RequestSlugRouteImport.update({
+  id: '/request/$slug',
+  path: '/request/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -259,11 +271,13 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
+  '/select': typeof SelectRoute
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -297,9 +311,11 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
+  '/select': typeof SelectRoute
   '/track': typeof TrackRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers': typeof OffersIndexRoute
   '/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -335,11 +351,13 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
+  '/select': typeof SelectRoute
   '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
+  '/request/$slug': typeof RequestSlugRoute
   '/offers/': typeof OffersIndexRoute
   '/_authenticated/admin/agencies': typeof AuthenticatedAdminAgenciesRoute
   '/_authenticated/admin/balances': typeof AuthenticatedAdminBalancesRoute
@@ -375,11 +393,13 @@ export interface FileRouteTypes {
     | '/account'
     | '/auth'
     | '/catalog'
+    | '/select'
     | '/track'
     | '/admin'
     | '/agency'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers/'
     | '/admin/agencies'
     | '/admin/balances'
@@ -413,9 +433,11 @@ export interface FileRouteTypes {
     | '/account'
     | '/auth'
     | '/catalog'
+    | '/select'
     | '/track'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers'
     | '/admin/agencies'
     | '/admin/balances'
@@ -450,11 +472,13 @@ export interface FileRouteTypes {
     | '/account'
     | '/auth'
     | '/catalog'
+    | '/select'
     | '/track'
     | '/_authenticated/admin'
     | '/_authenticated/agency'
     | '/checkout/$slug'
     | '/offers/$slug'
+    | '/request/$slug'
     | '/offers/'
     | '/_authenticated/admin/agencies'
     | '/_authenticated/admin/balances'
@@ -490,9 +514,11 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AuthRoute: typeof AuthRoute
   CatalogRoute: typeof CatalogRoute
+  SelectRoute: typeof SelectRoute
   TrackRoute: typeof TrackRoute
   CheckoutSlugRoute: typeof CheckoutSlugRoute
   OffersSlugRoute: typeof OffersSlugRoute
+  RequestSlugRoute: typeof RequestSlugRoute
   OffersIndexRoute: typeof OffersIndexRoute
   ApiPublicEmailDispatchRoute: typeof ApiPublicEmailDispatchRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -535,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/select': {
+      id: '/select'
+      path: '/select'
+      fullPath: '/select'
+      preLoaderRoute: typeof SelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track': {
       id: '/track'
       path: '/track'
@@ -575,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/offers/$slug'
       fullPath: '/offers/$slug'
       preLoaderRoute: typeof OffersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request/$slug': {
+      id: '/request/$slug'
+      path: '/request/$slug'
+      fullPath: '/request/$slug'
+      preLoaderRoute: typeof RequestSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -848,9 +888,11 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AuthRoute: AuthRoute,
   CatalogRoute: CatalogRoute,
+  SelectRoute: SelectRoute,
   TrackRoute: TrackRoute,
   CheckoutSlugRoute: CheckoutSlugRoute,
   OffersSlugRoute: OffersSlugRoute,
+  RequestSlugRoute: RequestSlugRoute,
   OffersIndexRoute: OffersIndexRoute,
   ApiPublicEmailDispatchRoute: ApiPublicEmailDispatchRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
