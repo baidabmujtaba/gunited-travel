@@ -217,3 +217,65 @@ function mapOffer(
     ),
   };
 }
+
+export type OfferType = {
+  id: string;
+  slug: string;
+  title_en: string;
+  title_ar: string;
+  description_en: string;
+  description_ar: string;
+  category: string;
+  icon: string | null;
+  badge_color: string | null;
+  display_order: number;
+};
+
+/**
+ * Card list for the guided catalog (/select): every active offer, including the
+ * security-approval templates, with the admin-configured icon/badge/order.
+ */
+export const getOfferTypes = createServerFn({ method: "GET" }).handler(
+  async (): Promise<OfferType[]> => {
+    const sb = getPublicClient();
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await sb
+      .from("service_offers")
+      .select(
+        "id,slug,title_en,title_ar,description_en,description_ar,category,icon,badge_color,display_order,expiry_date",
+      )
+      .eq("status", "active")
+      .is("deleted_at", null)
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data ?? [])
+      .filter((r) => !r.expiry_date || r.expiry_date >= today)
+      .map((r) => ({
+        id: r.id,
+        slug: r.slug ?? r.id,
+        title_en: r.title_en,
+        title_ar: r.title_ar,
+        description_en: r.description_en ?? "",
+        description_ar: r.description_ar ?? "",
+        category: r.category,
+        icon: r.icon ?? null,
+        badge_color: r.badge_color ?? null,
+        display_order: Number(r.display_order ?? 0),
+      }));
+  },
+);
+
+export type Destination = { code: string; name_en: string; name_ar: string };
+
+export const getDestinations = createServerFn({ method: "GET" }).handler(
+  async (): Promise<Destination[]> => {
+    const sb = getPublicClient();
+    const { data } = await sb
+      .from("destinations")
+      .select("code,name_en,name_ar")
+      .eq("is_active", true)
+      .order("display_order");
+    return data ?? [];
+  },
+);
