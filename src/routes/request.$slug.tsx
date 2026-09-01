@@ -77,21 +77,54 @@ function RequestPage() {
   });
 
   const offer = offerQuery.data?.offer ?? null;
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [passportExpiry, setPassportExpiry] = useState("");
+  const [gender, setGender] = useState("");
   const [nationality, setNationality] = useState("");
   const [destination, setDestination] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  const [borderPoint, setBorderPoint] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [notes, setNotes] = useState("");
   const [travelers, setTravelers] = useState(1);
 
   const currentStep = 1; // zero-based: "البيانات"
+
+  const canProceed =
+    Boolean(fullName.trim()) &&
+    Boolean(email.trim()) &&
+    Boolean(whatsapp.trim()) &&
+    Boolean(passportNumber.trim()) &&
+    Boolean(nationality) &&
+    Boolean(destination);
 
   const proceed = () => {
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(
         `${REQUEST_DRAFT_PREFIX}${slug}`,
-        JSON.stringify({ nationality, destination, travelers }),
+        JSON.stringify({
+          fullName,
+          email,
+          whatsapp,
+          passportNumber,
+          passportExpiry,
+          gender,
+          nationality,
+          destination,
+          travelDate,
+          borderPoint,
+          purpose,
+          notes,
+          travelers,
+        }),
       );
     }
     void navigate({ to: "/checkout/$slug", params: { slug }, search: { currency: "USD" } });
   };
+
 
   return (
     <div className="min-h-screen bg-cream pb-10">
