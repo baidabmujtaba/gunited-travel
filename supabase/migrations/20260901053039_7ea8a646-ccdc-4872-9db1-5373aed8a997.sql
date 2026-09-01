@@ -1,0 +1,1 @@
+grant select (icon, badge_color, display_order) on public.service_offers to anon, authenticated;
