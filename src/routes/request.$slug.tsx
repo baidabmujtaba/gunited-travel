@@ -108,7 +108,7 @@ function RequestPage() {
       </header>
 
       <div className="mx-auto max-w-2xl px-4">
-        <ol className="flex items-start justify-between gap-1 py-5">
+        <ol className="flex items-start justify-between gap-1 overflow-hidden py-5">
           {STEP_KEYS.map((key, index) => {
             const done = index < currentStep;
             const active = index === currentStep;
