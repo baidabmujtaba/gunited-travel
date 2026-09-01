@@ -74,7 +74,7 @@ function badgeClass(offer: OfferType, index: number) {
   return index % 2 === 0 ? "bg-forest text-primary-foreground" : "bg-gold text-forest-deep";
 }
 
-export default function SelectPage() {
+function SelectPage() {
   const i18n = useI18n();
   const t = i18n.t;
   const lang = i18n.lang;
