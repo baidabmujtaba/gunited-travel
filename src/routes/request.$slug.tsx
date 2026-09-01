@@ -77,21 +77,54 @@ function RequestPage() {
   });
 
   const offer = offerQuery.data?.offer ?? null;
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [passportExpiry, setPassportExpiry] = useState("");
+  const [gender, setGender] = useState("");
   const [nationality, setNationality] = useState("");
   const [destination, setDestination] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  const [borderPoint, setBorderPoint] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [notes, setNotes] = useState("");
   const [travelers, setTravelers] = useState(1);
 
   const currentStep = 1; // zero-based: "البيانات"
+
+  const canProceed =
+    Boolean(fullName.trim()) &&
+    Boolean(email.trim()) &&
+    Boolean(whatsapp.trim()) &&
+    Boolean(passportNumber.trim()) &&
+    Boolean(nationality) &&
+    Boolean(destination);
 
   const proceed = () => {
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(
         `${REQUEST_DRAFT_PREFIX}${slug}`,
-        JSON.stringify({ nationality, destination, travelers }),
+        JSON.stringify({
+          fullName,
+          email,
+          whatsapp,
+          passportNumber,
+          passportExpiry,
+          gender,
+          nationality,
+          destination,
+          travelDate,
+          borderPoint,
+          purpose,
+          notes,
+          travelers,
+        }),
       );
     }
     void navigate({ to: "/checkout/$slug", params: { slug }, search: { currency: "USD" } });
   };
+
 
   return (
     <div className="min-h-screen bg-cream pb-10">
@@ -175,70 +208,196 @@ function RequestPage() {
               </span>
             </article>
 
-            <SelectField
-              label={t("request.nationality")}
-              placeholder={t("request.nationality_placeholder")}
-              icon={<Globe className="size-4 text-forest" />}
-              value={nationality}
-              onChange={setNationality}
-              options={NATIONALITIES.map((c) => ({
-                value: c.code,
-                label: lang === "ar" ? c.name_ar : c.name_en,
-              }))}
-            />
+            <section className="surface-card space-y-4 bg-white p-4">
+              <h2 className="text-sm font-bold text-forest-deep">{t("request.section.traveler")}</h2>
 
-            <SelectField
-              label={t("request.destination")}
-              placeholder={t("request.destination_placeholder")}
-              icon={<MapPin className="size-4 text-forest" />}
-              value={destination}
-              onChange={setDestination}
-              options={(destinationsQuery.data ?? []).map((d) => ({
-                value: d.code,
-                label: lang === "ar" ? d.name_ar : d.name_en,
-              }))}
-            />
+              <TextField
+                label={t("request.full_name")}
+                placeholder={t("request.full_name_placeholder")}
+                icon={<User className="size-4 text-forest" />}
+                value={fullName}
+                onChange={setFullName}
+              />
 
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-forest-deep">{t("request.travelers")}</p>
-              <div className="flex items-center justify-between rounded-2xl border border-border bg-white p-3">
-                <button
-                  type="button"
-                  aria-label={t("request.decrease")}
-                  onClick={() => setTravelers((n) => Math.max(1, n - 1))}
-                  className="grid size-9 place-items-center rounded-full border border-border text-forest-deep disabled:opacity-40"
-                  disabled={travelers <= 1}
-                >
-                  <Minus className="size-4" />
-                </button>
-                <span className="flex items-center gap-2">
-                  <User className="size-4 text-forest" />
-                  <span className="text-xl font-bold text-forest-deep">{travelers}</span>
-                </span>
-                <button
-                  type="button"
-                  aria-label={t("request.increase")}
-                  onClick={() => setTravelers((n) => Math.min(20, n + 1))}
-                  className="grid size-9 place-items-center rounded-full bg-forest text-primary-foreground"
-                >
-                  <Plus className="size-4" />
-                </button>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label={t("request.email")}
+                  placeholder="name@email.com"
+                  type="email"
+                  icon={<Mail className="size-4 text-forest" />}
+                  value={email}
+                  onChange={setEmail}
+                />
+                <TextField
+                  label={t("request.whatsapp")}
+                  placeholder="+249 ..."
+                  type="tel"
+                  dir="ltr"
+                  icon={<Phone className="size-4 text-forest" />}
+                  value={whatsapp}
+                  onChange={setWhatsapp}
+                />
               </div>
-            </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label={t("request.passport_number")}
+                  placeholder="P1234567"
+                  dir="ltr"
+                  icon={<BookUser className="size-4 text-forest" />}
+                  value={passportNumber}
+                  onChange={setPassportNumber}
+                />
+                <TextField
+                  label={t("request.passport_expiry")}
+                  placeholder=""
+                  type="date"
+                  icon={<CalendarDays className="size-4 text-forest" />}
+                  value={passportExpiry}
+                  onChange={setPassportExpiry}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SelectField
+                  label={t("request.gender")}
+                  placeholder={t("request.gender_placeholder")}
+                  icon={<Users className="size-4 text-forest" />}
+                  value={gender}
+                  onChange={setGender}
+                  options={[
+                    { value: "male", label: t("request.gender_male") },
+                    { value: "female", label: t("request.gender_female") },
+                  ]}
+                />
+                <SelectField
+                  label={t("request.nationality")}
+                  placeholder={t("request.nationality_placeholder")}
+                  icon={<Globe className="size-4 text-forest" />}
+                  value={nationality}
+                  onChange={setNationality}
+                  options={NATIONALITIES.map((c) => ({
+                    value: c.code,
+                    label: lang === "ar" ? c.name_ar : c.name_en,
+                  }))}
+                />
+              </div>
+            </section>
+
+            <section className="surface-card space-y-4 bg-white p-4">
+              <h2 className="text-sm font-bold text-forest-deep">{t("request.section.trip")}</h2>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SelectField
+                  label={t("request.destination")}
+                  placeholder={t("request.destination_placeholder")}
+                  icon={<MapPin className="size-4 text-forest" />}
+                  value={destination}
+                  onChange={setDestination}
+                  options={(destinationsQuery.data ?? []).map((d) => ({
+                    value: d.code,
+                    label: lang === "ar" ? d.name_ar : d.name_en,
+                  }))}
+                />
+                <TextField
+                  label={t("request.travel_date")}
+                  placeholder=""
+                  type="date"
+                  icon={<CalendarDays className="size-4 text-forest" />}
+                  value={travelDate}
+                  onChange={setTravelDate}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SelectField
+                  label={t("request.border_point")}
+                  placeholder={t("request.border_placeholder")}
+                  icon={<Plane className="size-4 text-forest" />}
+                  value={borderPoint}
+                  onChange={setBorderPoint}
+                  options={[
+                    { value: "airport", label: t("request.border_airport") },
+                    { value: "argeen", label: t("request.border_argeen") },
+                    { value: "halfa", label: t("request.border_halfa") },
+                  ]}
+                />
+                <SelectField
+                  label={t("request.purpose")}
+                  placeholder={t("request.purpose_placeholder")}
+                  icon={<Info className="size-4 text-forest" />}
+                  value={purpose}
+                  onChange={setPurpose}
+                  options={[
+                    { value: "tourism", label: t("request.purpose_tourism") },
+                    { value: "work", label: t("request.purpose_work") },
+                    { value: "study", label: t("request.purpose_study") },
+                    { value: "family", label: t("request.purpose_family") },
+                    { value: "other", label: t("request.purpose_other") },
+                  ]}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <p className="text-xs font-semibold text-forest-deep">{t("request.travelers")}</p>
+                <div className="flex items-center justify-between rounded-2xl border border-border bg-white p-3">
+                  <button
+                    type="button"
+                    aria-label={t("request.decrease")}
+                    onClick={() => setTravelers((n) => Math.max(1, n - 1))}
+                    className="grid size-9 place-items-center rounded-full border border-border text-forest-deep disabled:opacity-40"
+                    disabled={travelers <= 1}
+                  >
+                    <Minus className="size-4" />
+                  </button>
+                  <span className="flex items-center gap-2">
+                    <User className="size-4 text-forest" />
+                    <span className="text-xl font-bold text-forest-deep">{travelers}</span>
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t("request.increase")}
+                    onClick={() => setTravelers((n) => Math.min(20, n + 1))}
+                    className="grid size-9 place-items-center rounded-full bg-forest text-primary-foreground"
+                  >
+                    <Plus className="size-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-forest-deep" htmlFor="request-notes">
+                  {t("request.notes")}
+                </label>
+                <textarea
+                  id="request-notes"
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={t("request.notes_placeholder")}
+                  className="w-full rounded-2xl border border-border bg-white p-3 text-sm outline-none focus:border-forest"
+                />
+              </div>
+            </section>
 
             <div className="flex items-start gap-2 rounded-2xl bg-beige/50 p-3 text-xs text-forest-deep">
               <Info className="mt-0.5 size-4 shrink-0 text-gold" />
               <p>{t("request.info")}</p>
             </div>
 
+            {!canProceed && (
+              <p className="text-center text-xs text-muted-foreground">{t("request.required_hint")}</p>
+            )}
+
             <Button
               className="h-12 w-full rounded-2xl text-sm font-bold"
-              disabled={!nationality || !destination}
+              disabled={!canProceed}
               onClick={proceed}
             >
               {t("request.continue")}
               <Forward className="size-4" />
             </Button>
+
           </div>
         )}
       </div>
