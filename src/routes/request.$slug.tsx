@@ -3,16 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
+  BookUser,
+  CalendarDays,
   Check,
   ChevronDown,
   Globe,
   Info,
   Loader2,
+  Mail,
   MapPin,
   Minus,
+  Phone,
+  Plane,
   Plus,
   ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 
