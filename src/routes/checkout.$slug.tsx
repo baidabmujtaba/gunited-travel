@@ -167,6 +167,21 @@ function Checkout() {
     setFile(f);
   }
 
+  /** Step 1 → step 2: applicant details and required documents must be complete. */
+  function goToPayment() {
+    if (!name.trim() || !email.trim() || !whatsapp.trim()) {
+      toast.error(t("checkout.required"));
+      return;
+    }
+    const missingDocs = requiredDocs.filter((d) => d.required && !docFiles[d.key]);
+    if (missingDocs.length > 0) {
+      toast.error(t("checkout.docs.missing"));
+      return;
+    }
+    setStep(2);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !whatsapp.trim() || !reference.trim() || !file || !methodId) {
