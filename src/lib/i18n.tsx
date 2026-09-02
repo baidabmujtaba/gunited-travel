@@ -701,6 +701,7 @@ export const messages: Dict = {
     ar: "أي تفاصيل تساعدنا في معالجة طلبك",
     en: "Any details that help us process your request",
   },
+  "request.info.title": { ar: "معلومة", en: "Information" },
   "request.required_hint": { ar: "أكمل الحقول المطلوبة للمتابعة", en: "Complete the required fields to continue" },
 
   "admin.theme.title": { ar: "ألوان الموقع", en: "Site colors" },
