@@ -13,6 +13,7 @@ import { useSession, useSignOut } from "@/lib/session";
 const TABS = [
   { to: "/admin", key: "admin.tab.sales", exact: true },
   { to: "/admin/offers", key: "admin.tab.offers", exact: false },
+  { to: "/admin/packages", key: "admin.tab.tree", exact: false },
   { to: "/admin/customers", key: "admin.tab.customers", exact: false },
   { to: "/admin/agencies", key: "admin.tab.agencies", exact: false },
   { to: "/admin/partners", key: "admin.tab.partners", exact: false },

@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { OfferTreePanel } from "@/components/admin/OfferTreePanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -648,6 +649,27 @@ export function OfferForm({
           </Row>
         </div>
       </section>
+
+      <SectionCard
+        title={ar ? "شجرة الباقات (الأبناء والأحفاد)" : "Package tree (children & grandchildren)"}
+        hint={
+          ar
+            ? "أضف باقات فرعية بأسعارها وعملاتها مباشرة من هنا، وأضف أحفادًا داخل كل باقة فرعية."
+            : "Add sub-packages with their own price and currency here, then add grandchildren inside each one."
+        }
+      >
+        {draft.id ? (
+          <OfferTreePanel rootId={draft.id} compact />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {ar
+              ? "احفظ الباقة الأم أولًا، ثم أضف الأبناء والأحفاد من هنا أو من شاشة «شجرة الباقات»."
+              : "Save this package first, then add children and grandchildren here or from the package tree screen."}
+          </p>
+        )}
+      </SectionCard>
+
+
 
       <SectionCard
         title={ar ? "التصنيف والعرض" : "Classification & display"}
