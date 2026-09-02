@@ -343,87 +343,84 @@ const listInput = z.object({
   limit: z.number().int().min(1).max(60).optional(),
 });
 
+type ListInput = z.infer<typeof listInput>;
+
+async function queryPackages(data: ListInput): Promise<{
+  offers: PackageSummary[];
+  currencies: CurrencyInfo[];
+  categories: PackageCategory[];
+}> {
+  const sb = getPublicClient();
+  const currencies = await loadCurrencies();
+  const cur = pickCurrency(currencies, data.currency);
+
+  const { data: rows, error } = await sb
+    .from("service_offers")
+    .select(OFFER_COLUMNS)
+    .eq("status", "active")
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+
+  const { data: categories } = await sb
+    .from("offer_categories")
+    .select("id,slug,name_ar,name_en,is_featured,display_order")
+    .eq("is_active", true)
+    .order("display_order");
+
+  let published = ((rows ?? []) as OfferRow[]).filter(publishedFilter);
+  if (data.categoryId) published = published.filter((r) => r.category_id === data.categoryId);
+  if (data.featuredOnly) published = published.filter((r) => r.is_featured);
+  if (data.search) {
+    const q = data.search.trim().toLowerCase();
+    published = published.filter((r) =>
+      [
+        r.title_ar,
+        r.title_en,
+        r.short_description_ar,
+        r.short_description_en,
+        r.description_ar,
+        r.description_en,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q),
+    );
+  }
+  if (data.minDays != null) published = published.filter((r) => (r.total_days ?? 0) >= data.minDays!);
+  if (data.maxDays != null) published = published.filter((r) => (r.total_days ?? 999) <= data.maxDays!);
+
+  const extras = await loadCardExtras(published);
+  let offers = published.map((r) =>
+    mapSummary(r, cur, {
+      badge: r.badge_id ? (extras.badgeMap.get(r.badge_id) ?? null) : null,
+      stars: extras.starMap.get(r.id) ?? null,
+      inclusions: extras.inclusionMap.get(r.id) ?? [],
+      signed: extras.signed,
+    }),
+  );
+
+  if (data.minPriceUsd != null) offers = offers.filter((o) => o.price.totalUsd >= data.minPriceUsd!);
+  if (data.maxPriceUsd != null) offers = offers.filter((o) => o.price.totalUsd <= data.maxPriceUsd!);
+  if (data.minStars != null) offers = offers.filter((o) => (o.stars ?? 0) >= data.minStars!);
+
+  const sort = data.sort ?? "featured";
+  offers.sort((a, b) => {
+    if (sort === "price_asc") return a.price.totalUsd - b.price.totalUsd;
+    if (sort === "price_desc") return b.price.totalUsd - a.price.totalUsd;
+    if (sort === "popular") return b.booking_count + b.view_count - (a.booking_count + a.view_count);
+    if (sort === "newest") return b.created_at.localeCompare(a.created_at);
+    if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
+    return a.featured_order - b.featured_order || b.created_at.localeCompare(a.created_at);
+  });
+
+  if (data.limit) offers = offers.slice(0, data.limit);
+  return { offers, currencies, categories: (categories ?? []) as PackageCategory[] };
+}
+
 export const listPackages = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => listInput.parse(d ?? {}))
-  .handler(
-    async ({
-      data,
-    }): Promise<{
-      offers: PackageSummary[];
-      currencies: CurrencyInfo[];
-      categories: PackageCategory[];
-    }> => {
-      const sb = getPublicClient();
-      const currencies = await loadCurrencies();
-      const cur = pickCurrency(currencies, data.currency);
-
-      const { data: rows, error } = await sb
-        .from("service_offers")
-        .select(OFFER_COLUMNS)
-        .eq("status", "active")
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false });
-      if (error) throw new Error(error.message);
-
-      const { data: categories } = await sb
-        .from("offer_categories")
-        .select("id,slug,name_ar,name_en,is_featured,display_order")
-        .eq("is_active", true)
-        .order("display_order");
-
-      let published = ((rows ?? []) as OfferRow[]).filter(publishedFilter);
-      if (data.categoryId) published = published.filter((r) => r.category_id === data.categoryId);
-      if (data.featuredOnly) published = published.filter((r) => r.is_featured);
-      if (data.search) {
-        const q = data.search.trim().toLowerCase();
-        published = published.filter((r) =>
-          [
-            r.title_ar,
-            r.title_en,
-            r.short_description_ar,
-            r.short_description_en,
-            r.description_ar,
-            r.description_en,
-          ]
-            .join(" ")
-            .toLowerCase()
-            .includes(q),
-        );
-      }
-      if (data.minDays != null) published = published.filter((r) => (r.total_days ?? 0) >= data.minDays!);
-      if (data.maxDays != null)
-        published = published.filter((r) => (r.total_days ?? 999) <= data.maxDays!);
-
-      const extras = await loadCardExtras(published);
-      let offers = published.map((r) =>
-        mapSummary(r, cur, {
-          badge: r.badge_id ? (extras.badgeMap.get(r.badge_id) ?? null) : null,
-          stars: extras.starMap.get(r.id) ?? null,
-          inclusions: extras.inclusionMap.get(r.id) ?? [],
-          signed: extras.signed,
-        }),
-      );
-
-      if (data.minPriceUsd != null)
-        offers = offers.filter((o) => o.price.totalUsd >= data.minPriceUsd!);
-      if (data.maxPriceUsd != null)
-        offers = offers.filter((o) => o.price.totalUsd <= data.maxPriceUsd!);
-      if (data.minStars != null) offers = offers.filter((o) => (o.stars ?? 0) >= data.minStars!);
-
-      const sort = data.sort ?? "featured";
-      offers.sort((a, b) => {
-        if (sort === "price_asc") return a.price.totalUsd - b.price.totalUsd;
-        if (sort === "price_desc") return b.price.totalUsd - a.price.totalUsd;
-        if (sort === "popular") return b.booking_count + b.view_count - (a.booking_count + a.view_count);
-        if (sort === "newest") return b.created_at.localeCompare(a.created_at);
-        if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
-        return a.featured_order - b.featured_order || b.created_at.localeCompare(a.created_at);
-      });
-
-      if (data.limit) offers = offers.slice(0, data.limit);
-      return { offers, currencies, categories: (categories ?? []) as PackageCategory[] };
-    },
-  );
+  .handler(async ({ data }) => queryPackages(data));
 
 export const getFeaturedPackages = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
@@ -435,9 +432,11 @@ export const getFeaturedPackages = createServerFn({ method: "GET" })
       .parse(d ?? {}),
   )
   .handler(async ({ data }) => {
-    const result = await listPackages({
-      data: { currency: data.currency, sort: "featured", limit: data.limit },
-    });
+    const result = await queryPackages({
+      currency: data.currency,
+      sort: "featured",
+      limit: data.limit,
+    } as ListInput);
     // Featured first; fall back to the newest offers so the section is never empty.
     const featured = result.offers.filter((o) => o.is_featured);
     return {
@@ -446,6 +445,7 @@ export const getFeaturedPackages = createServerFn({ method: "GET" })
       categories: result.categories,
     };
   });
+
 
 export const getPackage = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
