@@ -384,7 +384,11 @@ function Checkout() {
                   t("checkout.submit")
                 )}
               </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={() => setStep(1)}>
+                {t("common.back")}
+              </Button>
             </section>
+            ) : null}
           </form>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">
