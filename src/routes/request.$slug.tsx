@@ -160,18 +160,6 @@ function RequestPage() {
           </p>
         ) : (
           <div className="space-y-5">
-            <article className="surface-card flex items-center gap-3 bg-white p-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-forest">
-                <ShieldCheck className="size-5 text-primary-foreground" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{t("request.selected")}</p>
-                <p className="truncate text-sm font-bold text-forest-deep">
-                  {lang === "ar" ? offer.title_ar : offer.title_en}
-                </p>
-                <p className="line-clamp-1 text-xs text-muted-foreground">
-                  {lang === "ar" ? offer.description_ar : offer.description_en}
-                </p>
             <section className="surface-card space-y-6 bg-white p-4">
               <div className="space-y-2">
                 <p className="text-sm font-bold text-forest-deep">{t("request.selected")}</p>
