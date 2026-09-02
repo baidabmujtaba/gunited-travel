@@ -15,7 +15,12 @@ const roomSchema = z.object({
   name_en: z.string().min(1).max(120),
   occupancy: z.number().int().min(1).max(20).default(2),
   price: z.number().min(0).default(0),
-  currency_code: z.string().min(3).max(6).default("USD"),
+  currency_code: z
+    .preprocess(
+      (v) => (typeof v === "string" && v.trim().length >= 3 ? v.trim().toUpperCase() : "USD"),
+      z.string().min(3).max(6),
+    )
+    .default("USD"),
   available_rooms: z.number().int().min(0).max(9999).default(0),
   description_ar: z.string().max(600).default(""),
   description_en: z.string().max(600).default(""),
