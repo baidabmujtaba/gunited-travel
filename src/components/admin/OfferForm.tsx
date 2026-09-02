@@ -176,6 +176,11 @@ export function OfferForm({
     queryFn: () => listOfferCategories(),
   });
   const badges = useQuery({ queryKey: ["offer-badges"], queryFn: () => listOfferBadges() });
+  const currencies = useQuery({
+    queryKey: ["offer-currencies"],
+    queryFn: () => listOfferCurrencies(),
+  });
+  const allOffers = useQuery({ queryKey: ["admin-offers"], queryFn: () => listOffersAdmin() });
 
   // Child collections live in their own tables, so hydrate them for existing offers.
   const builder = useQuery({
@@ -279,6 +284,18 @@ export function OfferForm({
         }));
       });
   }, [draft.images]);
+
+  // Live "= $x" hint so the admin sees the stored USD value while typing.
+  const inputRate =
+    draft.input_currency === "USD"
+      ? 1
+      : ((currencies.data ?? []).find((c) => c.code === draft.input_currency)?.rate ?? 0);
+  const usdHint = (value: string) => {
+    const n = Number(value);
+    if (!(n > 0)) return undefined;
+    if (!(inputRate > 0)) return ar ? "لا يوجد سعر صرف لهذه العملة" : "No exchange rate for this currency";
+    return `≈ $${(n / inputRate).toFixed(2)} ${ar ? "بالدولار" : "USD"}`;
+  };
 
   const save = useMutation({
     mutationFn: () =>
@@ -499,7 +516,29 @@ export function OfferForm({
               </SelectContent>
             </Select>
           </Row>
-          <Row label={t("admin.offers.price.customer")}>
+          <Row label={ar ? "عملة الإدخال" : "Entry currency"}>
+            <Select
+              value={draft.input_currency}
+              onValueChange={(v) => set("input_currency", v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(currencies.data ?? [{ code: "USD", name_ar: "دولار", name_en: "US Dollar", rate: 1 }]).map(
+                  (c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      {c.code} — {ar ? c.name_ar : c.name_en}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+          </Row>
+          <Row
+            label={`${t("admin.offers.price.customer")} (${draft.input_currency})`}
+            hint={usdHint(draft.customer_price_usd)}
+          >
             <Input
               type="number"
               min="0.01"
@@ -509,7 +548,10 @@ export function OfferForm({
               required
             />
           </Row>
-          <Row label={t("admin.offers.price.agency")}>
+          <Row
+            label={`${t("admin.offers.price.agency")} (${draft.input_currency})`}
+            hint={usdHint(draft.agency_price_usd)}
+          >
             <Input
               type="number"
               min="0.01"
@@ -518,6 +560,33 @@ export function OfferForm({
               onChange={(e) => set("agency_price_usd", e.target.value)}
               required
             />
+          </Row>
+          <Row
+            label={ar ? "الباقة الأم (اختياري)" : "Parent package (optional)"}
+            hint={
+              ar
+                ? "اترك الحقل فارغًا للباقة الرئيسية. اختيار باقة أم يجعل هذه الباقة مستوى فرعيًا يظهر بعد الضغط على الأم."
+                : "Leave empty for a top-level package. Choosing a parent nests this package one level deeper."
+            }
+          >
+            <Select
+              value={draft.parent_offer_id || "none"}
+              onValueChange={(v) => set("parent_offer_id", v === "none" ? "" : v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{ar ? "— بدون (باقة رئيسية)" : "— None (top level)"}</SelectItem>
+                {(allOffers.data ?? [])
+                  .filter((o: Record<string, unknown>) => String(o["id"]) !== draft.id)
+                  .map((o: Record<string, unknown>) => (
+                    <SelectItem key={String(o["id"])} value={String(o["id"])}>
+                      {ar ? String(o["title_ar"]) : String(o["title_en"])}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </Row>
           <Row label={t("admin.offers.status")}>
             <Select
@@ -659,7 +728,7 @@ export function OfferForm({
               ar={ar}
             />
           </Row>
-          <Row label={ar ? "السعر قبل الخصم (دولار)" : "Original price (USD)"}>
+          <Row label={`${ar ? "السعر قبل الخصم" : "Original price"} (${draft.input_currency})`}>
             <Input
               type="number"
               min="0"
