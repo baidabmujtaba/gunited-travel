@@ -36,23 +36,45 @@ export const Route = createFileRoute("/_authenticated/admin/offers")({
 });
 
 function toDraft(row: Record<string, unknown>): OfferDraft {
+  const s = (k: string) => (row[k] == null ? "" : String(row[k]));
   return {
     id: String(row["id"]),
-    slug: (row["slug"] as string) ?? "",
-    title_ar: (row["title_ar"] as string) ?? "",
-    title_en: (row["title_en"] as string) ?? "",
-    description_ar: (row["description_ar"] as string) ?? "",
-    description_en: (row["description_en"] as string) ?? "",
-    category: (row["category"] as string) ?? "package",
+    slug: s("slug"),
+    title_ar: s("title_ar"),
+    title_en: s("title_en"),
+    short_description_ar: s("short_description_ar"),
+    short_description_en: s("short_description_en"),
+    description_ar: s("description_ar"),
+    description_en: s("description_en"),
+    category: s("category") || "package",
+    category_id: s("category_id"),
+    badge_id: s("badge_id"),
+    offer_type: s("offer_type") || "tourism_package",
     customer_price_usd: String(row["customer_price_usd"] ?? row["base_price_usd"] ?? ""),
-    agency_price_usd: String(row["agency_price_usd"] ?? ""),
+    agency_price_usd: s("agency_price_usd"),
+    original_price_usd: s("original_price_usd"),
+    price_display_mode: s("price_display_mode") || "starting_from",
     tax_percent: String(row["tax_percent"] ?? 0),
     fee_amount_usd: String(row["fee_amount_usd"] ?? 0),
     discount_percent: String(row["discount_percent"] ?? 0),
-    duration_ar: (row["duration_ar"] as string) ?? "",
-    duration_en: (row["duration_en"] as string) ?? "",
-    expiry_date: (row["expiry_date"] as string) ?? "",
+    total_days: s("total_days"),
+    makkah_nights: s("makkah_nights"),
+    madinah_nights: s("madinah_nights"),
+    other_nights: s("other_nights"),
+    other_destination: s("other_destination"),
+    duration_ar: s("duration_ar"),
+    duration_en: s("duration_en"),
+    expiry_date: s("expiry_date"),
+    publish_at: s("publish_at").slice(0, 16),
     status: ((row["status"] as OfferDraft["status"]) ?? "active"),
+    is_featured: row["is_featured"] === true,
+    featured_order: String(row["featured_order"] ?? 0),
+    important_info_ar: s("important_info_ar"),
+    important_info_en: s("important_info_en"),
+    terms_ar: s("terms_ar"),
+    terms_en: s("terms_en"),
+    seo_title: s("seo_title"),
+    seo_description: s("seo_description"),
     features: Array.isArray(row["features"]) ? (row["features"] as string[]) : [],
     images: Array.isArray(row["images"]) ? (row["images"] as string[]) : [],
     allowed_payment_methods: Array.isArray(row["allowed_payment_methods"])
@@ -61,6 +83,7 @@ function toDraft(row: Record<string, unknown>): OfferDraft {
     required_documents: normalizeDocs(row["required_documents"]),
   };
 }
+
 
 function AdminOffersPage() {
   const { t, lang } = useI18n();
