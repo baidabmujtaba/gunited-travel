@@ -573,3 +573,218 @@ export const archiveOffer = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+/* ------------------------------------------------------------------ */
+/* Package tree (mother -> children -> grandchildren)                  */
+/* ------------------------------------------------------------------ */
+
+type AnySb = { from: (t: string) => any };
+
+async function rateFor(sb: AnySb, currency: string): Promise<number> {
+  if (currency === "USD") return 1;
+  const { data } = await sb
+    .from("exchange_rates")
+    .select("rate_per_usd")
+    .eq("currency_code", currency)
+    .maybeSingle();
+  const value = Number((data as { rate_per_usd?: number } | null)?.rate_per_usd ?? 0);
+  if (!(value > 0)) throw new Error(`No exchange rate configured for ${currency}.`);
+  return value;
+}
+
+const currencyField = z.preprocess(
+  (v) => (typeof v === "string" && v.trim().length >= 3 ? v.trim().toUpperCase() : "USD"),
+  z.string().min(3).max(6),
+);
+
+export type OfferTreeNode = {
+  id: string;
+  slug: string | null;
+  title_ar: string;
+  title_en: string;
+  parent_offer_id: string | null;
+  status: string;
+  input_currency: string;
+  input_price: number | null;
+  customer_price_usd: number;
+  is_featured: boolean;
+};
+
+/** Flat list of every non-deleted offer with its parent link, for tree screens. */
+export const listOfferTree = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context);
+    const { data, error } = await context.supabase
+      .from("service_offers")
+      .select(
+        "id,slug,title_ar,title_en,parent_offer_id,status,input_currency,input_price,customer_price_usd,is_featured",
+      )
+      .is("deleted_at", null)
+      .order("title_ar");
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as OfferTreeNode[];
+  });
+
+/** Quick-create a sub-package (child or grandchild) under a parent offer. */
+export const createChildOffer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        parent_offer_id: z.string().uuid(),
+        title_ar: z.string().min(1).max(200),
+        title_en: z.string().min(1).max(200),
+        currency: currencyField,
+        price: z.number().min(0),
+        agency_price: z.number().min(0).nullable().default(null),
+        status: z.enum(["draft", "active"]).default("active"),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context);
+    const sb = context.supabase as unknown as AnySb;
+
+    const { data: parent } = await sb
+      .from("service_offers")
+      .select("id,category,category_id,offer_type,display_currency")
+      .eq("id", data.parent_offer_id)
+      .maybeSingle();
+    if (!parent) throw new Error("Parent package not found.");
+
+    const rate = await rateFor(sb, data.currency);
+    const toUsd = (v: number) => Math.round((v / rate) * 100) / 100;
+    const priceUsd = toUsd(data.price);
+    const agencyUsd = data.agency_price == null ? priceUsd : toUsd(data.agency_price);
+
+    const base = slugify(data.title_en, `package-${Date.now()}`);
+    let slug = base;
+    for (let i = 2; i < 100; i++) {
+      const { data: clash } = await sb.from("service_offers").select("id").eq("slug", slug).limit(1);
+      if (!clash?.length) break;
+      slug = `${base}-${i}`;
+    }
+
+    const p = parent as Record<string, unknown>;
+    const { data: row, error } = await sb
+      .from("service_offers")
+      .insert({
+        slug,
+        parent_offer_id: data.parent_offer_id,
+        title_ar: data.title_ar,
+        title_en: data.title_en,
+        category: String(p["category"] ?? "package"),
+        category_id: p["category_id"] ?? null,
+        offer_type: String(p["offer_type"] ?? "tourism_package"),
+        display_currency: data.currency,
+        input_currency: data.currency,
+        input_price: data.price,
+        input_agency_price: data.agency_price ?? data.price,
+        input_rate_per_usd: rate,
+        base_price_usd: priceUsd,
+        customer_price_usd: priceUsd,
+        agency_price_usd: agencyUsd,
+        status: data.status,
+      })
+      .select("id,slug")
+      .single();
+    if (error) throw new Error(error.message);
+
+    await sb.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: "offer.create_child",
+      entity: "service_offers",
+      entity_id: (row as { id: string }).id,
+      after_data: { parent_offer_id: data.parent_offer_id, title_en: data.title_en },
+    });
+    return row as { id: string; slug: string };
+  });
+
+/** Inline edit of a tree node: name, price, currency, parent or status. */
+export const updateOfferNode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        title_ar: z.string().min(1).max(200).optional(),
+        title_en: z.string().min(1).max(200).optional(),
+        currency: currencyField.optional(),
+        price: z.number().min(0).optional(),
+        parent_offer_id: z.string().uuid().nullable().optional(),
+        status: z.enum(["draft", "active", "scheduled", "archived"]).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context);
+    const sb = context.supabase as unknown as AnySb;
+    if (data.parent_offer_id && data.parent_offer_id === data.id) {
+      throw new Error("An offer cannot be its own parent.");
+    }
+
+    const patch: Record<string, unknown> = {};
+    if (data.title_ar) patch["title_ar"] = data.title_ar;
+    if (data.title_en) patch["title_en"] = data.title_en;
+    if (data.status) patch["status"] = data.status;
+    if (data.parent_offer_id !== undefined) patch["parent_offer_id"] = data.parent_offer_id;
+
+    if (data.price !== undefined || data.currency) {
+      const { data: current } = await sb
+        .from("service_offers")
+        .select("input_currency,input_price,customer_price_usd")
+        .eq("id", data.id)
+        .maybeSingle();
+      const cur = (current ?? {}) as Record<string, unknown>;
+      const currency = data.currency ?? String(cur["input_currency"] ?? "USD");
+      const price =
+        data.price ?? Number(cur["input_price"] ?? cur["customer_price_usd"] ?? 0);
+      const rate = await rateFor(sb, currency);
+      const usd = Math.round((price / rate) * 100) / 100;
+      patch["input_currency"] = currency;
+      patch["display_currency"] = currency;
+      patch["input_price"] = price;
+      patch["input_rate_per_usd"] = rate;
+      patch["base_price_usd"] = usd;
+      patch["customer_price_usd"] = usd;
+    }
+
+    if (Object.keys(patch).length === 0) return { ok: true };
+    const { error } = await sb.from("service_offers").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Archive a node and every descendant beneath it. */
+export const deleteOfferBranch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    await assertStaff(context);
+    const sb = context.supabase as unknown as AnySb;
+    const ids: string[] = [data.id];
+    let frontier = [data.id];
+    for (let depth = 0; depth < 6 && frontier.length; depth++) {
+      const { data: kids } = await sb
+        .from("service_offers")
+        .select("id")
+        .in("parent_offer_id", frontier)
+        .is("deleted_at", null);
+      frontier = ((kids ?? []) as { id: string }[]).map((k) => k.id).filter((id) => !ids.includes(id));
+      ids.push(...frontier);
+    }
+    const { error } = await sb
+      .from("service_offers")
+      .update({ status: "archived", deleted_at: new Date().toISOString() })
+      .in("id", ids);
+    if (error) throw new Error(error.message);
+    await sb.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: "offer.archive_branch",
+      entity: "service_offers",
+      entity_id: data.id,
+      after_data: { archived: ids.length },
+    });
+    return { ok: true, archived: ids.length };
+  });
