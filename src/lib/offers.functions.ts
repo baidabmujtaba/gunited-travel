@@ -375,17 +375,20 @@ export const saveOffer = createServerFn({ method: "POST" })
     const offerId = (row as { id: string }).id;
 
     // Child collections: replace wholesale, but only the ones the caller sent.
+    const anySb = sb as unknown as {
+      from: (t: string) => any;
+    };
     const replace = async (
       table: string,
       rows: Record<string, unknown>[] | undefined,
     ) => {
       if (!rows) return;
-      const { error: delError } = await sb.from(table).delete().eq("offer_id", offerId);
+      const { error: delError } = await anySb.from(table).delete().eq("offer_id", offerId);
       if (delError) throw new Error(delError.message);
       if (rows.length === 0) return;
-      const { error: insError } = await sb
+      const { error: insError } = await anySb
         .from(table)
-        .insert(rows.map((r) => ({ ...r, offer_id: offerId })) as never);
+        .insert(rows.map((r) => ({ ...r, offer_id: offerId })));
       if (insError) throw new Error(insError.message);
     };
 
@@ -477,15 +480,16 @@ export const duplicateOffer = createServerFn({ method: "POST" })
       "offer_faqs",
       "offer_departures",
     ]) {
-      const { data: children } = await sb.from(table).select("*").eq("offer_id", data.id);
-      const rows = (children ?? []).map((c: Record<string, unknown>) => {
+      const anySb = sb as unknown as { from: (t: string) => any };
+      const { data: children } = await anySb.from(table).select("*").eq("offer_id", data.id);
+      const rows = ((children ?? []) as Record<string, unknown>[]).map((c) => {
         const copy = { ...c, offer_id: newId };
         delete copy["id"];
         delete copy["created_at"];
         delete copy["updated_at"];
         return copy;
       });
-      if (rows.length) await sb.from(table).insert(rows as never);
+      if (rows.length) await anySb.from(table).insert(rows);
     }
     return { id: newId };
   });
