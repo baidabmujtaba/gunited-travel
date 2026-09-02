@@ -196,7 +196,11 @@ async function signPaths(paths: string[]): Promise<Map<string, string>> {
   if (storagePaths.length === 0) return new Map();
   const sb = getPublicClient();
   const { data } = await sb.storage.from("offer-images").createSignedUrls(storagePaths, 60 * 60);
-  return new Map((data ?? []).map((d) => [d.path, d.signedUrl]));
+  return new Map(
+    (data ?? [])
+      .filter((d) => d.path && d.signedUrl)
+      .map((d) => [d.path as string, d.signedUrl as string]),
+  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
