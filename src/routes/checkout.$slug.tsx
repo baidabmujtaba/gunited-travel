@@ -59,6 +59,7 @@ function Checkout() {
   });
   const methodsQuery = useQuery({ queryKey: ["payment-methods"], queryFn: () => getPaymentMethods() });
 
+  const [step, setStep] = useState<1 | 2>(1);
   const [methodId, setMethodId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
