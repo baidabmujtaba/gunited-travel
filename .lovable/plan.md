@@ -1,52 +1,58 @@
-# Financial Ledger, Agency Tenancy & Portals
+# Dynamic Offers & Packages System
 
-Extending the existing Gunited Travel system — no rebuild, no deletions. Current auth, catalog, orders, invoices, offers, documents, flights, notifications and admin hub stay exactly as they are.
+A fully database-driven offers/packages system (Umrah packages, hotel/flight/visa/tourism offers) layered onto the existing Gunited Travel ERP — reusing its auth, roles, currencies, orders, invoicing, accounting ledger and email notifications.
 
-## What already exists (verified)
-- Real database + auth + RBAC (`user_roles`, `is_staff`, `is_admin`, `has_role`), RLS on every table.
-- Orders, invoices (auto number + PDF + email), offers with document checklists, payment methods, manual exchange rates, CRM (customers + travel agencies), users & settings hubs, Amadeus flights, realtime notification bell, Arabic RTL i18n.
+This is far too large for one pass, so it ships in 4 phases. Each phase is complete and usable on its own.
 
-## What is missing (this is the work)
-1. **Agency tenancy** — agencies are CRM records today, not tenants. No `agency_id` on orders/customers/payments, so no A-cannot-see-B isolation.
-2. **Financial ledger** — revenue is derived from invoices; there is no double-entry ledger, no agency balance, no outstanding amount, no credit limit.
-3. **Payments** — no payments table. Receipts are uploaded per order only; no external payments, no reversals, no adjustments, no receipts.
-4. **Statements & reports** — no agency statement, no payments/outstanding/sales report pages.
-5. **Agency & customer portals** — clients get `/account` only; agencies have no sidebar portal.
-6. **Agency vs customer pricing** — one `base_price_usd`; no agency price tier beyond a flat discount.
+## Phase 1 — Data model + admin offer builder
 
-## Phase 1 — Database (safe additive migration)
-Reuse existing tables; add only what's absent.
-- `agencies_link`: add `agency_id uuid` (FK → `travel_agencies`) to `profiles`, `customers`, `service_orders`, `invoices`. Backfill left null → existing data untouched.
-- `travel_agencies`: add `credit_limit_usd`, `is_active`, `currency_code`.
-- New `agency_ledger` (append-only): agency, order, payment, user, currency, entry_type (`charge`/`payment`/`adjustment`/`reversal`), `amount_usd`, `signed_amount_usd`, reference, note, `reversed_by`, timestamps. No UPDATE/DELETE policy — corrections happen via reversal rows.
-- New `payments`: agency/customer, order (nullable → external), amount + currency + frozen rate, method, transaction reference (unique per agency to block duplicates), receipt path, status (`recorded`/`reversed`), `is_external`, recorded_by, timestamps.
-- New `service_prices`: offer, audience (`agency`/`customer`), `price_usd` — so agency and customer prices are separate rows; falls back to `base_price_usd`.
-- SQL function `agency_balance(agency_id)` summing the ledger; a `v_agency_balances` view for dashboards.
-- Indexes on every FK plus `(agency_id, created_at)` on orders/payments/ledger.
-- RLS: staff full access; agency users see only rows where `agency_id` matches their profile's agency (via a `security definer` `current_agency_id()`); customers see only their own. GRANTs for `authenticated` + `service_role` on all new tables.
+New relational tables (all with row-level security, staff-only write, public read of published rows only):
 
-## Phase 2 — Backend (server functions, all validation server-side)
-- `src/lib/ledger.server.ts` — the only writer of ledger rows: `chargeOrder`, `recordPayment`, `reversePayment`, `adjust`. Enforces: positive amounts only, duplicate reference check, credit-limit check, agency derived from the session (never from the client payload), audit log on every call.
-- `src/lib/payments.functions.ts` — `recordPayment`, `recordExternalPayment`, `reversePayment`, `financialAdjustment`, `listPayments`, `getPaymentReceipt` (PDF via existing pdf-lib helper), all staff-gated; agencies get read-only `myPayments`.
-- `src/lib/statements.functions.ts` — `getAgencyStatement` (opening balance, entries, running balance, closing), `listAgencyBalances`, paginated.
-- `src/lib/reports.functions.ts` — sales, orders, agency balances, payments, external payments, outstanding. Aggregated in SQL, paginated, CSV export.
-- Order approval hooks into `chargeOrder` so an approved order creates the due amount; invoice issuance stays as-is.
-- Pricing: `computePrice` gains an audience argument reading `service_prices`; agencies never receive customer prices in the payload and vice versa.
+- `offer_categories` — bilingual name/description, icon, image, display order, active, featured
+- `offer_badges` — bilingual label, colour (admin can add custom badges)
+- extend `service_offers` with: category_id, badge_id, offer_type, short descriptions, price display mode, original/discounted price, currency, total days, Makkah/Madinah/other nights, publish/expiry dates, featured + featured order, SEO title/description/og image, view + booking counters
+- `offer_room_types` — bilingual name, occupancy, price, currency, inventory, description, active, sort order
+- `offer_hotels` — city, bilingual name, stars, distance to Haram / Prophet's Mosque, image, description, sort order
+- `offer_services` — bilingual name, icon, description, included/excluded flag, sort order
+- `offer_departures` — fixed departure dates, seats, blocked dates
+- `offer_faqs`, `offer_terms` — bilingual, ordered
+- `offer_coupons` — code, percent/fixed, window, usage limit, min order, scope (offers/categories)
+- `offer_analytics` — daily views/clicks/booking events per offer
 
-## Phase 3 — UI (reuse AdminShell / StoreLayout patterns)
-- **Admin sidebar** extended with: Payments, External Payments, Agency Balances, Statements, Reports, Audit Log. Existing tabs untouched.
-- **Agency portal** at `/_authenticated/agency/*`: home, services (agency prices), customers, orders, balance, payments, statement, notifications, profile.
-- **Customer area**: keep `/account`, add sidebar shell with services, my orders, notifications, profile.
-- Responsive: full sidebar desktop, collapsed tablet, drawer mobile; tables wrapped in a scroll container with card fallback on mobile.
-- Realtime: extend the existing notification channel to also invalidate balance/ledger queries so dashboards update without refresh.
+Admin builder at `/admin/offers`, rebuilt as a sectioned form: basic info, images (existing private storage bucket + signed URLs), pricing, room types, program/nights, hotels, included/excluded services, departures, terms, FAQ, SEO, status & scheduling. Drag-and-drop ordering for room types, hotels, services and gallery. Duplicate / publish / unpublish / archive / delete actions, stats row (total, published, draft, featured, expired, categories), and a device-framed preview (mobile/tablet/desktop) before publishing.
 
-## Phase 4 — Verification
-End-to-end checks in the browser: agency login sees only its own customers/orders/payments; a second agency's data is unreachable via API too; payment recording moves balance and statement; reversal restores it; duplicate reference is rejected; negative amount rejected; receipts print; reports export.
+Categories and badges get their own management screens.
 
-## Order of delivery
-Phases run in sequence, each shippable. Phase 1 is a single approved migration; nothing existing is dropped or renamed.
+## Phase 2 — Public storefront
+
+- Homepage section "باقات العمرة" driven by featured offers with category tabs, premium cards (image, badge, name, duration, nights split, top inclusions, "ابتداءً من" price, CTA); horizontal scroll on mobile, grid on desktop. Section title/subtitle/limit are admin-editable.
+- `/offers` listing: category chips, filters (price, duration, stars, Makkah/Madinah nights, services, availability), sorting (popular, price asc/desc, newest, featured), pagination, skeletons, debounced search.
+- `/offers/:slug` details: hero, badge, summary card (starting price, days, nights), description, program, hotels, included/excluded services, room options, pricing, terms, important info, gallery, FAQ, sticky mobile "احجز هذه الباقة".
+- Empty/expired states, per-offer SEO head metadata + og:image, structured data.
+- Visa-only and custom-package offer types render without hotel/room sections; custom package shows "اطلب برنامجك الخاص".
+
+## Phase 3 — Booking flow
+
+Multi-step booking with a progress indicator and back/forward navigation that preserves data: package → travel date (admin-controlled available/blocked dates) → passengers (adults/children/infants with age rules) → traveller details → rooms (quantity per type, inventory-checked) → extra services → coupon → review → payment (existing manual bank-transfer receipt flow) → confirmation.
+
+Server-side price engine (single source of truth, never client-trusted): base/per-person/per-room, room subtotals, extra services, discount, coupon, tax, total, with a transparent breakdown. Booking writes a **price snapshot** so later admin price edits never change existing bookings.
+
+Bookings land in the existing `service_orders`/invoice/ledger pipeline so accounting keeps working, and trigger the existing notification + email queue for admin-notify-on-submit and customer-notify-on-status-change.
+
+## Phase 4 — Analytics, search, polish
+
+- Offer analytics in the admin dashboard: views, clicks, booking requests, confirmed bookings, conversion rate, revenue, top offers, top room types.
+- Global bilingual offer search (name, category, hotel, destination, price, badge).
+- Full RTL/LTR, mobile/tablet/desktop pass, micro-interactions (hover elevation, image zoom, button loading, skeletons, toasts, step transitions), error handling with Arabic-first messages.
+- End-to-end verification: create → publish → homepage → details → booking → price check → submit → admin sees order → notification; plus expired offer, sold-out room, coupon, edit, duplicate.
 
 ## Technical notes
-- All money stored in USD with a frozen display rate, matching current invoice/order behaviour.
-- Balance is never a stored mutable column — always the ledger sum via the SQL function.
-- Every new server function goes through `requireSupabaseAuth` + role assertion; frontend never sends agency_id, balance, status or transaction type.
+
+- Server functions in `src/lib/offers.functions.ts` (+ new `offer-admin.functions.ts`, `offer-booking.functions.ts`) with Zod validation; staff checks via existing `assertStaff` / `has_role`.
+- Public reads go through the existing publishable-key server client with narrow anon SELECT policies limited to published, non-expired offers.
+- Existing offers keep working: `service_offers` is extended, not replaced, and current storefront/checkout routes stay functional throughout.
+- Prices stay USD-anchored with the existing exchange-rate/frozen-rate mechanism; the new currency field controls display only.
+
+## Suggested start
+
+Phase 1 (database + admin builder) in this round, since everything else reads from it.
