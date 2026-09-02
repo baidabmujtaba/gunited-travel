@@ -43,6 +43,8 @@ import { Route as AuthenticatedAgencyCustomersRouteImport } from './routes/_auth
 import { Route as AuthenticatedAgencyOffersRouteImport } from './routes/_authenticated/agency.offers'
 import { Route as AuthenticatedAgencyOrdersRouteImport } from './routes/_authenticated/agency.orders'
 import { Route as AuthenticatedAgencyStatementRouteImport } from './routes/_authenticated/agency.statement'
+import { Route as AuthenticatedBookSlugRouteImport } from './routes/_authenticated/book.$slug'
+import { Route as AuthenticatedBookingTrackingRouteImport } from './routes/_authenticated/booking.$tracking'
 import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
 import { Route as ApiPublicEmailDispatchRouteImport } from './routes/api/public/email-dispatch'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
@@ -236,6 +238,17 @@ const AuthenticatedAgencyStatementRoute =
     path: '/statement',
     getParentRoute: () => AuthenticatedAgencyRoute,
   } as any)
+const AuthenticatedBookSlugRoute = AuthenticatedBookSlugRouteImport.update({
+  id: '/book/$slug',
+  path: '/book/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBookingTrackingRoute =
+  AuthenticatedBookingTrackingRouteImport.update({
+    id: '/booking/$tracking',
+    path: '/booking/$tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInvoiceNumberRoute =
   AuthenticatedInvoiceNumberRouteImport.update({
     id: '/invoice/$number',
@@ -298,6 +311,8 @@ export interface FileRoutesByFullPath {
   '/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
+  '/book/$slug': typeof AuthenticatedBookSlugRoute
+  '/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -336,6 +351,8 @@ export interface FileRoutesByTo {
   '/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/agency/statement': typeof AuthenticatedAgencyStatementRoute
+  '/book/$slug': typeof AuthenticatedBookSlugRoute
+  '/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -378,6 +395,8 @@ export interface FileRoutesById {
   '/_authenticated/agency/offers': typeof AuthenticatedAgencyOffersRoute
   '/_authenticated/agency/orders': typeof AuthenticatedAgencyOrdersRoute
   '/_authenticated/agency/statement': typeof AuthenticatedAgencyStatementRoute
+  '/_authenticated/book/$slug': typeof AuthenticatedBookSlugRoute
+  '/_authenticated/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -420,6 +439,8 @@ export interface FileRouteTypes {
     | '/agency/offers'
     | '/agency/orders'
     | '/agency/statement'
+    | '/book/$slug'
+    | '/booking/$tracking'
     | '/invoice/$number'
     | '/api/public/email-dispatch'
     | '/admin/'
@@ -458,6 +479,8 @@ export interface FileRouteTypes {
     | '/agency/offers'
     | '/agency/orders'
     | '/agency/statement'
+    | '/book/$slug'
+    | '/booking/$tracking'
     | '/invoice/$number'
     | '/api/public/email-dispatch'
     | '/admin'
@@ -499,6 +522,8 @@ export interface FileRouteTypes {
     | '/_authenticated/agency/offers'
     | '/_authenticated/agency/orders'
     | '/_authenticated/agency/statement'
+    | '/_authenticated/book/$slug'
+    | '/_authenticated/booking/$tracking'
     | '/_authenticated/invoice/$number'
     | '/api/public/email-dispatch'
     | '/_authenticated/admin/'
@@ -764,6 +789,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgencyStatementRouteImport
       parentRoute: typeof AuthenticatedAgencyRoute
     }
+    '/_authenticated/book/$slug': {
+      id: '/_authenticated/book/$slug'
+      path: '/book/$slug'
+      fullPath: '/book/$slug'
+      preLoaderRoute: typeof AuthenticatedBookSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/booking/$tracking': {
+      id: '/_authenticated/booking/$tracking'
+      path: '/booking/$tracking'
+      fullPath: '/booking/$tracking'
+      preLoaderRoute: typeof AuthenticatedBookingTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/invoice/$number': {
       id: '/_authenticated/invoice/$number'
       path: '/invoice/$number'
@@ -870,12 +909,16 @@ const AuthenticatedAgencyRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAgencyRoute: typeof AuthenticatedAgencyRouteWithChildren
+  AuthenticatedBookSlugRoute: typeof AuthenticatedBookSlugRoute
+  AuthenticatedBookingTrackingRoute: typeof AuthenticatedBookingTrackingRoute
   AuthenticatedInvoiceNumberRoute: typeof AuthenticatedInvoiceNumberRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAgencyRoute: AuthenticatedAgencyRouteWithChildren,
+  AuthenticatedBookSlugRoute: AuthenticatedBookSlugRoute,
+  AuthenticatedBookingTrackingRoute: AuthenticatedBookingTrackingRoute,
   AuthenticatedInvoiceNumberRoute: AuthenticatedInvoiceNumberRoute,
 }
 
