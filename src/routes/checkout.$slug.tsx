@@ -245,6 +245,7 @@ function Checkout() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <form onSubmit={submit} className="space-y-8">
+            {step === 2 ? (
             <section className="surface-card p-6">
               <h2 className="text-lg font-bold">{t("checkout.method")}</h2>
               <RadioGroup value={methodId} onValueChange={setMethodId} className="mt-4 space-y-3">
