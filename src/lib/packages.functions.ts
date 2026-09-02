@@ -60,6 +60,10 @@ export type PackageSummary = {
   booking_count: number;
   created_at: string;
   price: PriceBreakdown;
+  /** Parent package (mother/child hierarchy); null for top-level packages. */
+  parent_offer_id: string | null;
+  /** Number of published sub-packages; > 0 means this card drills down instead of booking. */
+  child_count: number;
 };
 
 export type PackageHotel = {
@@ -163,7 +167,7 @@ const OFFER_COLUMNS =
   "duration_ar,duration_en,total_days,makkah_nights,madinah_nights,other_nights,other_destination," +
   "is_featured,featured_order,primary_image,images,features,expiry_date,publish_at,status," +
   "important_info_ar,important_info_en,terms_ar,terms_en,seo_title,seo_description," +
-  "allowed_payment_methods,required_documents,view_count,booking_count,created_at";
+  "allowed_payment_methods,required_documents,view_count,booking_count,created_at,parent_offer_id";
 
 const EXCLUDED_CATEGORIES = ["security_approval"];
 
@@ -214,6 +218,7 @@ function mapSummary(
     stars?: number | null;
     inclusions?: { name_ar: string; name_en: string }[];
     signed?: Map<string, string>;
+    childCount?: number;
   } = {},
 ): PackageSummary {
   const priceUsd = Number(r.customer_price_usd ?? r.base_price_usd ?? 0);
@@ -249,6 +254,8 @@ function mapSummary(
     view_count: Number(r.view_count ?? 0),
     booking_count: Number(r.booking_count ?? 0),
     created_at: r.created_at,
+    parent_offer_id: r.parent_offer_id ?? null,
+    child_count: extras.childCount ?? 0,
     price: computePrice(
       {
         basePriceUsd: priceUsd,
@@ -341,6 +348,10 @@ const listInput = z.object({
   maxDays: z.number().int().min(0).nullable().optional(),
   minStars: z.number().int().min(0).max(7).nullable().optional(),
   featuredOnly: z.boolean().optional(),
+  /** Only direct children of this package. */
+  parentId: z.string().uuid().nullable().optional(),
+  /** Only mother packages (no parent). Default for public listings. */
+  topLevelOnly: z.boolean().optional(),
   sort: z
     .enum(["featured", "popular", "price_asc", "price_desc", "newest"])
     .default("featured")
@@ -373,7 +384,16 @@ async function queryPackages(data: ListInput): Promise<{
     .eq("is_active", true)
     .order("display_order");
 
-  let published = ((rows ?? []) as OfferRow[]).filter(publishedFilter);
+  const allPublished = ((rows ?? []) as OfferRow[]).filter(publishedFilter);
+  // Child counts come from the full published set so drill-down works at every level.
+  const childCount = new Map<string, number>();
+  for (const r of allPublished) {
+    if (r.parent_offer_id) childCount.set(r.parent_offer_id, (childCount.get(r.parent_offer_id) ?? 0) + 1);
+  }
+
+  let published = allPublished;
+  if (data.parentId) published = published.filter((r) => r.parent_offer_id === data.parentId);
+  else if (data.topLevelOnly) published = published.filter((r) => !r.parent_offer_id);
   if (data.categoryId) published = published.filter((r) => r.category_id === data.categoryId);
   if (data.featuredOnly) published = published.filter((r) => r.is_featured);
   if (data.search) {
@@ -402,6 +422,7 @@ async function queryPackages(data: ListInput): Promise<{
       stars: extras.starMap.get(r.id) ?? null,
       inclusions: extras.inclusionMap.get(r.id) ?? [],
       signed: extras.signed,
+      childCount: childCount.get(r.id) ?? 0,
     }),
   );
 
@@ -425,7 +446,59 @@ async function queryPackages(data: ListInput): Promise<{
 
 export const listPackages = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => listInput.parse(d ?? {}))
-  .handler(async ({ data }) => queryPackages(data));
+  .handler(async ({ data }) =>
+    queryPackages({ ...data, topLevelOnly: data.topLevelOnly ?? !data.parentId }),
+  );
+
+/**
+ * One level of the package hierarchy: the package itself, its ancestors for the
+ * breadcrumb and its direct published children. Children exist -> group page.
+ */
+export const getPackageGroup = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        slug: z.string().min(1).max(120),
+        currency: z.unknown().transform(normalizeCurrency).default("USD"),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const sb = getPublicClient();
+    const { data: row } = await sb
+      .from("service_offers")
+      .select("id,slug,title_ar,title_en,parent_offer_id")
+      .eq("slug", data.slug)
+      .is("deleted_at", null)
+      .maybeSingle();
+    const offer = row as OfferRow | null;
+    if (!offer) return { children: [], ancestors: [], currencies: await loadCurrencies() };
+
+    const ancestors: { slug: string; title_ar: string; title_en: string }[] = [];
+    let parentId: string | null = offer.parent_offer_id ?? null;
+    for (let i = 0; i < 5 && parentId; i++) {
+      const { data: p } = await sb
+        .from("service_offers")
+        .select("id,slug,title_ar,title_en,parent_offer_id")
+        .eq("id", parentId)
+        .maybeSingle();
+      const parent = p as OfferRow | null;
+      if (!parent) break;
+      ancestors.unshift({
+        slug: parent.slug ?? parent.id,
+        title_ar: parent.title_ar,
+        title_en: parent.title_en,
+      });
+      parentId = parent.parent_offer_id ?? null;
+    }
+
+    const result = await queryPackages({
+      currency: data.currency,
+      parentId: offer.id,
+      sort: "featured",
+    } as ListInput);
+    return { children: result.offers, ancestors, currencies: result.currencies };
+  });
 
 export const getFeaturedPackages = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
@@ -440,6 +513,7 @@ export const getFeaturedPackages = createServerFn({ method: "GET" })
     const result = await queryPackages({
       currency: data.currency,
       sort: "featured",
+      topLevelOnly: true,
       limit: data.limit,
     } as ListInput);
     // Featured first; fall back to the newest offers so the section is never empty.
