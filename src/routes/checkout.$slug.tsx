@@ -343,6 +343,16 @@ function Checkout() {
                   required
                 />
               </Field>
+
+              <Button type="button" size="lg" className="w-full" onClick={goToPayment}>
+                {t("request.continue")}
+              </Button>
+            </section>
+            ) : null}
+
+            {step === 2 ? (
+            <section className="surface-card space-y-4 p-6">
+              <h2 className="text-lg font-bold">{t("checkout.payment_details")}</h2>
               <Field id="reference" label={t("checkout.reference")}>
                 <Input
                   id="reference"
