@@ -275,8 +275,9 @@ function Checkout() {
                 ))}
               </RadioGroup>
             </section>
+            ) : null}
 
-            {requiredDocs.length > 0 ? (
+            {step === 1 && requiredDocs.length > 0 ? (
               <section className="surface-card space-y-4 p-6">
                 <h2 className="text-lg font-bold">{t("checkout.docs")}</h2>
                 <p className="text-sm text-muted-foreground">{t("checkout.docs.note")}</p>
