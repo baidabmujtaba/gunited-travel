@@ -59,6 +59,7 @@ function Checkout() {
   });
   const methodsQuery = useQuery({ queryKey: ["payment-methods"], queryFn: () => getPaymentMethods() });
 
+  const [step, setStep] = useState<1 | 2>(1);
   const [methodId, setMethodId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -166,6 +167,21 @@ function Checkout() {
     setFile(f);
   }
 
+  /** Step 1 → step 2: applicant details and required documents must be complete. */
+  function goToPayment() {
+    if (!name.trim() || !email.trim() || !whatsapp.trim()) {
+      toast.error(t("checkout.required"));
+      return;
+    }
+    const missingDocs = requiredDocs.filter((d) => d.required && !docFiles[d.key]);
+    if (missingDocs.length > 0) {
+      toast.error(t("checkout.docs.missing"));
+      return;
+    }
+    setStep(2);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !whatsapp.trim() || !reference.trim() || !file || !methodId) {
@@ -245,6 +261,7 @@ function Checkout() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <form onSubmit={submit} className="space-y-8">
+            {step === 2 ? (
             <section className="surface-card p-6">
               <h2 className="text-lg font-bold">{t("checkout.method")}</h2>
               <RadioGroup value={methodId} onValueChange={setMethodId} className="mt-4 space-y-3">
@@ -274,8 +291,9 @@ function Checkout() {
                 ))}
               </RadioGroup>
             </section>
+            ) : null}
 
-            {requiredDocs.length > 0 ? (
+            {step === 1 && requiredDocs.length > 0 ? (
               <section className="surface-card space-y-4 p-6">
                 <h2 className="text-lg font-bold">{t("checkout.docs")}</h2>
                 <p className="text-sm text-muted-foreground">{t("checkout.docs.note")}</p>
@@ -316,6 +334,7 @@ function Checkout() {
               </section>
             ) : null}
 
+            {step === 1 ? (
             <section className="surface-card space-y-4 p-6">
               <h2 className="text-lg font-bold">{t("checkout.yourdetails")}</h2>
               <Field id="name" label={t("checkout.name")}>
@@ -340,6 +359,16 @@ function Checkout() {
                   required
                 />
               </Field>
+
+              <Button type="button" size="lg" className="w-full" onClick={goToPayment}>
+                {t("request.continue")}
+              </Button>
+            </section>
+            ) : null}
+
+            {step === 2 ? (
+            <section className="surface-card space-y-4 p-6">
+              <h2 className="text-lg font-bold">{t("checkout.payment_details")}</h2>
               <Field id="reference" label={t("checkout.reference")}>
                 <Input
                   id="reference"
@@ -371,7 +400,11 @@ function Checkout() {
                   t("checkout.submit")
                 )}
               </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={() => setStep(1)}>
+                {t("common.back")}
+              </Button>
             </section>
+            ) : null}
           </form>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">

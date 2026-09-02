@@ -105,6 +105,7 @@ export const messages: Dict = {
   "checkout.iban": { ar: "الآيبان", en: "IBAN" },
   "checkout.branch": { ar: "الفرع", en: "Branch" },
   "checkout.yourdetails": { ar: "بياناتك", en: "Your details" },
+  "checkout.payment_details": { ar: "بيانات الدفع", en: "Payment details" },
   "checkout.name": { ar: "الاسم الكامل", en: "Full name" },
   "checkout.email": { ar: "البريد الإلكتروني", en: "Email address" },
   "checkout.whatsapp": { ar: "رقم واتساب (مع رمز الدولة)", en: "WhatsApp number (with country code)" },
