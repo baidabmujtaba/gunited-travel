@@ -16,7 +16,8 @@ import { StoreLayout } from "@/components/store/StoreLayout";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { categoryImage } from "@/lib/offer-images";
-import { getPackage, trackPackageEvent } from "@/lib/packages.functions";
+import { PackageCard } from "@/components/store/PackageCard";
+import { getPackage, getPackageGroup, trackPackageEvent } from "@/lib/packages.functions";
 
 export const Route = createFileRoute("/offers/$slug")({
   loader: async ({ params }) => {
@@ -88,6 +89,14 @@ function OfferDetail() {
   const data = query.data ?? initial;
   const offer = data.offer;
 
+  // One level of the mother -> children -> grandchildren tree.
+  const group = useQuery({
+    queryKey: ["package-group", slug, currency],
+    queryFn: () => getPackageGroup({ data: { slug, currency } }),
+  });
+  const children = group.data?.children ?? [];
+  const ancestors = group.data?.ancestors ?? [];
+
   useEffect(() => {
     if (offer?.id) void trackPackageEvent({ data: { offerId: offer.id, event: "view" } });
   }, [offer?.id]);
@@ -100,6 +109,59 @@ function OfferDetail() {
           <Button asChild className="mt-6">
             <Link to="/offers">كل العروض / All offers</Link>
           </Button>
+        </div>
+      </StoreLayout>
+    );
+  }
+
+  const crumbs = (
+    <nav className="mb-5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+      <Link to="/offers" className="hover:text-forest">
+        {ar ? "كل الباقات" : "All packages"}
+      </Link>
+      {ancestors.map((a) => (
+        <span key={a.slug} className="flex items-center gap-2">
+          <span>/</span>
+          <Link to="/offers/$slug" params={{ slug: a.slug }} className="hover:text-forest">
+            {ar ? a.title_ar : a.title_en}
+          </Link>
+        </span>
+      ))}
+      <span>/</span>
+      <span className="font-semibold text-foreground">{ar ? offer.title_ar : offer.title_en}</span>
+    </nav>
+  );
+
+  // A package with sub-packages is a group level: show its children, not a booking page.
+  if (children.length > 0) {
+    return (
+      <StoreLayout>
+        <div className="mx-auto w-full max-w-6xl px-5 pb-16">
+          {crumbs}
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold sm:text-4xl">
+                {ar ? offer.title_ar : offer.title_en}
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                {(ar ? offer.short_description_ar : offer.short_description_en) ||
+                  (ar
+                    ? "اختر الباقة الفرعية المناسبة لك."
+                    : "Choose the sub-package that suits you.")}
+              </p>
+            </div>
+            <CurrencySelector
+              currencies={group.data?.currencies ?? data.currencies}
+              value={currency}
+              onChange={setCurrency}
+            />
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {children.map((c) => (
+              <PackageCard key={c.id} offer={c} />
+            ))}
+          </div>
         </div>
       </StoreLayout>
     );
@@ -126,6 +188,7 @@ function OfferDetail() {
   return (
     <StoreLayout>
       <div className="mx-auto w-full max-w-6xl px-5 pb-28 sm:pb-14">
+        {crumbs}
         {/* Hero */}
         <div className="surface-card overflow-hidden">
           <div className="relative aspect-16/9 bg-secondary">

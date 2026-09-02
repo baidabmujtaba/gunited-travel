@@ -1506,6 +1506,11 @@ export type Database = {
           images: Json
           important_info_ar: string
           important_info_en: string
+          input_agency_price: number | null
+          input_currency: string
+          input_original_price: number | null
+          input_price: number | null
+          input_rate_per_usd: number | null
           is_featured: boolean
           madinah_nights: number | null
           makkah_nights: number | null
@@ -1514,6 +1519,7 @@ export type Database = {
           original_price_usd: number | null
           other_destination: string | null
           other_nights: number | null
+          parent_offer_id: string | null
           price_display_mode: string
           primary_image: string | null
           publish_at: string | null
@@ -1566,6 +1572,11 @@ export type Database = {
           images?: Json
           important_info_ar?: string
           important_info_en?: string
+          input_agency_price?: number | null
+          input_currency?: string
+          input_original_price?: number | null
+          input_price?: number | null
+          input_rate_per_usd?: number | null
           is_featured?: boolean
           madinah_nights?: number | null
           makkah_nights?: number | null
@@ -1574,6 +1585,7 @@ export type Database = {
           original_price_usd?: number | null
           other_destination?: string | null
           other_nights?: number | null
+          parent_offer_id?: string | null
           price_display_mode?: string
           primary_image?: string | null
           publish_at?: string | null
@@ -1626,6 +1638,11 @@ export type Database = {
           images?: Json
           important_info_ar?: string
           important_info_en?: string
+          input_agency_price?: number | null
+          input_currency?: string
+          input_original_price?: number | null
+          input_price?: number | null
+          input_rate_per_usd?: number | null
           is_featured?: boolean
           madinah_nights?: number | null
           makkah_nights?: number | null
@@ -1634,6 +1651,7 @@ export type Database = {
           original_price_usd?: number | null
           other_destination?: string | null
           other_nights?: number | null
+          parent_offer_id?: string | null
           price_display_mode?: string
           primary_image?: string | null
           publish_at?: string | null
@@ -1667,6 +1685,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "offer_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_offers_parent_offer_id_fkey"
+            columns: ["parent_offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
             referencedColumns: ["id"]
           },
         ]

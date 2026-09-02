@@ -98,6 +98,15 @@ const offerSchema = z.object({
       "security_approval",
     ])
     .default("tourism_package"),
+  /** Optional parent package: builds the mother -> children -> grandchildren tree. */
+  parent_offer_id: z.string().uuid().nullable().default(null),
+  /** Currency the admin typed the prices in; stored prices are always converted to USD. */
+  input_currency: z
+    .preprocess(
+      (v) => (typeof v === "string" && v.trim().length >= 3 ? v.trim().toUpperCase() : "USD"),
+      z.string().min(3).max(6),
+    )
+    .default("USD"),
   // Two independent, manually entered prices — no automatic relation between them.
   customer_price_usd: z.number().positive(),
   agency_price_usd: z.number().positive(),
@@ -262,6 +271,23 @@ export const saveOfferBadge = createServerFn({ method: "POST" })
 /* Offers                                                              */
 /* ------------------------------------------------------------------ */
 
+/** Active currencies with their USD rate, for the offer builder's currency picker. */
+export const listOfferCurrencies = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context);
+    const [{ data: currencies }, { data: rates }] = await Promise.all([
+      context.supabase
+        .from("currencies")
+        .select("code,name_en,name_ar,symbol")
+        .eq("is_active", true)
+        .order("code"),
+      context.supabase.from("exchange_rates").select("currency_code,rate_per_usd"),
+    ]);
+    const rateMap = new Map((rates ?? []).map((r) => [r.currency_code, Number(r.rate_per_usd)]));
+    return (currencies ?? []).map((c) => ({ ...c, rate: rateMap.get(c.code) ?? (c.code === "USD" ? 1 : 0) }));
+  });
+
 /** Staff-only catalog manager listing (includes drafts and archived offers). */
 export const listOffersAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -322,8 +348,37 @@ export const saveOffer = createServerFn({ method: "POST" })
       slug = `${base}-${i}`;
     }
 
+    if (data.parent_offer_id && data.id && data.parent_offer_id === data.id) {
+      throw new Error("An offer cannot be its own parent.");
+    }
+
+    // Prices are typed in the admin's chosen currency; USD is the accounting anchor.
+    let rate = 1;
+    if (data.input_currency !== "USD") {
+      const { data: rateRow } = await sb
+        .from("exchange_rates")
+        .select("rate_per_usd")
+        .eq("currency_code", data.input_currency)
+        .maybeSingle();
+      const value = Number((rateRow as { rate_per_usd?: number } | null)?.rate_per_usd ?? 0);
+      if (!(value > 0)) {
+        throw new Error(`No exchange rate configured for ${data.input_currency}.`);
+      }
+      rate = value;
+    }
+    const toUsd = (v: number) => Math.round((v / rate) * 100) / 100;
+    const customerUsd = toUsd(data.customer_price_usd);
+    const agencyUsd = toUsd(data.agency_price_usd);
+    const originalUsd = data.original_price_usd == null ? null : toUsd(data.original_price_usd);
+
     const payload = {
       slug,
+      parent_offer_id: data.parent_offer_id,
+      input_currency: data.input_currency,
+      input_price: data.customer_price_usd,
+      input_agency_price: data.agency_price_usd,
+      input_original_price: data.original_price_usd,
+      input_rate_per_usd: rate,
       title_ar: data.title_ar,
       title_en: data.title_en,
       short_description_ar: data.short_description_ar,
@@ -335,10 +390,10 @@ export const saveOffer = createServerFn({ method: "POST" })
       badge_id: data.badge_id,
       offer_type: data.offer_type,
       // base_price_usd is kept in sync with the customer price for legacy readers.
-      base_price_usd: data.customer_price_usd,
-      customer_price_usd: data.customer_price_usd,
-      agency_price_usd: data.agency_price_usd,
-      original_price_usd: data.original_price_usd,
+      base_price_usd: customerUsd,
+      customer_price_usd: customerUsd,
+      agency_price_usd: agencyUsd,
+      original_price_usd: originalUsd,
       price_display_mode: data.price_display_mode,
       display_currency: data.display_currency,
       tax_percent: data.tax_percent,

@@ -110,7 +110,13 @@ export function PackageCard({ offer }: { offer: PackageSummary }) {
           </div>
           <Button asChild size="sm">
             <Link to="/offers/$slug" params={{ slug: offer.slug }}>
-              {ar ? "التفاصيل" : "View details"}
+              {offer.child_count > 0
+                ? ar
+                  ? `الباقات الفرعية (${offer.child_count})`
+                  : `Sub-packages (${offer.child_count})`
+                : ar
+                  ? "التفاصيل"
+                  : "View details"}
             </Link>
           </Button>
         </div>
