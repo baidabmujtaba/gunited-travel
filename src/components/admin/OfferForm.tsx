@@ -20,6 +20,8 @@ import { useI18n } from "@/lib/i18n";
 import {
   getOfferBuilder,
   listOfferBadges,
+  listOfferCurrencies,
+  listOffersAdmin,
   listOfferCategories,
   saveOffer,
 } from "@/lib/offers.functions";
@@ -65,6 +67,8 @@ export type OfferDraft = {
   description_en: string;
   category: string;
   category_id: string;
+  parent_offer_id: string;
+  input_currency: string;
   badge_id: string;
   offer_type: string;
   customer_price_usd: string;
@@ -107,6 +111,8 @@ export const emptyOffer: OfferDraft = {
   description_en: "",
   category: "package",
   category_id: "",
+  parent_offer_id: "",
+  input_currency: "USD",
   badge_id: "",
   offer_type: "tourism_package",
   customer_price_usd: "",
@@ -287,6 +293,8 @@ export function OfferForm({
           description_en: draft.description_en,
           category: draft.category,
           category_id: draft.category_id || null,
+          parent_offer_id: draft.parent_offer_id || null,
+          input_currency: draft.input_currency || "USD",
           badge_id: draft.badge_id || null,
           offer_type: draft.offer_type as never,
           customer_price_usd: Number(draft.customer_price_usd || 0),

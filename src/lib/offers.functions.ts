@@ -271,6 +271,23 @@ export const saveOfferBadge = createServerFn({ method: "POST" })
 /* Offers                                                              */
 /* ------------------------------------------------------------------ */
 
+/** Active currencies with their USD rate, for the offer builder's currency picker. */
+export const listOfferCurrencies = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context);
+    const [{ data: currencies }, { data: rates }] = await Promise.all([
+      context.supabase
+        .from("currencies")
+        .select("code,name_en,name_ar,symbol")
+        .eq("is_active", true)
+        .order("code"),
+      context.supabase.from("exchange_rates").select("currency_code,rate_per_usd"),
+    ]);
+    const rateMap = new Map((rates ?? []).map((r) => [r.currency_code, Number(r.rate_per_usd)]));
+    return (currencies ?? []).map((c) => ({ ...c, rate: rateMap.get(c.code) ?? (c.code === "USD" ? 1 : 0) }));
+  });
+
 /** Staff-only catalog manager listing (includes drafts and archived offers). */
 export const listOffersAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
