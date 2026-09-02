@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, MessageCircle, ShieldCheck, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CatalogGrid } from "@/components/store/CatalogGrid";
+import { FeaturedPackages } from "@/components/store/FeaturedPackages";
 import { PlaneHero } from "@/components/store/PlaneHero";
 import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
@@ -67,6 +68,8 @@ function Home() {
       <PlaneHero />
 
       <SecurityClearanceCard />
+
+      <FeaturedPackages currency={currency} />
 
 
       <section className="mx-auto w-full max-w-6xl px-5 py-14">
