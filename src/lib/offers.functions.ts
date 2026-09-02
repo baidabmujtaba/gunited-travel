@@ -483,7 +483,7 @@ export const duplicateOffer = createServerFn({ method: "POST" })
       const anySb = sb as unknown as { from: (t: string) => any };
       const { data: children } = await anySb.from(table).select("*").eq("offer_id", data.id);
       const rows = ((children ?? []) as Record<string, unknown>[]).map((c) => {
-        const copy = { ...c, offer_id: newId };
+        const copy: Record<string, unknown> = { ...c, offer_id: newId };
         delete copy["id"];
         delete copy["created_at"];
         delete copy["updated_at"];
