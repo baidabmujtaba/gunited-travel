@@ -65,8 +65,20 @@ export const saveOffer = createServerFn({ method: "POST" })
     await assertStaff(context);
     const sb = context.supabase;
 
+    // Slugs are unique, so suffix a counter until a free one is found.
+    const base = slugify(data.slug || data.title_en, `offer-${Date.now()}`);
+    let slug = base;
+    for (let i = 2; i < 100; i++) {
+      let q = sb.from("service_offers").select("id").eq("slug", slug).limit(1);
+      if (data.id) q = q.neq("id", data.id);
+      const { data: clash, error: clashError } = await q;
+      if (clashError) throw new Error(clashError.message);
+      if (!clash?.length) break;
+      slug = `${base}-${i}`;
+    }
+
     const payload = {
-      slug: slugify(data.slug || data.title_en, `offer-${Date.now()}`),
+      slug,
       title_ar: data.title_ar,
       title_en: data.title_en,
       description_ar: data.description_ar,
