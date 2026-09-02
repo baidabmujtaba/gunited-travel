@@ -717,6 +717,462 @@ export type Database = {
           },
         ]
       }
+      offer_analytics: {
+        Row: {
+          booking_requests: number
+          clicks: number
+          created_at: string
+          day: string
+          id: string
+          offer_id: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          booking_requests?: number
+          clicks?: number
+          created_at?: string
+          day?: string
+          id?: string
+          offer_id: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          booking_requests?: number
+          clicks?: number
+          created_at?: string
+          day?: string
+          id?: string
+          offer_id?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_analytics_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_badges: {
+        Row: {
+          color: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      offer_categories: {
+        Row: {
+          created_at: string
+          description_ar: string
+          description_en: string
+          display_order: number
+          icon: string | null
+          id: string
+          image: string | null
+          is_active: boolean
+          is_featured: boolean
+          name_ar: string
+          name_en: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          name_ar: string
+          name_en: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          name_ar?: string
+          name_en?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      offer_coupons: {
+        Row: {
+          category_ids: string[]
+          code: string
+          created_at: string
+          created_by: string | null
+          discount_type: string
+          discount_value: number
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          min_order_usd: number
+          offer_ids: string[]
+          starts_at: string | null
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+        }
+        Insert: {
+          category_ids?: string[]
+          code: string
+          created_at?: string
+          created_by?: string | null
+          discount_type?: string
+          discount_value?: number
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order_usd?: number
+          offer_ids?: string[]
+          starts_at?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Update: {
+          category_ids?: string[]
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          discount_type?: string
+          discount_value?: number
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order_usd?: number
+          offer_ids?: string[]
+          starts_at?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      offer_departures: {
+        Row: {
+          created_at: string
+          departure_date: string
+          id: string
+          is_blocked: boolean
+          note: string | null
+          offer_id: string
+          return_date: string | null
+          seats_taken: number
+          seats_total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          departure_date: string
+          id?: string
+          is_blocked?: boolean
+          note?: string | null
+          offer_id: string
+          return_date?: string | null
+          seats_taken?: number
+          seats_total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          departure_date?: string
+          id?: string
+          is_blocked?: boolean
+          note?: string | null
+          offer_id?: string
+          return_date?: string | null
+          seats_taken?: number
+          seats_total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_departures_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_faqs: {
+        Row: {
+          answer_ar: string
+          answer_en: string
+          created_at: string
+          id: string
+          offer_id: string
+          question_ar: string
+          question_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer_ar?: string
+          answer_en?: string
+          created_at?: string
+          id?: string
+          offer_id: string
+          question_ar: string
+          question_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer_ar?: string
+          answer_en?: string
+          created_at?: string
+          id?: string
+          offer_id?: string
+          question_ar?: string
+          question_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_faqs_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_hotels: {
+        Row: {
+          check_in: string | null
+          check_out: string | null
+          city_ar: string
+          city_en: string
+          created_at: string
+          description_ar: string
+          description_en: string
+          distance_haram_m: number | null
+          distance_mosque_m: number | null
+          id: string
+          image: string | null
+          name_ar: string
+          name_en: string
+          offer_id: string
+          room_type: string | null
+          sort_order: number
+          stars: number
+          updated_at: string
+        }
+        Insert: {
+          check_in?: string | null
+          check_out?: string | null
+          city_ar?: string
+          city_en?: string
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          distance_haram_m?: number | null
+          distance_mosque_m?: number | null
+          id?: string
+          image?: string | null
+          name_ar: string
+          name_en: string
+          offer_id: string
+          room_type?: string | null
+          sort_order?: number
+          stars?: number
+          updated_at?: string
+        }
+        Update: {
+          check_in?: string | null
+          check_out?: string | null
+          city_ar?: string
+          city_en?: string
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          distance_haram_m?: number | null
+          distance_mosque_m?: number | null
+          id?: string
+          image?: string | null
+          name_ar?: string
+          name_en?: string
+          offer_id?: string
+          room_type?: string | null
+          sort_order?: number
+          stars?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_hotels_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_room_types: {
+        Row: {
+          available_rooms: number
+          created_at: string
+          currency_code: string
+          description_ar: string
+          description_en: string
+          id: string
+          is_active: boolean
+          name_ar: string
+          name_en: string
+          occupancy: number
+          offer_id: string
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          available_rooms?: number
+          created_at?: string
+          currency_code?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          is_active?: boolean
+          name_ar: string
+          name_en: string
+          occupancy?: number
+          offer_id: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          available_rooms?: number
+          created_at?: string
+          currency_code?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string
+          name_en?: string
+          occupancy?: number
+          offer_id?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_room_types_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_services: {
+        Row: {
+          created_at: string
+          description_ar: string
+          description_en: string
+          extra_price_usd: number
+          icon: string | null
+          id: string
+          is_included: boolean
+          is_optional: boolean
+          name_ar: string
+          name_en: string
+          offer_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          extra_price_usd?: number
+          icon?: string | null
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          name_ar: string
+          name_en: string
+          offer_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          extra_price_usd?: number
+          icon?: string | null
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          name_ar?: string
+          name_en?: string
+          offer_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_services_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "service_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_documents: {
         Row: {
           created_at: string
@@ -1022,9 +1478,13 @@ export type Database = {
           agency_price_usd: number | null
           allowed_payment_methods: string[]
           badge_color: string | null
+          badge_id: string | null
           base_price_usd: number
+          booking_count: number
           border_point: string | null
           category: string
+          category_id: string | null
+          click_count: number
           commission_percent: number
           created_at: string
           created_by: string | null
@@ -1033,32 +1493,58 @@ export type Database = {
           description_ar: string | null
           description_en: string | null
           discount_percent: number
+          display_currency: string
           display_order: number
           duration_ar: string | null
           duration_en: string | null
           expiry_date: string | null
+          featured_order: number
           features: Json
           fee_amount_usd: number
           icon: string | null
           id: string
           images: Json
+          important_info_ar: string
+          important_info_en: string
+          is_featured: boolean
+          madinah_nights: number | null
+          makkah_nights: number | null
+          offer_type: string
+          og_image: string | null
+          original_price_usd: number | null
+          other_destination: string | null
+          other_nights: number | null
+          price_display_mode: string
           primary_image: string | null
+          publish_at: string | null
           required_documents: Json
           security_subtype: string | null
+          seo_description: string | null
+          seo_title: string | null
+          short_description_ar: string
+          short_description_en: string
           slug: string | null
           status: Database["public"]["Enums"]["offer_status"]
           tax_percent: number
+          terms_ar: string
+          terms_en: string
           title_ar: string
           title_en: string
+          total_days: number | null
           updated_at: string
+          view_count: number
         }
         Insert: {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           badge_color?: string | null
+          badge_id?: string | null
           base_price_usd: number
+          booking_count?: number
           border_point?: string | null
           category?: string
+          category_id?: string | null
+          click_count?: number
           commission_percent?: number
           created_at?: string
           created_by?: string | null
@@ -1067,32 +1553,58 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           discount_percent?: number
+          display_currency?: string
           display_order?: number
           duration_ar?: string | null
           duration_en?: string | null
           expiry_date?: string | null
+          featured_order?: number
           features?: Json
           fee_amount_usd?: number
           icon?: string | null
           id?: string
           images?: Json
+          important_info_ar?: string
+          important_info_en?: string
+          is_featured?: boolean
+          madinah_nights?: number | null
+          makkah_nights?: number | null
+          offer_type?: string
+          og_image?: string | null
+          original_price_usd?: number | null
+          other_destination?: string | null
+          other_nights?: number | null
+          price_display_mode?: string
           primary_image?: string | null
+          publish_at?: string | null
           required_documents?: Json
           security_subtype?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          short_description_ar?: string
+          short_description_en?: string
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
+          terms_ar?: string
+          terms_en?: string
           title_ar: string
           title_en: string
+          total_days?: number | null
           updated_at?: string
+          view_count?: number
         }
         Update: {
           agency_price_usd?: number | null
           allowed_payment_methods?: string[]
           badge_color?: string | null
+          badge_id?: string | null
           base_price_usd?: number
+          booking_count?: number
           border_point?: string | null
           category?: string
+          category_id?: string | null
+          click_count?: number
           commission_percent?: number
           created_at?: string
           created_by?: string | null
@@ -1101,26 +1613,63 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           discount_percent?: number
+          display_currency?: string
           display_order?: number
           duration_ar?: string | null
           duration_en?: string | null
           expiry_date?: string | null
+          featured_order?: number
           features?: Json
           fee_amount_usd?: number
           icon?: string | null
           id?: string
           images?: Json
+          important_info_ar?: string
+          important_info_en?: string
+          is_featured?: boolean
+          madinah_nights?: number | null
+          makkah_nights?: number | null
+          offer_type?: string
+          og_image?: string | null
+          original_price_usd?: number | null
+          other_destination?: string | null
+          other_nights?: number | null
+          price_display_mode?: string
           primary_image?: string | null
+          publish_at?: string | null
           required_documents?: Json
           security_subtype?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          short_description_ar?: string
+          short_description_en?: string
           slug?: string | null
           status?: Database["public"]["Enums"]["offer_status"]
           tax_percent?: number
+          terms_ar?: string
+          terms_en?: string
           title_ar?: string
           title_en?: string
+          total_days?: number | null
           updated_at?: string
+          view_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "service_offers_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "offer_badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_offers_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "offer_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_orders: {
         Row: {
@@ -1415,6 +1964,11 @@ export type Database = {
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       next_invoice_number: { Args: never; Returns: string }
       next_tracking_id: { Args: never; Returns: string }
+      offer_is_public: { Args: { _offer_id: string }; Returns: boolean }
+      track_offer_event: {
+        Args: { _event: string; _offer_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -1424,7 +1978,7 @@ export type Database = {
         | "accountant"
         | "client"
         | "travel_agency"
-      offer_status: "active" | "draft" | "archived"
+      offer_status: "active" | "draft" | "archived" | "scheduled"
       order_status:
         | "submitted"
         | "payment_pending"
@@ -1568,7 +2122,7 @@ export const Constants = {
         "client",
         "travel_agency",
       ],
-      offer_status: ["active", "draft", "archived"],
+      offer_status: ["active", "draft", "archived", "scheduled"],
       order_status: [
         "submitted",
         "payment_pending",
