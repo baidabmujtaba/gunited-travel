@@ -199,7 +199,8 @@ async function signPaths(paths: string[]): Promise<Map<string, string>> {
   return new Map((data ?? []).map((d) => [d.path, d.signedUrl]));
 }
 
-type OfferRow = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type OfferRow = any;
 
 function mapSummary(
   r: OfferRow,

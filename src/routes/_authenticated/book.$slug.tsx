@@ -231,11 +231,11 @@ function BookPackage() {
   }
 
   function next() {
-    if (step === 1 && offer.departures.length > 0 && !departureId) {
+    if (step === 1 && offer!.departures.length > 0 && !departureId) {
       toast.error(ar ? "اختر تاريخ المغادرة" : "Select a departure date");
       return;
     }
-    if (step === 1 && offer.departures.length === 0 && !travelDate) {
+    if (step === 1 && offer!.departures.length === 0 && !travelDate) {
       toast.error(ar ? "اختر تاريخ السفر" : "Select a travel date");
       return;
     }

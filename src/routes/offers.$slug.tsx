@@ -37,8 +37,8 @@ export const Route = createFileRoute("/offers/$slug")({
     const title = o.seo_title ?? `${o.title_en} | ${o.title_ar} — Gunited Travel`;
     const description =
       o.seo_description ??
-      (o.short_description_en || o.description_en).slice(0, 155) ||
-      "Gunited Travel package details.";
+      ((o.short_description_en || o.description_en).slice(0, 155) ||
+        "Gunited Travel package details.");
     const image = o.primary_image && /^https:\/\//.test(o.primary_image) ? o.primary_image : null;
     return {
       meta: [
