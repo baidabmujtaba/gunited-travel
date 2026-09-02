@@ -318,6 +318,7 @@ function Checkout() {
               </section>
             ) : null}
 
+            {step === 1 ? (
             <section className="surface-card space-y-4 p-6">
               <h2 className="text-lg font-bold">{t("checkout.yourdetails")}</h2>
               <Field id="name" label={t("checkout.name")}>
