@@ -3,22 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
-  BookUser,
-  CalendarDays,
   Check,
   ChevronDown,
   Globe,
   Info,
   Loader2,
-  Mail,
   MapPin,
   Minus,
-  Phone,
-  Plane,
   Plus,
   ShieldCheck,
   User,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -312,42 +306,6 @@ function SelectField({
           ))}
         </select>
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-      </div>
-    </div>
-  );
-}
-
-function TextField({
-  label,
-  placeholder,
-  icon,
-  value,
-  onChange,
-  type = "text",
-  dir,
-}: {
-  label: string;
-  placeholder: string;
-  icon: React.ReactNode;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  dir?: "ltr" | "rtl";
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-forest-deep">{label}</label>
-      <div className="flex items-center rounded-2xl border border-border bg-white px-3">
-        <span className="shrink-0">{icon}</span>
-        <input
-          type={type}
-          dir={dir}
-          value={value}
-          placeholder={placeholder}
-          aria-label={label}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-12 w-full bg-transparent px-2 text-sm text-forest-deep outline-none placeholder:text-muted-foreground"
-        />
       </div>
     </div>
   );
