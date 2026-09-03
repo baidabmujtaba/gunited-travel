@@ -1,0 +1,587 @@
+{
+  "meta": {
+    "name": "Gunited Travel Hub",
+    "package": "@ws-94902ecbe26305dc86ea/5c4bd00d-5303-4eb4-96c6-a18ead850b08",
+    "version": "1.0.0",
+    "framework": "react",
+    "css_framework": "tailwind",
+    "starter_template": "custom_design_system_tailwind",
+    "theme_files": [
+      "src/lib/theme.ts",
+      "src/styles.css"
+    ],
+    "source_type": "local",
+    "source_manifest": {
+      "#enrichment": "a9317aa530d18b7b4eb25ec1a4346f74447725447558d81d0369de3f2cb82c56",
+      ".gitignore": "6d9e901a692b46a83707c245fb03bc91",
+      ".lovable/plan/dynamic-offers-packages-system-2026-09-02.md": "57e769414711abc9f18b4f4edc97867d",
+      ".lovable/project.json": "683a7777285ec09604e1030ddf427ac5",
+      ".prettierignore": "7279a476f196a2da5f7edd18db568dc6",
+      ".prettierrc": "185ef0234746ab738ac1ab6cec5e2bd9",
+      "AGENTS.md": "3da3c4cd15b686e79a248c25735d6aaf",
+      "README.md": "5650a9d6d747b40b63c920ca675a7be0",
+      "bunfig.toml": "89115995d9de72fdfc894e16b1e75297",
+      "components.json": "30d3d035361ce807021f5c54620962e9",
+      "eslint.config.js": "345bdd57e188e0e4525edcd00e5003f5",
+      "package.json": "24e3694cb4e5ef9e34e5e3a802381e4f",
+      "public/favicon.png": "546809cf0f39c155f81aa255fb52d660",
+      "public/icons/apple-touch-icon.png": "c11783cb31ac4d9cf2cfb00163ae6d82",
+      "public/icons/icon-192.png": "fbbfe0133e672bca342bdd4af15efdaa",
+      "public/icons/icon-512-maskable.png": "413a7eae9c9047b54f1b33c8bf76cdb9",
+      "public/icons/icon-512.png": "2448ce4d50bdce8e32af5e36cd480aa6",
+      "public/manifest.webmanifest": "1995d69260e490d60d2beb90bd02c2c7",
+      "public/offline.html": "c885bca0103a0bfc2bffebfd4e13a94d",
+      "public/robots.txt": "f9dff89adf98833e676de2205921996a",
+      "src/assets/offer-insurance.jpg": "edaf377f6a10037d25ba275b3e7c6257",
+      "src/assets/offer-package.jpg": "6c38e7d1cc758ec927831870b790e478",
+      "src/assets/offer-tour.jpg": "f0894c89e88c5f4f5688b5cdb245b2a7",
+      "src/assets/offer-visa.jpg": "ace01d141b0c839931171fa7377c5792",
+      "src/components/AssistantWidget.tsx": "9253332928e83235cedc06968e360ec5",
+      "src/components/GunitedTicketCard.tsx": "a7c24758bd9bce1955b6f29ac7dc915c",
+      "src/components/NotificationBell.tsx": "6f4a6ad6917dae51129c488a44b80582",
+      "src/components/PricingSync.tsx": "5adc595b485e34ca0965ce2eab539a5d",
+      "src/components/ThemeSync.tsx": "fc7fdb803573e132e9372fbb5e0ba747",
+      "src/components/admin/AdminShell.tsx": "f8025f20ff8b4c2fb50698a249ab52a4",
+      "src/components/admin/Bilingual.tsx": "fe7eb6b3a1cacd019db6d7e06a4d83bb",
+      "src/components/admin/CrmDetail.tsx": "50594558b92fa95fa003eb07be1131a9",
+      "src/components/admin/CrmSection.tsx": "ec1f9c834f1af7d3f8f65f1f9649f715",
+      "src/components/admin/DashboardKit.tsx": "fa42077867b2401242b977ccc73a6e62",
+      "src/components/admin/DirectoryTable.tsx": "5e892e4516d0d7852328e9668c71b752",
+      "src/components/admin/ExchangeRatePanel.tsx": "7b91da77f5d8149d7516cd943ffd63bd",
+      "src/components/admin/InvoiceArchive.tsx": "f1833abf6ce269889c2acf8a7a3cd089",
+      "src/components/admin/OfferBuilderSections.tsx": "9e85e0a058ab51eed19f387b420b1d61",
+      "src/components/admin/OfferForm.tsx": "af6b030b1f99131862c23388af72d2c0",
+      "src/components/admin/OfferTreePanel.tsx": "e9d0756cd53e5ec79fefb3344093236f",
+      "src/components/admin/OpsAlerts.tsx": "f8891bd5b349229e46e2fe7e1c3294bf",
+      "src/components/admin/PaymentMethodsPanel.tsx": "24c0110a4b30427bbd700d915333d966",
+      "src/components/admin/ThemeSection.tsx": "35488baff1f9a7500ab40b16675346bf",
+      "src/components/brand/Wordmark.tsx": "554f63c48f0bb1015a29ec67d8a0956f",
+      "src/components/pwa/InstallAppPrompt.tsx": "7c9c066197d0f822f250c89a7a2a14d9",
+      "src/components/pwa/PwaBootstrap.tsx": "fcfed4810952cd3fc4c50044581fef54",
+      "src/components/store/CatalogGrid.tsx": "fef64e6e2d86728ccb510f2025459ce3",
+      "src/components/store/CurrencySelector.tsx": "c8146557f192403ab2c19299c7db54fc",
+      "src/components/store/FeaturedPackages.tsx": "11501cf3143487dee0f923f76f070f24",
+      "src/components/store/LanguageSwitcher.tsx": "8e425db5de32a32832f1cecf2b1f9af5",
+      "src/components/store/OfferCard.tsx": "b45ab5b9305341a71da5d6da0a1a1b7e",
+      "src/components/store/PackageCard.tsx": "18607fff1486e2d82798e3b886f2f1c1",
+      "src/components/store/PlaneHero.tsx": "c440c73e75d6d16367bf939eeddea119",
+      "src/components/store/SecurityClearanceCard.tsx": "84411d03f2b0d0e1022fa2657e9e3592",
+      "src/components/store/StoreLayout.tsx": "229a1b704b70dd9a0532ccdcd2ba2554",
+      "src/components/ui/accordion.tsx": "55f9dda62b4e3913c9b23e5015a86aef",
+      "src/components/ui/alert-dialog.tsx": "96350e949e9b7b674545430a410ab89c",
+      "src/components/ui/alert.tsx": "f993d7e96b1e25ce50e68ed97e11d2a8",
+      "src/components/ui/aspect-ratio.tsx": "c5c364545e1b25a94e9e752cd67ad048",
+      "src/components/ui/avatar.tsx": "72989cd32f72c4122802540ef32525a5",
+      "src/components/ui/badge.tsx": "81cade001fc4260f9943e18dcd79449b",
+      "src/components/ui/breadcrumb.tsx": "bb9ac254f12662b20d5d50b84308bf3a",
+      "src/components/ui/button.tsx": "7d07d520f486b12bd47373d694ecd2ee",
+      "src/components/ui/calendar.tsx": "d849cc610e2683271f3f1c47d093cf30",
+      "src/components/ui/card.tsx": "d6c48ea36221b9cdc3576d305d12d5d5",
+      "src/components/ui/carousel.tsx": "e324c68ae00cd5aed49317638abd429a",
+      "src/components/ui/chart.tsx": "6a3baf94f2e89f1f97d4d7a28f3622d2",
+      "src/components/ui/checkbox.tsx": "f78aac270ca482c8c2cb907ef6260462",
+      "src/components/ui/collapsible.tsx": "767631bbc344945c236f185f4078d71d",
+      "src/components/ui/command.tsx": "014782599cc838b021ec68b07ad4ea02",
+      "src/components/ui/context-menu.tsx": "3ba8244ea23df34a1dba92f3a1230dad",
+      "src/components/ui/dialog.tsx": "ef4fe8e7de8675730afe3d633b260e09",
+      "src/components/ui/drawer.tsx": "8be333e8fd8e42576b1b5f72f07f4337",
+      "src/components/ui/dropdown-menu.tsx": "28d6e98d3c7811fc0514bfa69416f087",
+      "src/components/ui/form.tsx": "1b0aa6302b9017ea2a1307c22a1d2983",
+      "src/components/ui/hover-card.tsx": "1442794c5ca2a78d69e4e613b315ed3d",
+      "src/components/ui/input-otp.tsx": "65625f2f1c4d731a760aeed7b54459d1",
+      "src/components/ui/input.tsx": "1d4cc52a4cd8afb3e18e45bda942bb8a",
+      "src/components/ui/label.tsx": "7e35df4ca8edd0835efd97ca7937ef92",
+      "src/components/ui/menubar.tsx": "3c4121a1e78d3f424a7295381a8997d3",
+      "src/components/ui/navigation-menu.tsx": "e85351147a02b29577ff83d188b63c24",
+      "src/components/ui/pagination.tsx": "fac6cdbb4bbf78b273d85cd36d6cbb49",
+      "src/components/ui/popover.tsx": "f18aa1da2144f25ee60795c539c51bcd",
+      "src/components/ui/progress.tsx": "55c462e5c9dd678dcf2c0c510b014ac4",
+      "src/components/ui/radio-group.tsx": "0e1ace237a5da3197e3eb1e6683faba9",
+      "src/components/ui/resizable.tsx": "d9fcb9203c749fcab4e125a99bb12a86",
+      "src/components/ui/scroll-area.tsx": "87b65d3eb26f2b02ff35a7acea585ba5",
+      "src/components/ui/select.tsx": "31ea1bbd6671833b010b2e852c8a55d0",
+      "src/components/ui/separator.tsx": "433d163c4ffa00b59398a0c293198b5e",
+      "src/components/ui/sheet.tsx": "0221fbf97b69611b47fcbc10bb27669a",
+      "src/components/ui/sidebar.tsx": "83c1623eb50ebc370d7b1b84a542e369",
+      "src/components/ui/skeleton.tsx": "41b182e6e2fc3805960d41e767d4a972",
+      "src/components/ui/slider.tsx": "4752f1bfa26426988d325599e01c335b",
+      "src/components/ui/sonner.tsx": "97f59f60be3413196d095fcbf7383216",
+      "src/components/ui/switch.tsx": "82f5d8b0c59bb7ff305caa9f502e79ff",
+      "src/components/ui/table.tsx": "7cc889989d53894b659903c73aded96e",
+      "src/components/ui/tabs.tsx": "56e725558c2ce72c18243bf51717f385",
+      "src/components/ui/textarea.tsx": "c7aad96fb9545210d53135a96c76ed6b",
+      "src/components/ui/toggle-group.tsx": "ac26383acf721d116ca8e3ab5c5355d5",
+      "src/components/ui/toggle.tsx": "ee8c5adac74e7242b85b544db1a8fbad",
+      "src/components/ui/tooltip.tsx": "67d71db5a1ab935695d1def497f5b8a6",
+      "src/hooks/use-mobile.tsx": "c0a0bdd4638c391a1dd06ac82074e60b",
+      "src/integrations/lovable/index.ts": "c997b4d5cc51f8fe73119e270709d8f1",
+      "src/integrations/supabase/auth-attacher.ts": "dad043cda134d909e52de0346c16625e",
+      "src/integrations/supabase/auth-middleware.ts": "5d9d831f79177b7c6327cbd794a97367",
+      "src/integrations/supabase/client.server.ts": "23f838ab7633e0a97e695f3c500d91aa",
+      "src/integrations/supabase/client.ts": "b40d27b03f346573ed0f76551e478ffb",
+      "src/integrations/supabase/previewAuthStorage.ts": "bc45a76c9242c4b85d6d4345625c46e9",
+      "src/integrations/supabase/types.ts": "e0515b76294e713defedea0811ddcebb",
+      "src/lib/admin.functions.ts": "66d29bba33de17f7ffb5e23b6743e690",
+      "src/lib/admin.shared.ts": "6b0f6fe4008b3cafbcd3ba23f5a16d1a",
+      "src/lib/agencies.functions.ts": "2b8d541dd7ccae2352ee5967fe83322f",
+      "src/lib/agency-catalog.functions.ts": "2379dc195967abeb5329726c59a58929",
+      "src/lib/agency-catalog.server.ts": "17cb7e907801b1d559363536705ab57a",
+      "src/lib/agency-link.functions.ts": "ea14994b59b7b2ae1e193d66a90f27c6",
+      "src/lib/agency.functions.ts": "e1dda00d9663055d431df13fcf1fe578",
+      "src/lib/amadeus-errors.ts": "9620406b736a4460d67d3b967f9ddf2a",
+      "src/lib/amadeus.server.ts": "0d38904432a94804ed778e5a4f172682",
+      "src/lib/assistant.functions.ts": "0939b848b810fcf8230b68d7a542bbb1",
+      "src/lib/assistant.server.ts": "217c6f3e865abb4ed703983610d19af3",
+      "src/lib/catalog.functions.ts": "8f3a5a3ab035d6d18e52c508ebd71ca5",
+      "src/lib/countries.ts": "84c24f2102e3e14911ea14afb1ae97ec",
+      "src/lib/crm.functions.ts": "aae42dd91a1b619137773ad6a28c9dad",
+      "src/lib/currency.ts": "a2a5cbb586fadbeab4a8f6ccc3cb6b90",
+      "src/lib/email-monitor.functions.ts": "522a2d2d27318c60be41e2b6a04f932a",
+      "src/lib/email-templates/registry.ts": "3f336cf83517a242b9240bcf8e63fac9",
+      "src/lib/email-templates/send-email.ts": "b59b5ce8c6c25d7ec124c128c32306e9",
+      "src/lib/email.server.ts": "dbfa1bc0afac0ea3d1257f8458a240b9",
+      "src/lib/error-capture.ts": "f630d9686a9a989170f22eff4de7b30d",
+      "src/lib/error-page.ts": "8da0ddd7569bac2676b9a5c8edff8a36",
+      "src/lib/finance.functions.ts": "030e666ae3ad21fbc433a3e56f987553",
+      "src/lib/flights.functions.ts": "e5ad29fda80df7482dc630a23ce3c247",
+      "src/lib/i18n.tsx": "912482c75dd8ecc648534c10339a6497",
+      "src/lib/insights.functions.ts": "5993ff448ff6ee027cf2d7f6911fa765",
+      "src/lib/invoice-pdf.server.ts": "102ef4c6bd4282372564a7eb48db6614",
+      "src/lib/invoices.server.ts": "9ea02cde9e939c8fd8d3bfdf67295740",
+      "src/lib/ledger.server.ts": "fe229d969bbe66ee02cc1de66bf2ad95",
+      "src/lib/lovable-error-reporting.ts": "77368331b8ef6e6edcf1a29b24a52d39",
+      "src/lib/notifications.server.ts": "cda7618b9797ca73f959ce875b7fda4c",
+      "src/lib/offer-docs.ts": "c982b9c2f049660da80e7f24789c72ae",
+      "src/lib/offer-images.ts": "7059df94b9b2a385373df62a1d23d2ab",
+      "src/lib/offers.functions.ts": "aa8c717d1e05f0f35ba6b2f826615c35",
+      "src/lib/order-docs.functions.ts": "19dd907083ef33d82dca9fd41d694c6a",
+      "src/lib/orders.functions.ts": "f27de5cb694c31d71e5b0ff1d7574599",
+      "src/lib/package-pricing.ts": "c1f1160664c301466f14432eb749c740",
+      "src/lib/packages.functions.ts": "058f3a2beeb448646dfd5bd1c0bebcb2",
+      "src/lib/payments.functions.ts": "63c7bfd93022dd20299fb8bbcfa8fcab",
+      "src/lib/pricing.ts": "1dceed9da0f773caa9028180d1398503",
+      "src/lib/public-client.server.ts": "933f64b2b9d3766a3f9125e177f04c92",
+      "src/lib/pwa.ts": "e93ea533d8376b9a5e1042bb833491ec",
+      "src/lib/reports.functions.ts": "01b192d320b66e64d12bd57626fcbc1f",
+      "src/lib/reset.functions.ts": "f09c9620adf174e733b74c41b2790698",
+      "src/lib/session.ts": "eb1d593091d7af7f76363d87302030b6",
+      "src/lib/settings.functions.ts": "4ea21e8ee7e63859ad5a72df66aa5f5a",
+      "src/lib/statements.functions.ts": "fadc8729ef6e1584e05a3482ef543bee",
+      "src/lib/theme.ts": "d0da0b55970960d6e8f8ae3c49dd2e70",
+      "src/lib/users.functions.ts": "9024392e8808e3b0576b580ab9b52489",
+      "src/lib/utils.ts": "d9837f38cc05303254571985e3164050",
+      "src/routeTree.gen.ts": "d88dd1ace802b5f5edbdd5880a8ce0e1",
+      "src/router.tsx": "c10dacbf340ea6142f7f4b5f230e736e",
+      "src/routes/README.md": "b3a2f259b66fd1a11f54b6d5ac83bf57",
+      "src/routes/__root.tsx": "47d1e50b5ba3b61caf016778363dc9e4",
+      "src/routes/_authenticated/admin.agencies.tsx": "58cf244a0da0b61e8b2348d9896089bc",
+      "src/routes/_authenticated/admin.agency.$id.tsx": "0727b3cbd16f61f2268d59d6cf9f2f43",
+      "src/routes/_authenticated/admin.balances.tsx": "c740d17622810f3cb7bfead2c50e1d5a",
+      "src/routes/_authenticated/admin.customer.$id.tsx": "e823449b2470f1dbca7438cb277a55d6",
+      "src/routes/_authenticated/admin.customers.tsx": "0447b4a4e90e1899dcb07ab52f92ad6e",
+      "src/routes/_authenticated/admin.dashboard.tsx": "b2504d8e401eb13780c183da7a4941aa",
+      "src/routes/_authenticated/admin.email-notifications.tsx": "b3d6f1553a8102e1e2bc1bcbf5a5b446",
+      "src/routes/_authenticated/admin.finance.tsx": "0b41d0c12e0d3d57c7311cb095145099",
+      "src/routes/_authenticated/admin.flights.tsx": "cebe2715620a5d7f7ba67ac56d0f6758",
+      "src/routes/_authenticated/admin.index.tsx": "daf5b10c6a51c4573e0f2ea957a1fd7c",
+      "src/routes/_authenticated/admin.links.tsx": "67d709a722ae67570196bc77766c1877",
+      "src/routes/_authenticated/admin.offers.tsx": "a6c6304bac97780c841b4a4deaf93a21",
+      "src/routes/_authenticated/admin.packages.tsx": "0217a34da7cfe84831a6a321848f76b6",
+      "src/routes/_authenticated/admin.partners.tsx": "be2194295c262970ef2e98cf8e6db3d6",
+      "src/routes/_authenticated/admin.payments.tsx": "a6893da647ac4933ee59b60229d432fe",
+      "src/routes/_authenticated/admin.reports.tsx": "6b4575499e3819e7f1d2943e1e09760d",
+      "src/routes/_authenticated/admin.settings.tsx": "fcf976cd2edd927bbd02d626660c94c1",
+      "src/routes/_authenticated/admin.tsx": "1c2a429a490d2bff4a8468ec0f2c4565",
+      "src/routes/_authenticated/admin.users.tsx": "376813154dcdac626cc1f71552417be4",
+      "src/routes/_authenticated/agency.balance.tsx": "8e6be1a65acc2b9d3b8d1bd6320e5974",
+      "src/routes/_authenticated/agency.customers.tsx": "9d0157af85c65f317c7959daaf478a4a",
+      "src/routes/_authenticated/agency.index.tsx": "20a0113a9eaf89abca8df96e2093a90c",
+      "src/routes/_authenticated/agency.offers.tsx": "c55af42903149550ac703456efc2185b",
+      "src/routes/_authenticated/agency.orders.tsx": "e929e1e574702bb3ef3cc6136b466d6e",
+      "src/routes/_authenticated/agency.statement.tsx": "86633998d63dc236c7feeb2a79bc2789",
+      "src/routes/_authenticated/agency.tsx": "765bdcd35a49ad41a9aeaa824c12e3e4",
+      "src/routes/_authenticated/book.$slug.tsx": "0840cb9cc3cb231b7ec90e90dad41467",
+      "src/routes/_authenticated/booking.$tracking.tsx": "b08b0aca990462e1da1a520e89ab9a62",
+      "src/routes/_authenticated/invoice.$number.tsx": "b1301ae50b9640d1026dfccb1832a639",
+      "src/routes/_authenticated/route.tsx": "cfef1e67d3830b63f600a6d3d70ea3c4",
+      "src/routes/account.tsx": "9838d06744f81d5c34467eef50933979",
+      "src/routes/api/public/email-dispatch.ts": "bf0a7d98c17995db2e2d2b5daa55fdc5",
+      "src/routes/auth.tsx": "dbb6899c7062525163af4a843745298a",
+      "src/routes/catalog.tsx": "1b1e1b88e291643640c27e0399c507c3",
+      "src/routes/checkout.$slug.tsx": "370629345c7d3b04e92d1c21a98c1569",
+      "src/routes/index.tsx": "a2e54f1d69d9218e19b02199a6bf5140",
+      "src/routes/lovable/email/transactional/preview.ts": "9aa7feddd687c2e5b97197b257e30850",
+      "src/routes/offers.$slug.tsx": "520ac7acff167075bdd194a2b7727ac2",
+      "src/routes/offers.index.tsx": "65c55bc73a2b32d846c6c87b702326fb",
+      "src/routes/request.$slug.tsx": "c9f122e9edd1ede52b8c15f463038624",
+      "src/routes/select.tsx": "f8947aea3ab7ff6ceaa7c6a33d24d325",
+      "src/routes/track.tsx": "60cc86653e47c1d580860bcf8ac0dcc8",
+      "src/server.ts": "c7bbc49bb70e318af618d92775ee0f27",
+      "src/start.ts": "4db08eba82f7073136374cea44b2759f",
+      "src/styles.css": "14b5d0ebddb3d3fc6bfb289b8aad0692",
+      "supabase/config.toml": "93125d8a7bc67d6a1f0d4cb7f131a747",
+      "supabase/migrations/20260821104824_8517896e-922e-4025-aaea-d095aaca51c5.sql": "41a500220e396637452bea803ba1dec5",
+      "supabase/migrations/20260821104845_2750edeb-a0c7-4278-8df2-448f5704ff74.sql": "eda343feee3bebaa160bfdfb07ea0df1",
+      "supabase/migrations/20260821104857_ac4b67b8-e5a7-4eb4-93bc-da24d5e345d7.sql": "aa829ebd14da8a27d568eea56080793e",
+      "supabase/migrations/20260821104930_c6e84d9b-bc91-48f7-8e59-f34bee6f3369.sql": "fed3b667af68a1d67f8381ae3b6ba6df",
+      "supabase/migrations/20260824070456_bc5d1294-4254-439d-805b-f55071932eee.sql": "59ac9fb040f38dcdd9431f4191a1501a",
+      "supabase/migrations/20260825090712_afbead5f-a227-4342-b9d3-238200883a23.sql": "b1db5b0d8f4497e3b09485d99d38879d",
+      "supabase/migrations/20260825091146_c8b34f25-353d-4129-99a1-7b6cc9377ffb.sql": "1283aba35b07c9f082847cb67c7cecfe",
+      "supabase/migrations/20260825091844_ad16adfa-2cf9-4628-a63c-ed0222bf4470.sql": "269e62e7ebf450b21320c72228519437",
+      "supabase/migrations/20260825091915_780899ee-b2a7-4116-81f8-8496e0862361.sql": "f1cc6e120ddcd6d41433230b295d6cc2",
+      "supabase/migrations/20260825092354_2616d2a4-b8ed-494f-b348-4a4b87b929a3.sql": "729b0ec71ace808c31b8e5cca0836d88",
+      "supabase/migrations/20260825093326_4a8ea145-7814-49f3-8df4-c6227ad5ab46.sql": "f9804340b434a594e7bfc6f43fae736a",
+      "supabase/migrations/20260825093538_c96b7e09-5e82-40c4-8f8f-34754846553e.sql": "52b579c7d2af585eb7ad77aef3a71204",
+      "supabase/migrations/20260825100739_4d848f04-b000-4616-87ae-f25b593a9d36.sql": "816c61b8b585f8aa9aea0d9a8e9615c9",
+      "supabase/migrations/20260825101954_df4c8a7e-21b0-41da-9ab2-695325738653.sql": "7d663805505d6e5c3f2508cc5d8d827e",
+      "supabase/migrations/20260825103356_5792a0e2-8376-437c-9b6f-814ae26b29b1.sql": "473a46ed05fcd55692fbf4c0ee1e5c1b",
+      "supabase/migrations/20260825103417_b17803f9-5097-4ef1-a4ef-24bfe9d3c1fa.sql": "df577ec430eac6a5532e35581da66979",
+      "supabase/migrations/20260826135705_d5933f7f-3692-48b6-ab2c-0adc8bd86dc3.sql": "7da09afff01966e101c1779681c7aec3",
+      "supabase/migrations/20260826143603_c4eda6c8-3eb3-4860-9f6f-21564d4fe87f.sql": "31821194de1dd008f08120ce454d7baa",
+      "supabase/migrations/20260826143751_a6d7082a-199f-4459-bdca-623e40e4b739.sql": "1addebe1d3132491382f65516e5eea92",
+      "supabase/migrations/20260827075740_35e5645e-9c00-4bdd-8849-1b7327d4b60a.sql": "be588b1700b2637df9c1d1e91a1ead94",
+      "supabase/migrations/20260827104921_b2c99718-e903-47c4-bdec-e4f892d194b5.sql": "f67997377871cd0e70d799570336b8a9",
+      "supabase/migrations/20260827110609_3252094d-0f12-406d-baa5-5d923aeb6e97.sql": "d9c63a47cfa49e74b9b290f10b105de7",
+      "supabase/migrations/20260827110654_d214438f-7c5d-4861-ba87-814e188d53cb.sql": "30a1a1a935845f1edc736161ad8320c3",
+      "supabase/migrations/20260829073455_acd1de7c-89e6-4106-b617-ab333a386d87.sql": "cd1f666c3b43f661438d3e1d9e7d18f7",
+      "supabase/migrations/20260831063418_eab64a6e-edd5-4050-a6b0-56fd4b2557b1.sql": "0e6625bd67ac27348c5f610c4fd34f69",
+      "supabase/migrations/20260901053039_7ea8a646-ccdc-4872-9db1-5373aed8a997.sql": "2afdf6ba41d3661e958fc00e91aa18b7",
+      "supabase/migrations/20260902150232_ac842c0c-cf23-4140-85b5-1f7a14ecb87d.sql": "bba95aa5f824ffb7e63a2f1e766166ce",
+      "supabase/migrations/20260902150254_fee450ab-399d-434a-8df0-d52e240e2e0d.sql": "f97ad6537f062f977800d89b6c06f92d",
+      "supabase/migrations/20260902160352_b06b62b8-6add-412e-be9c-4053b6c83929.sql": "14b06ca2ecbb78caf866010df32380df",
+      "supabase/migrations/20260902164748_c7484c36-63af-4976-b174-2838bfb4f09f.sql": "49c05a26a50a5a2be8e85d7fbb15b417",
+      "tsconfig.json": "e84e5c7fe88e3c5a4d54f55a816d42c1",
+      "vite.config.ts": "5f2d434661e617ccaed23450a871f61f"
+    },
+    "pipeline_version": 8
+  },
+  "tokens": {
+    "color": [
+      {
+        "name": "DEFAULT_THEME.forest",
+        "raw": "#1d442f",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.forest_deep",
+        "raw": "#0e2d1d",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.sage",
+        "raw": "#638370",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.mint",
+        "raw": "#a4c3b0",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.beige",
+        "raw": "#f2eade",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.beige_card",
+        "raw": "#e8dcca",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.cream",
+        "raw": "#fcf8f0",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "DEFAULT_THEME.gold",
+        "raw": "#c19e68",
+        "source": "src/lib/theme.ts"
+      },
+      {
+        "name": "--forest",
+        "raw": "oklch(0.35 0.058 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--forest-deep",
+        "raw": "oklch(0.27 0.048 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sage",
+        "raw": "oklch(0.58 0.048 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--mint",
+        "raw": "oklch(0.79 0.043 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--beige",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--beige-card",
+        "raw": "oklch(0.9 0.028 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--cream",
+        "raw": "oklch(0.98 0.012 84)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--gold",
+        "raw": "oklch(0.72 0.083 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card",
+        "raw": "oklch(1 0 0)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover",
+        "raw": "oklch(1 0 0)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--primary-foreground",
+        "raw": "oklch(0.98 0.012 84)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted-foreground",
+        "raw": "oklch(0.5 0.028 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive",
+        "raw": "oklch(0.55 0.19 27)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive-foreground",
+        "raw": "oklch(0.98 0.012 84)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--border",
+        "raw": "oklch(0.87 0.024 90)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--input",
+        "raw": "oklch(0.87 0.024 90)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-5",
+        "raw": "oklch(0.45 0.06 200)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-accent",
+        "raw": "oklch(0.33 0.05 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-accent-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-border",
+        "raw": "oklch(0.33 0.05 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--background",
+        "raw": "oklch(0.21 0.03 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary",
+        "raw": "oklch(0.29 0.035 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted",
+        "raw": "oklch(0.29 0.035 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent",
+        "raw": "oklch(0.33 0.045 158)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent-foreground",
+        "raw": "oklch(0.94 0.018 78)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar",
+        "raw": "oklch(0.18 0.028 158)",
+        "source": "src/styles.css"
+      }
+    ],
+    "typography": [
+      {
+        "name": "--font-sans",
+        "raw": "\"Cairo\", \"Segoe UI\", sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--font-display",
+        "raw": "\"Tajawal\", \"Cairo\", serif",
+        "source": "src/styles.css"
+      }
+    ],
+    "radius": [
+      {
+        "name": "--radius-sm",
+        "raw": "calc(var(--radius) - 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-md",
+        "raw": "calc(var(--radius) - 2px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-xl",
+        "raw": "calc(var(--radius) + 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-2xl",
+        "raw": "calc(var(--radius) + 8px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-3xl",
+        "raw": "calc(var(--radius) + 12px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-4xl",
+        "raw": "calc(var(--radius) + 16px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius",
+        "raw": "0.75rem",
+        "source": "src/styles.css"
+      }
+    ],
+    "shadow": [
+      {
+        "name": "--shadow-soft",
+        "raw": "0 1px 2px oklch(0.31 0.05 155 / 0.06), 0 8px 24px oklch(0.31 0.05 155 / 0.07)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--shadow-lift",
+        "raw": "0 2px 6px oklch(0.31 0.05 155 / 0.08), 0 18px 40px oklch(0.31 0.05 155 / 0.14)",
+        "source": "src/styles.css"
+      }
+    ],
+    "other": [
+      {
+        "name": "--gt-taxi-from",
+        "raw": "-46%",
+        "source": "src/styles.css"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "GunitedTicketCard",
+      "file": "src/components/GunitedTicketCard",
+      "import_path": "",
+      "is_default": true,
+      "props": [
+        {
+          "name": "locale",
+          "type": "enum",
+          "values": [
+            "ar",
+            "en"
+          ],
+          "default": "ar"
+        },
+        {
+          "name": "from",
+          "type": "any"
+        },
+        {
+          "name": "to",
+          "type": "any"
+        },
+        {
+          "name": "bookingRef",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "travelClass",
+          "type": "string"
+        },
+        {
+          "name": "passenger",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "file": "src/assets/offer-insurance.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/offer-package.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/offer-tour.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/offer-visa.jpg",
+      "kind": "image",
+      "format": "jpg"
+    }
+  ]
+}
