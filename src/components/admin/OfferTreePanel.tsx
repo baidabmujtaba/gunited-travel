@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -128,10 +129,21 @@ function TreeRow({
   const [price, setPrice] = useState(String(node.input_price ?? node.customer_price_usd ?? ""));
   const [currency, setCurrency] = useState(node.input_currency || "USD");
 
+  const [descAr, setDescAr] = useState(node.description_ar ?? "");
+  const [descEn, setDescEn] = useState(node.description_en ?? "");
+  const [roomType, setRoomType] = useState("");
+  const [hotelName, setHotelName] = useState("");
+  const [hotelCity, setHotelCity] = useState("");
+
   const [newAr, setNewAr] = useState("");
   const [newEn, setNewEn] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newCurrency, setNewCurrency] = useState(node.input_currency || "USD");
+  const [newDescAr, setNewDescAr] = useState("");
+  const [newDescEn, setNewDescEn] = useState("");
+  const [newRoomType, setNewRoomType] = useState("");
+  const [newHotelName, setNewHotelName] = useState("");
+  const [newHotelCity, setNewHotelCity] = useState("");
 
   const save = useMutation({
     mutationFn: () =>
@@ -140,8 +152,13 @@ function TreeRow({
           id: node.id,
           title_ar: titleAr,
           title_en: titleEn,
-          price: Number(price) || 0,
+          price: price.trim() === "" ? null : Number(price) || 0,
           currency,
+          description_ar: descAr,
+          description_en: descEn,
+          room_type: roomType,
+          hotel_name: hotelName,
+          hotel_city: hotelCity,
         },
       }),
     onSuccess: () => {
@@ -159,10 +176,15 @@ function TreeRow({
           parent_offer_id: node.id,
           title_ar: newAr,
           title_en: newEn || newAr,
-          price: Number(newPrice) || 0,
+          price: newPrice.trim() === "" ? null : Number(newPrice) || 0,
           currency: newCurrency,
           agency_price: null,
           status: "active",
+          description_ar: newDescAr,
+          description_en: newDescEn,
+          room_type: newRoomType,
+          hotel_name: newHotelName,
+          hotel_city: newHotelCity,
         },
       }),
     onSuccess: () => {
@@ -170,6 +192,11 @@ function TreeRow({
       setNewAr("");
       setNewEn("");
       setNewPrice("");
+      setNewDescAr("");
+      setNewDescEn("");
+      setNewRoomType("");
+      setNewHotelName("");
+      setNewHotelCity("");
       setAdding(false);
       setOpen(true);
       onChanged();
@@ -210,8 +237,10 @@ function TreeRow({
             {lang === "ar" ? node.title_ar : node.title_en}
           </p>
           <p className="text-xs text-muted-foreground">
-            {levelLabel} · {node.input_currency} {Number(node.input_price ?? node.customer_price_usd ?? 0)} · $
-            {Number(node.customer_price_usd ?? 0).toFixed(2)}
+            {levelLabel} ·{" "}
+            {Number(node.customer_price_usd ?? 0) > 0
+              ? `${node.input_currency} ${Number(node.input_price ?? node.customer_price_usd ?? 0)} · $${Number(node.customer_price_usd ?? 0).toFixed(2)}`
+              : t("tree.noPrice")}
             {children.length ? ` · ${children.length} ${t("tree.children")}` : ""}
           </p>
         </div>
@@ -263,11 +292,12 @@ function TreeRow({
           <Field label={t("tree.nameEn")}>
             <Input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} dir="ltr" />
           </Field>
-          <Field label={t("tree.price")}>
+          <Field label={`${t("tree.price")} (${t("tree.optional")})`}>
             <Input
               type="number"
               min="0"
               step="0.01"
+              placeholder={t("tree.noPrice")}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
@@ -279,6 +309,21 @@ function TreeRow({
               onChange={setCurrency}
               lang={lang}
             />
+          </Field>
+          <Field label={`${t("tree.roomType")} (${t("tree.optional")})`}>
+            <Input value={roomType} onChange={(e) => setRoomType(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.hotel")} (${t("tree.optional")})`}>
+            <Input value={hotelName} onChange={(e) => setHotelName(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.hotelCity")} (${t("tree.optional")})`}>
+            <Input value={hotelCity} onChange={(e) => setHotelCity(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.detailsAr")} (${t("tree.optional")})`}>
+            <Textarea rows={2} dir="rtl" value={descAr} onChange={(e) => setDescAr(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.detailsEn")} (${t("tree.optional")})`}>
+            <Textarea rows={2} dir="ltr" value={descEn} onChange={(e) => setDescEn(e.target.value)} />
           </Field>
           <div className="sm:col-span-4">
             <Button
@@ -303,11 +348,12 @@ function TreeRow({
           <Field label={t("tree.nameEn")}>
             <Input value={newEn} onChange={(e) => setNewEn(e.target.value)} dir="ltr" />
           </Field>
-          <Field label={t("tree.price")}>
+          <Field label={`${t("tree.price")} (${t("tree.optional")})`}>
             <Input
               type="number"
               min="0"
               step="0.01"
+              placeholder={t("tree.noPrice")}
               value={newPrice}
               onChange={(e) => setNewPrice(e.target.value)}
             />
@@ -319,6 +365,21 @@ function TreeRow({
               onChange={setNewCurrency}
               lang={lang}
             />
+          </Field>
+          <Field label={`${t("tree.roomType")} (${t("tree.optional")})`}>
+            <Input value={newRoomType} onChange={(e) => setNewRoomType(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.hotel")} (${t("tree.optional")})`}>
+            <Input value={newHotelName} onChange={(e) => setNewHotelName(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.hotelCity")} (${t("tree.optional")})`}>
+            <Input value={newHotelCity} onChange={(e) => setNewHotelCity(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.detailsAr")} (${t("tree.optional")})`}>
+            <Textarea rows={2} dir="rtl" value={newDescAr} onChange={(e) => setNewDescAr(e.target.value)} />
+          </Field>
+          <Field label={`${t("tree.detailsEn")} (${t("tree.optional")})`}>
+            <Textarea rows={2} dir="ltr" value={newDescEn} onChange={(e) => setNewDescEn(e.target.value)} />
           </Field>
           <div className="sm:col-span-4">
             <Button
