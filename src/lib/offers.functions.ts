@@ -627,7 +627,80 @@ export const listOfferTree = createServerFn({ method: "GET" })
     return (data ?? []) as unknown as OfferTreeNode[];
   });
 
-/** Quick-create a sub-package (child or grandchild) under a parent offer. */
+const optionalText = z.preprocess(
+  (v) => (typeof v === "string" ? v.trim() : v),
+  z.string().max(2000).optional(),
+);
+
+/** Optional extras (details, room type, hotel) shared by create + update. */
+const nodeExtras = {
+  description_ar: optionalText,
+  description_en: optionalText,
+  room_type: optionalText,
+  hotel_name: optionalText,
+  hotel_city: optionalText,
+};
+
+/** Upsert the single quick room type / hotel row attached to a tree node. */
+async function applyNodeExtras(
+  sb: AnySb,
+  offerId: string,
+  data: {
+    room_type?: string | undefined;
+    hotel_name?: string | undefined;
+    hotel_city?: string | undefined;
+    price?: number | null | undefined;
+    currency?: string | undefined;
+  },
+) {
+  if (data.room_type) {
+    const { data: existing } = await sb
+      .from("offer_room_types")
+      .select("id")
+      .eq("offer_id", offerId)
+      .order("sort_order")
+      .limit(1);
+    const payload = {
+      offer_id: offerId,
+      name_ar: data.room_type,
+      name_en: data.room_type,
+      price: data.price ?? 0,
+      currency_code: data.currency ?? "USD",
+    };
+    if (existing?.length) {
+      await sb.from("offer_room_types").update(payload).eq("id", existing[0].id);
+    } else {
+      await sb.from("offer_room_types").insert(payload);
+    }
+  }
+
+  if (data.hotel_name) {
+    const { data: existing } = await sb
+      .from("offer_hotels")
+      .select("id")
+      .eq("offer_id", offerId)
+      .order("sort_order")
+      .limit(1);
+    const payload = {
+      offer_id: offerId,
+      name_ar: data.hotel_name,
+      name_en: data.hotel_name,
+      city_ar: data.hotel_city ?? "",
+      city_en: data.hotel_city ?? "",
+    };
+    if (existing?.length) {
+      await sb.from("offer_hotels").update(payload).eq("id", existing[0].id);
+    } else {
+      await sb.from("offer_hotels").insert(payload);
+    }
+  }
+}
+
+/**
+ * Quick-create a sub-package (child or grandchild) under a parent offer.
+ * Everything except the Arabic name is optional — a package may have no price
+ * at all, in which case it is shown as "price on request".
+ */
 export const createChildOffer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
@@ -635,11 +708,12 @@ export const createChildOffer = createServerFn({ method: "POST" })
       .object({
         parent_offer_id: z.string().uuid(),
         title_ar: z.string().min(1).max(200),
-        title_en: z.string().min(1).max(200),
+        title_en: z.string().max(200).optional(),
         currency: currencyField,
-        price: z.number().min(0),
+        price: z.number().min(0).nullable().default(null),
         agency_price: z.number().min(0).nullable().default(null),
         status: z.enum(["draft", "active"]).default("active"),
+        ...nodeExtras,
       })
       .parse(d),
   )
@@ -654,12 +728,15 @@ export const createChildOffer = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!parent) throw new Error("Parent package not found.");
 
-    const rate = await rateFor(sb, data.currency);
+    const titleEn = data.title_en?.trim() || data.title_ar;
+    const hasPrice = data.price != null && data.price > 0;
+    const rate = hasPrice ? await rateFor(sb, data.currency) : 1;
     const toUsd = (v: number) => Math.round((v / rate) * 100) / 100;
-    const priceUsd = toUsd(data.price);
-    const agencyUsd = data.agency_price == null ? priceUsd : toUsd(data.agency_price);
+    const priceUsd = hasPrice ? toUsd(data.price as number) : 0;
+    const agencyUsd =
+      data.agency_price == null ? priceUsd : hasPrice ? toUsd(data.agency_price) : 0;
 
-    const base = slugify(data.title_en, `package-${Date.now()}`);
+    const base = slugify(titleEn, `package-${Date.now()}`);
     let slug = base;
     for (let i = 2; i < 100; i++) {
       const { data: clash } = await sb.from("service_offers").select("id").eq("slug", slug).limit(1);
@@ -674,47 +751,63 @@ export const createChildOffer = createServerFn({ method: "POST" })
         slug,
         parent_offer_id: data.parent_offer_id,
         title_ar: data.title_ar,
-        title_en: data.title_en,
+        title_en: titleEn,
+        description_ar: data.description_ar ?? "",
+        description_en: data.description_en ?? "",
         category: String(p["category"] ?? "package"),
         category_id: p["category_id"] ?? null,
         offer_type: String(p["offer_type"] ?? "tourism_package"),
         display_currency: data.currency,
         input_currency: data.currency,
-        input_price: data.price,
-        input_agency_price: data.agency_price ?? data.price,
+        input_price: hasPrice ? data.price : null,
+        input_agency_price: data.agency_price ?? (hasPrice ? data.price : null),
         input_rate_per_usd: rate,
         base_price_usd: priceUsd,
         customer_price_usd: priceUsd,
         agency_price_usd: agencyUsd,
+        price_display_mode: hasPrice ? "starting_from" : "contact_us",
         status: data.status,
       })
       .select("id,slug")
       .single();
     if (error) throw new Error(error.message);
 
+    const created = row as { id: string; slug: string };
+    await applyNodeExtras(sb, created.id, {
+      room_type: data.room_type,
+      hotel_name: data.hotel_name,
+      hotel_city: data.hotel_city,
+      price: hasPrice ? data.price : 0,
+      currency: data.currency,
+    });
+
     await sb.from("audit_logs").insert({
       actor_id: context.userId,
       action: "offer.create_child",
       entity: "service_offers",
-      entity_id: (row as { id: string }).id,
-      after_data: { parent_offer_id: data.parent_offer_id, title_en: data.title_en },
+      entity_id: created.id,
+      after_data: { parent_offer_id: data.parent_offer_id, title_en: titleEn },
     });
-    return row as { id: string; slug: string };
+    return created;
   });
 
-/** Inline edit of a tree node: name, price, currency, parent or status. */
+/**
+ * Inline edit of a tree node. Every field is optional; sending `price: null`
+ * clears the price and switches the package to "price on request".
+ */
 export const updateOfferNode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z
       .object({
         id: z.string().uuid(),
-        title_ar: z.string().min(1).max(200).optional(),
-        title_en: z.string().min(1).max(200).optional(),
+        title_ar: z.string().max(200).optional(),
+        title_en: z.string().max(200).optional(),
         currency: currencyField.optional(),
-        price: z.number().min(0).optional(),
+        price: z.number().min(0).nullable().optional(),
         parent_offer_id: z.string().uuid().nullable().optional(),
         status: z.enum(["draft", "active", "scheduled", "archived"]).optional(),
+        ...nodeExtras,
       })
       .parse(d),
   )
@@ -730,6 +823,11 @@ export const updateOfferNode = createServerFn({ method: "POST" })
     if (data.title_en) patch["title_en"] = data.title_en;
     if (data.status) patch["status"] = data.status;
     if (data.parent_offer_id !== undefined) patch["parent_offer_id"] = data.parent_offer_id;
+    if (data.description_ar !== undefined) patch["description_ar"] = data.description_ar;
+    if (data.description_en !== undefined) patch["description_en"] = data.description_en;
+
+    let effectivePrice: number | null = null;
+    let effectiveCurrency = data.currency ?? "USD";
 
     if (data.price !== undefined || data.currency) {
       const { data: current } = await sb
@@ -739,21 +837,37 @@ export const updateOfferNode = createServerFn({ method: "POST" })
         .maybeSingle();
       const cur = (current ?? {}) as Record<string, unknown>;
       const currency = data.currency ?? String(cur["input_currency"] ?? "USD");
-      const price =
-        data.price ?? Number(cur["input_price"] ?? cur["customer_price_usd"] ?? 0);
-      const rate = await rateFor(sb, currency);
-      const usd = Math.round((price / rate) * 100) / 100;
+      const raw =
+        data.price !== undefined
+          ? data.price
+          : Number(cur["input_price"] ?? cur["customer_price_usd"] ?? 0) || null;
+      effectiveCurrency = currency;
+      effectivePrice = raw != null && raw > 0 ? raw : null;
+
+      const rate = effectivePrice == null ? 1 : await rateFor(sb, currency);
+      const usd = effectivePrice == null ? 0 : Math.round((effectivePrice / rate) * 100) / 100;
       patch["input_currency"] = currency;
       patch["display_currency"] = currency;
-      patch["input_price"] = price;
+      patch["input_price"] = effectivePrice;
       patch["input_rate_per_usd"] = rate;
       patch["base_price_usd"] = usd;
       patch["customer_price_usd"] = usd;
+      patch["price_display_mode"] = effectivePrice == null ? "contact_us" : "starting_from";
     }
 
-    if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await sb.from("service_offers").update(patch).eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (Object.keys(patch).length > 0) {
+      const { error } = await sb.from("service_offers").update(patch).eq("id", data.id);
+      if (error) throw new Error(error.message);
+    }
+
+    await applyNodeExtras(sb, data.id, {
+      room_type: data.room_type,
+      hotel_name: data.hotel_name,
+      hotel_city: data.hotel_city,
+      price: effectivePrice ?? 0,
+      currency: effectiveCurrency,
+    });
+
     return { ok: true };
   });
 
