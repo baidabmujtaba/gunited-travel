@@ -609,6 +609,8 @@ export type OfferTreeNode = {
   input_price: number | null;
   customer_price_usd: number;
   is_featured: boolean;
+  description_ar: string | null;
+  description_en: string | null;
 };
 
 /** Flat list of every non-deleted offer with its parent link, for tree screens. */
@@ -619,7 +621,7 @@ export const listOfferTree = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("service_offers")
       .select(
-        "id,slug,title_ar,title_en,parent_offer_id,status,input_currency,input_price,customer_price_usd,is_featured",
+        "id,slug,title_ar,title_en,parent_offer_id,status,input_currency,input_price,customer_price_usd,is_featured,description_ar,description_en",
       )
       .is("deleted_at", null)
       .order("title_ar");
