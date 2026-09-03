@@ -108,8 +108,9 @@ const offerSchema = z.object({
     )
     .default("USD"),
   // Two independent, manually entered prices — no automatic relation between them.
-  customer_price_usd: z.number().positive(),
-  agency_price_usd: z.number().positive(),
+  // A mother package may have no price at all (price on request).
+  customer_price_usd: z.number().min(0),
+  agency_price_usd: z.number().min(0),
   original_price_usd: z.number().min(0).nullable().default(null),
   price_display_mode: z
     .enum(["starting_from", "fixed", "per_person", "per_room", "contact_us"])
