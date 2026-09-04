@@ -4,6 +4,66 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertStaff, statusEnum } from "./admin.shared";
 import { agencyBalance, chargeOrder, notifyBalanceState } from "./ledger.server";
 
+/** Details of what the customer actually requested, shown in the admin queue. */
+export type OrderRequestDetails = {
+  travellers: { adults: number; children: number; infants: number; total: number } | null;
+  rooms: { name_ar: string; name_en: string; qty: number; occupancy?: number | null }[];
+  extras: { name_ar: string; name_en: string }[];
+  travel_date: string | null;
+  return_date: string | null;
+  nationality: string | null;
+  destination: string | null;
+  coupon: string | null;
+  customer_notes: string | null;
+};
+
+/** Reads the JSON snapshot the booking flow appends to internal notes. */
+function parseSnapshot(notes: string | null): Record<string, any> | null {
+  if (!notes) return null;
+  const i = notes.indexOf("SNAPSHOT ");
+  if (i < 0) return null;
+  try {
+    return JSON.parse(notes.slice(i + "SNAPSHOT ".length).trim());
+  } catch {
+    return null;
+  }
+}
+
+function toRequestDetails(notes: string | null): OrderRequestDetails | null {
+  const snap = parseSnapshot(notes);
+  if (!snap) return null;
+  const pax = snap["passengers"] ?? null;
+  const adults = Number(pax?.adults ?? 0);
+  const children = Number(pax?.children ?? 0);
+  const infants = Number(pax?.infants ?? 0);
+  const total = adults + children + infants;
+  return {
+    travellers: total > 0 ? { adults, children, infants, total } : null,
+    rooms: Array.isArray(snap["rooms"])
+      ? snap["rooms"]
+          .filter((r: any) => Number(r?.qty ?? 0) > 0)
+          .map((r: any) => ({
+            name_ar: String(r.name_ar ?? ""),
+            name_en: String(r.name_en ?? ""),
+            qty: Number(r.qty ?? 0),
+            occupancy: r.occupancy ?? null,
+          }))
+      : [],
+    extras: Array.isArray(snap["extras"])
+      ? snap["extras"].map((e: any) => ({
+          name_ar: String(e.name_ar ?? ""),
+          name_en: String(e.name_en ?? ""),
+        }))
+      : [],
+    travel_date: snap["travelDate"] ?? null,
+    return_date: snap["returnDate"] ?? null,
+    nationality: snap["nationality"] ?? null,
+    destination: snap["destination"] ?? null,
+    coupon: snap["coupon"] ?? null,
+    customer_notes: snap["notes"] ?? null,
+  };
+}
+
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -89,22 +149,48 @@ export const listAdminOrders = createServerFn({ method: "GET" })
       );
     }
 
-    const offerIds = [...new Set(orders.map((o: any) => o.offer_id).filter(Boolean))];
-    const offers = offerIds.length
-      ? (
-          await context.supabase
-            .from("service_offers")
-            .select("id,title_en,title_ar")
-            .in("id", offerIds)
-        ).data ?? []
-      : [];
-    const map = new Map(offers.map((o: any) => [o.id, o]));
+    // Offer titles plus the whole mother → child → grandchild chain, so staff
+    // see exactly which package level the customer requested.
+    const map = new Map<string, any>();
+    let lookup = [...new Set(orders.map((o: any) => o.offer_id).filter(Boolean))] as string[];
+    for (let depth = 0; depth < 6 && lookup.length > 0; depth++) {
+      const { data: offerRows } = await context.supabase
+        .from("service_offers")
+        .select("id,title_en,title_ar,parent_offer_id,category")
+        .in("id", lookup);
+      for (const row of offerRows ?? []) map.set((row as any).id, row);
+      lookup = [
+        ...new Set(
+          (offerRows ?? [])
+            .map((r: any) => r.parent_offer_id)
+            .filter((id: string | null) => id && !map.has(id)),
+        ),
+      ] as string[];
+    }
 
-    return orders.map((o: any) => ({
-      ...o,
-      offer_title_en: map.get(o.offer_id)?.title_en ?? null,
-      offer_title_ar: map.get(o.offer_id)?.title_ar ?? null,
-    }));
+    const pathFor = (offerId: string | null) => {
+      const chain: any[] = [];
+      let cursor = offerId ? map.get(offerId) : null;
+      while (cursor && chain.length < 6) {
+        chain.unshift(cursor);
+        cursor = cursor.parent_offer_id ? map.get(cursor.parent_offer_id) : null;
+      }
+      return chain;
+    };
+
+    return orders.map((o: any) => {
+      const chain = pathFor(o.offer_id);
+      const leaf = chain.length > 0 ? chain[chain.length - 1] : null;
+      return {
+        ...o,
+        offer_title_en: leaf?.title_en ?? null,
+        offer_title_ar: leaf?.title_ar ?? null,
+        offer_path_en: chain.map((c) => c.title_en).filter(Boolean),
+        offer_path_ar: chain.map((c) => c.title_ar).filter(Boolean),
+        offer_category: leaf?.category ?? null,
+        request_details: toRequestDetails(o.internal_notes ?? null),
+      };
+    });
   });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
