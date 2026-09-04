@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Footprints,
   MapPin,
+  MessageCircle,
   Star,
   X,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import { CurrencySelector } from "@/components/store/CurrencySelector";
 import { StoreLayout } from "@/components/store/StoreLayout";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { whatsappLink } from "@/lib/support";
 import { categoryImage } from "@/lib/offer-images";
 import { PackageCard } from "@/components/store/PackageCard";
 import { getPackage, getPackageGroup, trackPackageEvent } from "@/lib/packages.functions";
@@ -176,6 +178,12 @@ function OfferDetail() {
   const optional = offer.services.filter((s) => !s.is_included && s.is_optional);
   const isVisaOnly = offer.offer_type === "visa_only" || offer.category === "visa";
   const isCustom = offer.offer_type === "custom_package";
+  const onRequest = offer.price_display_mode === "contact_us" || offer.price.total <= 0;
+  const waHref = whatsappLink(
+    ar
+      ? `مرحبًا، أرغب في طلب: ${offer.title_ar}`
+      : `Hello, I would like to request: ${offer.title_en}`,
+  );
 
   const nights = [
     offer.makkah_nights ? { label: ar ? "مكة" : "Makkah", n: offer.makkah_nights } : null,
@@ -434,7 +442,11 @@ function OfferDetail() {
               />
               <div>
                 <p className="text-xs text-muted-foreground">
-                  {offer.price_display_mode === "fixed"
+                  {onRequest
+                    ? ar
+                      ? "السعر"
+                      : "Price"
+                    : offer.price_display_mode === "fixed"
                     ? ar
                       ? "السعر"
                       : "Price"
@@ -443,7 +455,11 @@ function OfferDetail() {
                       : "Starting from"}
                 </p>
                 <p className="text-3xl font-bold text-forest">
-                  {fmt(offer.price.total, offer.price.currency)}
+                  {onRequest
+                    ? ar
+                      ? "عند الطلب"
+                      : "On request"
+                    : fmt(offer.price.total, offer.price.currency)}
                 </p>
                 {offer.original_price_usd &&
                 offer.original_price_usd * offer.price.rate > offer.price.total ? (
@@ -463,17 +479,33 @@ function OfferDetail() {
                   <Row label={ar ? "الضريبة" : "Tax"} value={fmt(offer.price.tax, offer.price.currency)} />
                 ) : null}
               </dl>
-              <Button asChild size="lg" className="w-full">
-                <Link to="/book/$slug" params={{ slug: offer.slug }}>
-                  {isCustom
-                    ? ar
-                      ? "اطلب برنامجك الخاص"
-                      : "Request a custom program"
-                    : ar
-                      ? "احجز هذه الباقة"
-                      : "Book this package"}
-                </Link>
-              </Button>
+              {onRequest ? (
+                <div className="space-y-2">
+                  <Button asChild size="lg" className="w-full gap-2">
+                    <a href={waHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="size-4" />
+                      {ar ? "اطلب عبر واتساب" : "Request on WhatsApp"}
+                    </a>
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "هذه الباقة مخصصة — تواصل مع خدمة العملاء لتفصيل البرنامج والسعر."
+                      : "This package is tailor-made — contact customer service for the program and price."}
+                  </p>
+                </div>
+              ) : (
+                <Button asChild size="lg" className="w-full">
+                  <Link to="/book/$slug" params={{ slug: offer.slug }}>
+                    {isCustom
+                      ? ar
+                        ? "اطلب برنامجك الخاص"
+                        : "Request a custom program"
+                      : ar
+                        ? "احجز هذه الباقة"
+                        : "Book this package"}
+                  </Link>
+                </Button>
+              )}
             </div>
           </aside>
         </div>
@@ -483,14 +515,31 @@ function OfferDetail() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-3 backdrop-blur sm:hidden">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] text-muted-foreground">{ar ? "ابتداءً من" : "From"}</p>
-            <p className="font-bold text-forest">{fmt(offer.price.total, offer.price.currency)}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {onRequest ? (ar ? "السعر" : "Price") : ar ? "ابتداءً من" : "From"}
+            </p>
+            <p className="font-bold text-forest">
+              {onRequest
+                ? ar
+                  ? "عند الطلب"
+                  : "On request"
+                : fmt(offer.price.total, offer.price.currency)}
+            </p>
           </div>
-          <Button asChild className="flex-1">
-            <Link to="/book/$slug" params={{ slug: offer.slug }}>
-              {ar ? "احجز هذه الباقة" : "Book this package"}
-            </Link>
-          </Button>
+          {onRequest ? (
+            <Button asChild className="flex-1 gap-2">
+              <a href={waHref} target="_blank" rel="noreferrer">
+                <MessageCircle className="size-4" />
+                {ar ? "اطلب عبر واتساب" : "Request on WhatsApp"}
+              </a>
+            </Button>
+          ) : (
+            <Button asChild className="flex-1">
+              <Link to="/book/$slug" params={{ slug: offer.slug }}>
+                {ar ? "احجز هذه الباقة" : "Book this package"}
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </StoreLayout>
