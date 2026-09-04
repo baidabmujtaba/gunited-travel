@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, MapPin, Star, Check } from "lucide-react";
+import { CalendarDays, MapPin, MessageCircle, Star, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { PackageSummary } from "@/lib/packages.functions";
 import { useI18n } from "@/lib/i18n";
 import { categoryImage } from "@/lib/offer-images";
+import { whatsappLink } from "@/lib/support";
 
 /** Premium offer/package card used on the homepage section and /offers listing. */
 export function PackageCard({ offer }: { offer: PackageSummary }) {
@@ -20,6 +21,8 @@ export function PackageCard({ offer }: { offer: PackageSummary }) {
       ? `${offer.other_nights} ${ar ? `ليلة ${offer.other_destination ?? ""}` : `nights ${offer.other_destination ?? ""}`}`
       : null,
   ].filter(Boolean) as string[];
+
+  const onRequest = offer.price_display_mode === "contact_us" || offer.price.total <= 0;
 
   const original = offer.original_price_usd
     ? offer.original_price_usd * offer.price.rate
@@ -91,7 +94,11 @@ export function PackageCard({ offer }: { offer: PackageSummary }) {
         <div className="mt-auto flex items-end justify-between gap-3 pt-3">
           <div>
             <p className="text-xs text-muted-foreground">
-              {offer.price_display_mode === "fixed"
+              {onRequest
+                ? ar
+                  ? "السعر"
+                  : "Price"
+                : offer.price_display_mode === "fixed"
                 ? ar
                   ? "السعر"
                   : "Price"
@@ -100,7 +107,11 @@ export function PackageCard({ offer }: { offer: PackageSummary }) {
                   : "Starting from"}
             </p>
             <p className="text-xl font-bold text-forest">
-              {fmt(offer.price.total, offer.price.currency)}
+              {onRequest
+                ? ar
+                  ? "عند الطلب"
+                  : "On request"
+                : fmt(offer.price.total, offer.price.currency)}
             </p>
             {original && original > offer.price.total ? (
               <p className="text-xs text-muted-foreground line-through">
@@ -108,6 +119,23 @@ export function PackageCard({ offer }: { offer: PackageSummary }) {
               </p>
             ) : null}
           </div>
+          {onRequest && offer.child_count === 0 ? (
+            <Button asChild size="sm" variant="secondary">
+              <a
+                href={whatsappLink(
+                  ar
+                    ? `مرحبًا، أرغب في الاستفسار عن: ${offer.title_ar}`
+                    : `Hello, I would like to ask about: ${offer.title_en}`,
+                )}
+                target="_blank"
+                rel="noreferrer"
+                className="gap-1.5"
+              >
+                <MessageCircle className="size-4" />
+                {ar ? "اسأل عبر واتساب" : "Ask on WhatsApp"}
+              </a>
+            </Button>
+          ) : null}
           <Button asChild size="sm">
             <Link to="/offers/$slug" params={{ slug: offer.slug }}>
               {offer.child_count > 0
