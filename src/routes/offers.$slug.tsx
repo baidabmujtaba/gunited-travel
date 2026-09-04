@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Footprints,
   MapPin,
+  MessageCircle,
   Star,
   X,
 } from "lucide-react";
