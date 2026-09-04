@@ -15,6 +15,10 @@ const createOrderInput = z.object({
   transactionReference: z.string().min(2).max(80),
   paymentMethodId: z.string().uuid(),
   receiptPath: z.string().min(3).max(400),
+  // Trip data collected on the first request step (optional for legacy callers).
+  nationality: z.string().max(80).optional(),
+  destination: z.string().max(80).optional(),
+  travelers: z.number().int().min(1).max(50).optional(),
   documents: z
     .array(
       z.object({
@@ -101,6 +105,26 @@ export const createOrder = createServerFn({ method: "POST" })
     );
 
 
+    // Human-readable summary + machine-readable snapshot of the request, so the
+    // admin queue can show exactly what the customer asked for.
+    const requestSnapshot = {
+      passengers: { adults: data.travelers ?? 1, children: 0, infants: 0 },
+      rooms: [],
+      extras: [],
+      nationality: data.nationality ?? null,
+      destination: data.destination ?? null,
+      priceContext,
+    };
+    const requestNotes = [
+      `Request · ${offer.title_en}`,
+      `Travellers: ${data.travelers ?? 1}`,
+      data.nationality ? `Nationality: ${data.nationality}` : null,
+      data.destination ? `Destination: ${data.destination}` : null,
+      `SNAPSHOT ${JSON.stringify(requestSnapshot)}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     const { data: order, error } = await supabase
       .from("service_orders")
       .insert({
@@ -123,6 +147,7 @@ export const createOrder = createServerFn({ method: "POST" })
         receipt_path: data.receiptPath,
         payment_notified_at: new Date().toISOString(),
         document_status: requiredDocs.length > 0 ? "documents_submitted" : "awaiting_documents",
+        internal_notes: requestNotes,
         status: "submitted",
       })
       .select("id,tracking_id,amount_display,currency_code")
