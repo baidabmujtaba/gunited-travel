@@ -14,6 +14,7 @@ import { getOffer, getPaymentMethods } from "@/lib/catalog.functions";
 import { normalizeCurrency } from "@/lib/currency";
 import { useI18n } from "@/lib/i18n";
 import { createOrder } from "@/lib/orders.functions";
+import { REQUEST_DRAFT_PREFIX } from "@/routes/request.$slug";
 import { useRoles, useSession } from "@/lib/session";
 import { getAgencyOffer } from "@/lib/agency-catalog.functions";
 
@@ -126,10 +127,22 @@ function Checkout() {
         });
       }
 
+      let draft: { nationality?: string; destination?: string; travelers?: number } = {};
+      if (typeof window !== "undefined") {
+        try {
+          draft = JSON.parse(window.sessionStorage.getItem(`${REQUEST_DRAFT_PREFIX}${slug}`) ?? "{}");
+        } catch {
+          draft = {};
+        }
+      }
       return createOrder({
         data: {
           offerId: offer.id,
           currency,
+          nationality: draft.nationality || undefined,
+          destination: draft.destination || undefined,
+          travelers: draft.travelers,
+
           customerName: name.trim(),
           customerEmail: email.trim(),
           whatsapp: whatsapp.trim(),
