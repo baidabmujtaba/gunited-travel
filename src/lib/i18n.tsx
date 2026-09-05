@@ -595,7 +595,37 @@ export const messages: Dict = {
 
 
   "admin.tab.emails": { ar: "إشعارات البريد", en: "Emails" },
+  "admin.tab.videos": { ar: "فيديوهات الرئيسية", en: "Homepage videos" },
   "admin.tab.settings": { ar: "الإعدادات", en: "Settings" },
+
+  "videos.title": { ar: "فيديوهات الصفحة الرئيسية", en: "Homepage videos" },
+  "videos.subtitle": {
+    ar: "ارفع مقاطع فيديو أو أضف رابطاً، ورتّبها للعرض في شريط الفيديو بالصفحة الرئيسية.",
+    en: "Upload video files or paste a link, then order them for the homepage slideshow.",
+  },
+  "videos.add": { ar: "إضافة فيديو", en: "Add video" },
+  "videos.file": { ar: "ملف الفيديو (mp4 / webm)", en: "Video file (mp4 / webm)" },
+  "videos.url": { ar: "أو رابط فيديو", en: "Or video URL" },
+  "videos.titlear": { ar: "العنوان بالعربية (اختياري)", en: "Arabic caption (optional)" },
+  "videos.titleen": { ar: "العنوان بالإنجليزية (اختياري)", en: "English caption (optional)" },
+  "videos.order": { ar: "الترتيب", en: "Order" },
+  "videos.active": { ar: "مفعل", en: "Active" },
+  "videos.inactive": { ar: "غير مفعل", en: "Inactive" },
+  "videos.delete": { ar: "حذف", en: "Delete" },
+  "videos.up": { ar: "لأعلى", en: "Move up" },
+  "videos.down": { ar: "لأسفل", en: "Move down" },
+  "videos.empty": { ar: "لا توجد فيديوهات بعد.", en: "No videos yet." },
+  "videos.uploaded": { ar: "تم حفظ الفيديو", en: "Video saved" },
+  "videos.saved": { ar: "تم التحديث", en: "Updated" },
+  "videos.removed": { ar: "تم الحذف", en: "Deleted" },
+  "videos.duration": { ar: "المدة", en: "Duration" },
+  "videos.added": { ar: "تاريخ الإضافة", en: "Added" },
+  "videos.store.title": { ar: "لحظات من رحلاتنا", en: "Moments from our journeys" },
+  "videos.sound.on": { ar: "تشغيل الصوت", en: "Unmute" },
+  "videos.sound.off": { ar: "كتم الصوت", en: "Mute" },
+  "videos.prev": { ar: "السابق", en: "Previous" },
+  "videos.next": { ar: "التالي", en: "Next" },
+
 
   "admin.users.title": { ar: "المستخدمون والأدوار", en: "Users & roles" },
   "admin.users.subtitle": {
