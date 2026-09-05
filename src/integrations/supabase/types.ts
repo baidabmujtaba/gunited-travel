@@ -525,6 +525,51 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_videos: {
+        Row: {
+          created_at: string
+          display_order: number
+          duration_seconds: number | null
+          file_name: string | null
+          id: string
+          is_active: boolean
+          storage_path: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+          uploaded_by: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          duration_seconds?: number | null
+          file_name?: string | null
+          id?: string
+          is_active?: boolean
+          storage_path?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          duration_seconds?: number | null
+          file_name?: string | null
+          id?: string
+          is_active?: boolean
+          storage_path?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       integration_credentials: {
         Row: {
           client_id: string | null
