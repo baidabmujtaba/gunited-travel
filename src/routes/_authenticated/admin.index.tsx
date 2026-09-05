@@ -201,11 +201,14 @@ function SalesHub() {
                     <p className="text-xs text-muted-foreground">{t("admin.orders.customer")}</p>
                     <p className="text-sm font-medium">{row.customer_name}</p>
                   </div>
-                  <div className="min-w-40">
+                  <div className="min-w-52 flex-1">
                     <p className="text-xs text-muted-foreground">{t("admin.orders.service")}</p>
                     <p className="text-sm font-medium">
-                      {(lang === "ar" ? row.offer_title_ar : row.offer_title_en) ?? "—"}
+                      {(lang === "ar" ? row.offer_path_ar : row.offer_path_en)?.length
+                        ? (lang === "ar" ? row.offer_path_ar : row.offer_path_en).join(" › ")
+                        : ((lang === "ar" ? row.offer_title_ar : row.offer_title_en) ?? "—")}
                     </p>
+                    <RequestSummary row={row} />
                   </div>
                   <p className="font-semibold">
                     {fmt(Number(row.amount_display), row.currency_code)}
@@ -225,6 +228,99 @@ function SalesHub() {
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Full breakdown of the customer's request inside the manage panel. */
+function RequestDetailBlock({ row }: { row: any }) {
+  const { lang } = useI18n();
+  const ar = lang === "ar";
+  const d = row.request_details;
+  const path: string[] = (ar ? row.offer_path_ar : row.offer_path_en) ?? [];
+  const lines: { label: string; value: string }[] = [];
+  if (path.length) lines.push({ label: ar ? "الباقة" : "Package", value: path.join(" › ") });
+  if (d?.travellers?.total) {
+    lines.push({
+      label: ar ? "المسافرون" : "Travellers",
+      value: ar
+        ? `${d.travellers.adults} بالغ · ${d.travellers.children} طفل · ${d.travellers.infants} رضيع`
+        : `${d.travellers.adults} adult(s) · ${d.travellers.children} child(ren) · ${d.travellers.infants} infant(s)`,
+    });
+  }
+  if (d?.rooms?.length) {
+    lines.push({
+      label: ar ? "الغرف" : "Rooms",
+      value: d.rooms
+        .map((r: any) => `${r.qty}× ${ar ? r.name_ar || r.name_en : r.name_en || r.name_ar}`)
+        .join(", "),
+    });
+  }
+  if (d?.travel_date) lines.push({ label: ar ? "تاريخ السفر" : "Travel date", value: d.travel_date });
+  if (d?.return_date) lines.push({ label: ar ? "تاريخ العودة" : "Return date", value: d.return_date });
+  if (d?.nationality) lines.push({ label: ar ? "الجنسية" : "Nationality", value: d.nationality });
+  if (d?.destination) lines.push({ label: ar ? "الوجهة" : "Destination", value: d.destination });
+  if (d?.extras?.length) {
+    lines.push({
+      label: ar ? "خدمات إضافية" : "Extra services",
+      value: d.extras
+        .map((e: any) => (ar ? e.name_ar || e.name_en : e.name_en || e.name_ar))
+        .join(", "),
+    });
+  }
+  if (d?.coupon) lines.push({ label: ar ? "كوبون" : "Coupon", value: d.coupon });
+  if (d?.customer_notes) {
+    lines.push({ label: ar ? "ملاحظات العميل" : "Customer notes", value: d.customer_notes });
+  }
+  if (lines.length === 0) return null;
+  return (
+    <div className="rounded-xl border border-border/70 bg-secondary/30 p-3">
+      <p className="mb-2 text-xs font-semibold text-muted-foreground">
+        {ar ? "تفاصيل الطلب" : "Request details"}
+      </p>
+      <dl className="space-y-1 text-sm">
+        {lines.map((l) => (
+          <div key={l.label} className="flex flex-wrap gap-x-2">
+            <dt className="text-xs text-muted-foreground">{l.label}:</dt>
+            <dd className="font-medium">{l.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/** Compact chips describing exactly what the customer requested. */
+function RequestSummary({ row }: { row: any }) {
+  const { lang } = useI18n();
+  const ar = lang === "ar";
+  const d = row.request_details;
+  if (!d) return null;
+  const chips: string[] = [];
+  if (d.travellers?.total) {
+    chips.push(ar ? `${d.travellers.total} مسافر` : `${d.travellers.total} traveller(s)`);
+  }
+  for (const r of d.rooms ?? []) {
+    chips.push(`${r.qty}× ${ar ? r.name_ar || r.name_en : r.name_en || r.name_ar}`);
+  }
+  if (d.travel_date) chips.push(ar ? `المغادرة ${d.travel_date}` : `Departure ${d.travel_date}`);
+  if (d.nationality) chips.push(ar ? `الجنسية ${d.nationality}` : `Nationality ${d.nationality}`);
+  if (d.destination) chips.push(ar ? `الوجهة ${d.destination}` : `Destination ${d.destination}`);
+  for (const e of d.extras ?? []) {
+    chips.push(`+ ${ar ? e.name_ar || e.name_en : e.name_en || e.name_ar}`);
+  }
+  if (d.coupon) chips.push(ar ? `كوبون ${d.coupon}` : `Coupon ${d.coupon}`);
+  if (chips.length === 0) return null;
+  return (
+    <div className="mt-1 flex flex-wrap gap-1">
+      {chips.map((c) => (
+        <span
+          key={c}
+          className="rounded-full bg-secondary px-2 py-0.5 text-[11px] text-secondary-foreground"
+        >
+          {c}
+        </span>
+      ))}
     </div>
   );
 }
@@ -288,6 +384,7 @@ function OrderPanel({ row }: { row: any }) {
             {row.whatsapp}
           </a>
         </div>
+        <RequestDetailBlock row={row} />
         <div className="text-sm">
           <p className="text-xs text-muted-foreground">{t("admin.orders.reference")}</p>
           <p className="font-medium">{row.transaction_reference ?? "—"}</p>
