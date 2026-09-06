@@ -23,6 +23,7 @@ const TABS = [
   { to: "/admin/reports", key: "admin.tab.reports", exact: false },
   { to: "/admin/flights", key: "admin.tab.flights", exact: false },
 
+  { to: "/admin/videos", key: "admin.tab.videos", exact: false },
   { to: "/admin/links", key: "admin.tab.links", exact: false },
   { to: "/admin/users", key: "admin.tab.users", exact: false },
   { to: "/admin/email-notifications", key: "admin.tab.emails", exact: false },
