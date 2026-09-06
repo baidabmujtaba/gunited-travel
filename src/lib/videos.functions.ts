@@ -116,7 +116,11 @@ export const updateVideo = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => updateSchema.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { id, ...patch } = data;
+    const { id, ...rest } = data;
+    const patch: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rest)) {
+      if (value !== undefined) patch[key] = value;
+    }
     const { error } = await context.supabase.from("homepage_videos").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };
