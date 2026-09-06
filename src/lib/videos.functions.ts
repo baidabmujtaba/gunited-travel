@@ -144,6 +144,22 @@ export const deleteVideo = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Persist an explicit order (drag-and-drop result) as sequential display_order values. */
+export const setVideoOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await Promise.all(
+      data.ids.map((id, i) =>
+        context.supabase.from("homepage_videos").update({ display_order: i }).eq("id", id),
+      ),
+    );
+    return { ok: true };
+  });
+
 /** Move a video one slot up or down by swapping display order with its neighbour. */
 export const reorderVideo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
