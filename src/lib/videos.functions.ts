@@ -116,11 +116,13 @@ export const updateVideo = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => updateSchema.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { id, ...rest } = data;
-    const patch: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(rest)) {
-      if (value !== undefined) patch[key] = value;
-    }
+    const { id, title_ar, title_en, display_order, is_active } = data;
+    const patch = {
+      ...(title_ar !== undefined ? { title_ar } : {}),
+      ...(title_en !== undefined ? { title_en } : {}),
+      ...(display_order !== undefined ? { display_order } : {}),
+      ...(is_active !== undefined ? { is_active } : {}),
+    };
     const { error } = await context.supabase.from("homepage_videos").update(patch).eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -141,6 +143,22 @@ export const deleteVideo = createServerFn({ method: "POST" })
     if (row?.storage_path) {
       await context.supabase.storage.from(BUCKET).remove([row.storage_path]);
     }
+    return { ok: true };
+  });
+
+/** Persist an explicit order (drag-and-drop result) as sequential display_order values. */
+export const setVideoOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await Promise.all(
+      data.ids.map((id, i) =>
+        context.supabase.from("homepage_videos").update({ display_order: i }).eq("id", id),
+      ),
+    );
     return { ok: true };
   });
 

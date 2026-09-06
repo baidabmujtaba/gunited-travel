@@ -7,6 +7,7 @@ import { FeaturedPackages } from "@/components/store/FeaturedPackages";
 import { PlaneHero } from "@/components/store/PlaneHero";
 import { SecurityClearanceCard } from "@/components/store/SecurityClearanceCard";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { VideoSlideshow } from "@/components/store/VideoSlideshow";
 
 import { Button } from "@/components/ui/button";
 import { getCatalog } from "@/lib/catalog.functions";
@@ -66,6 +67,8 @@ function Home() {
   return (
     <StoreLayout>
       <PlaneHero />
+
+      <VideoSlideshow />
 
       <SecurityClearanceCard />
 
