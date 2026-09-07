@@ -1116,7 +1116,9 @@ export const createPackageBooking = createServerFn({ method: "POST" })
         .select("name_en")
         .eq("id", data.paymentMethodId)
         .maybeSingle();
+      const { recordCustomerTransfer } = await import("./treasury.server");
       await recordCustomerTransfer(supabaseAdmin, userId, {
+
         orderId: order.id,
         agencyId: profile?.agency_id ?? null,
         customerId: userId,
