@@ -25,8 +25,15 @@ export async function issueInvoiceForOrder(
   sb: Sb,
   actorId: string | null,
   orderId: string,
-  options: { force?: boolean } = {},
+  options: {
+    force?: boolean;
+    /** Financial state of the archived invoice. Bookings start unpaid until staff verify the transfer. */
+    status?: "paid" | "unpaid";
+    /** Skip the customer email (used when the booking confirmation already informs them). */
+    sendEmail?: boolean;
+  } = {},
 ): Promise<InvoiceResult | null> {
+
   const { data: order, error: orderErr } = await sb
     .from("service_orders")
     .select(
