@@ -992,7 +992,10 @@ export const createPackageBooking = createServerFn({ method: "POST" })
         : null,
       snapshot.extras.length ? `Extras: ${snapshot.extras.map((e) => e.name_en).join(", ")}` : null,
       quote.couponCode ? `Coupon: ${quote.couponCode}` : null,
+      data.nationality ? `Nationality: ${data.nationality}` : null,
+      data.destination ? `Destination: ${data.destination}` : null,
       data.notes ? `Notes: ${data.notes}` : null,
+
       `SNAPSHOT ${JSON.stringify(snapshot)}`,
     ].filter(Boolean);
 
