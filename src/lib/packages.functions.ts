@@ -889,7 +889,10 @@ const bookingInput = selectionSchema.extend({
   customerEmail: z.string().email(),
   whatsapp: z.string().min(7).max(24),
   nationality: z.string().max(80).nullable().optional(),
+  /** Destination code (e.g. SA / border point) as chosen by the traveller. */
+  destination: z.string().max(80).nullable().optional(),
   notes: z.string().max(1000).nullable().optional(),
+
   paymentMethodId: z.string().uuid(),
   transactionReference: z.string().min(2).max(80),
   receiptPath: z.string().min(3).max(400),
