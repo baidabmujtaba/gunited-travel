@@ -977,7 +977,9 @@ export const createPackageBooking = createServerFn({ method: "POST" })
         .map((s: any) => ({ id: s.id, name_ar: s.name_ar, name_en: s.name_en })),
       coupon: quote.couponCode,
       nationality: data.nationality ?? null,
+      destination: data.destination ?? null,
       notes: data.notes ?? null,
+
       priceContext,
     };
 
