@@ -450,6 +450,23 @@ export const listPackages = createServerFn({ method: "GET" })
     queryPackages({ ...data, topLevelOnly: data.topLevelOnly ?? !data.parentId }),
   );
 
+/** Umrah request screen: every published Umrah package at any level, grouped by category. */
+export const listUmrahPackages = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) =>
+    z.object({ currency: z.unknown().transform(normalizeCurrency).default("USD") }).parse(d ?? {}),
+  )
+  .handler(async ({ data }) => {
+    const res = await queryPackages({ currency: data.currency, topLevelOnly: false, sort: "featured" });
+    const umrahCats = res.categories.filter((c) => c.slug.startsWith("umrah"));
+    const catIds = new Set(umrahCats.map((c) => c.id));
+    const offers = res.offers.filter(
+      (o) => (o.category_id && catIds.has(o.category_id)) || o.offer_type === "umrah_package",
+    );
+    return { offers, categories: umrahCats, currencies: res.currencies };
+  });
+
+
+
 /**
  * One level of the package hierarchy: the package itself, its ancestors for the
  * breadcrumb and its direct published children. Children exist -> group page.
@@ -889,7 +906,10 @@ const bookingInput = selectionSchema.extend({
   customerEmail: z.string().email(),
   whatsapp: z.string().min(7).max(24),
   nationality: z.string().max(80).nullable().optional(),
+  /** Destination code (e.g. SA / border point) as chosen by the traveller. */
+  destination: z.string().max(80).nullable().optional(),
   notes: z.string().max(1000).nullable().optional(),
+
   paymentMethodId: z.string().uuid(),
   transactionReference: z.string().min(2).max(80),
   receiptPath: z.string().min(3).max(400),
@@ -974,7 +994,9 @@ export const createPackageBooking = createServerFn({ method: "POST" })
         .map((s: any) => ({ id: s.id, name_ar: s.name_ar, name_en: s.name_en })),
       coupon: quote.couponCode,
       nationality: data.nationality ?? null,
+      destination: data.destination ?? null,
       notes: data.notes ?? null,
+
       priceContext,
     };
 
@@ -987,7 +1009,10 @@ export const createPackageBooking = createServerFn({ method: "POST" })
         : null,
       snapshot.extras.length ? `Extras: ${snapshot.extras.map((e) => e.name_en).join(", ")}` : null,
       quote.couponCode ? `Coupon: ${quote.couponCode}` : null,
+      data.nationality ? `Nationality: ${data.nationality}` : null,
+      data.destination ? `Destination: ${data.destination}` : null,
       data.notes ? `Notes: ${data.notes}` : null,
+
       `SNAPSHOT ${JSON.stringify(snapshot)}`,
     ].filter(Boolean);
 
@@ -1100,13 +1125,49 @@ export const createPackageBooking = createServerFn({ method: "POST" })
     }
     await supabaseAdmin.rpc("track_offer_event", { _offer_id: offer.id, _event: "booking" });
 
+    // Treasury: pending transfer + unpaid invoice at the frozen booking price.
+    let invoiceNumber: string | null = null;
+    try {
+      const { data: method } = await supabaseAdmin
+        .from("payment_method_configs")
+        .select("name_en")
+        .eq("id", data.paymentMethodId)
+        .maybeSingle();
+      const { recordCustomerTransfer } = await import("./treasury.server");
+      await recordCustomerTransfer(supabaseAdmin, userId, {
+
+        orderId: order.id,
+        agencyId: profile?.agency_id ?? null,
+        customerId: userId,
+        amount: quote.total,
+        currencyCode: quote.currency,
+        frozenRate: quote.rate,
+        amountUsd: quote.totalUsd,
+        paymentMethod: method?.name_en ?? "bank_transfer",
+        payerName: data.customerName,
+        transactionReference: data.transactionReference,
+        receiptPath: data.receiptPath,
+        description: `Booking ${order.tracking_id} · ${offer.title_en}`,
+      });
+      const { issueInvoiceForOrder } = await import("./invoices.server");
+      const inv = await issueInvoiceForOrder(supabaseAdmin, userId, order.id, {
+        status: "unpaid",
+        sendEmail: false,
+      });
+      invoiceNumber = inv?.invoiceNumber ?? null;
+    } catch (e) {
+      console.error("booking_treasury_failed", (e as Error).message);
+    }
+
     return {
       trackingId: order.tracking_id as string,
       orderId: order.id as string,
       totalUsd: quote.totalUsd,
       total: quote.total,
       currency: quote.currency,
+      invoiceNumber,
     };
+
   });
 
 /** Confirmation page read — scoped to the signed-in customer's own booking. */

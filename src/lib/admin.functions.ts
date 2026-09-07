@@ -254,6 +254,13 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       }
     }
 
+    // Verified transfer -> confirm the treasury payment row and settle the invoice.
+    if (["payment_confirmed", "processing", "completed"].includes(data.status)) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { confirmOrderTreasury } = await import("./treasury.server");
+      await confirmOrderTreasury(supabaseAdmin, data.orderId);
+    }
+
 
     const { data: actor } = await sb
       .from("profiles")

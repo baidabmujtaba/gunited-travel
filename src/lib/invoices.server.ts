@@ -25,8 +25,15 @@ export async function issueInvoiceForOrder(
   sb: Sb,
   actorId: string | null,
   orderId: string,
-  options: { force?: boolean } = {},
+  options: {
+    force?: boolean;
+    /** Financial state of the archived invoice. Bookings start unpaid until staff verify the transfer. */
+    status?: "paid" | "unpaid";
+    /** Skip the customer email (used when the booking confirmation already informs them). */
+    sendEmail?: boolean;
+  } = {},
 ): Promise<InvoiceResult | null> {
+
   const { data: order, error: orderErr } = await sb
     .from("service_orders")
     .select(
@@ -96,8 +103,9 @@ export async function issueInvoiceForOrder(
         discount_usd: 0,
         total_usd: totalUsd,
         total_display: totalDisplay,
-        paid_usd: totalUsd,
-        status: "paid",
+        paid_usd: (options.status ?? "paid") === "paid" ? totalUsd : 0,
+        status: options.status ?? "paid",
+
         payment_method_id: order.payment_method_id,
         issued_by: actorId,
       } as any)
@@ -134,23 +142,27 @@ export async function issueInvoiceForOrder(
     .upload(path, pdf, { contentType: "application/pdf", upsert: true });
   if (upErr) console.error("invoice_pdf_upload_failed", upErr.message);
 
-  const email = await sendEmail({
-    to: order.customer_email,
-    subject: `فاتورة ${invoiceNumber} · Gunited Travel`,
-    html: invoiceEmailHtml({
-      invoiceNumber,
-      customerName: order.customer_name,
-      trackingId: order.tracking_id,
-      totalDisplay: money(totalDisplay, currency),
-      totalUsd: money(totalUsd, "USD"),
-      rows: [
-        { label: offer?.title_ar || "خدمة سفر", amount: money(netUsd, "USD") },
-        ...(taxUsd > 0 ? [{ label: "الضريبة", amount: money(taxUsd, "USD") }] : []),
-        ...(feesUsd > 0 ? [{ label: "رسوم الخدمة", amount: money(feesUsd, "USD") }] : []),
-      ],
-    }),
-    attachment: { filename: `${invoiceNumber}.pdf`, content: bytesToBase64(pdf) },
-  });
+  const email =
+    options.sendEmail === false
+      ? { sent: false, error: undefined as string | undefined }
+      : await sendEmail({
+          to: order.customer_email,
+          subject: `فاتورة ${invoiceNumber} · Gunited Travel`,
+          html: invoiceEmailHtml({
+            invoiceNumber,
+            customerName: order.customer_name,
+            trackingId: order.tracking_id,
+            totalDisplay: money(totalDisplay, currency),
+            totalUsd: money(totalUsd, "USD"),
+            rows: [
+              { label: offer?.title_ar || "خدمة سفر", amount: money(netUsd, "USD") },
+              ...(taxUsd > 0 ? [{ label: "الضريبة", amount: money(taxUsd, "USD") }] : []),
+              ...(feesUsd > 0 ? [{ label: "رسوم الخدمة", amount: money(feesUsd, "USD") }] : []),
+            ],
+          }),
+          attachment: { filename: `${invoiceNumber}.pdf`, content: bytesToBase64(pdf) },
+        });
+
 
   await sb
     .from("invoices")

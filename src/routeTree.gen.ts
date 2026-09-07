@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as SelectRouteImport } from './routes/select'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAgencyRouteImport } from './routes/_authenticated/agency'
 import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
@@ -85,6 +86,11 @@ const SelectRoute = SelectRouteImport.update({
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UmrahRoute = UmrahRouteImport.update({
+  id: '/umrah',
+  path: '/umrah',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -300,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
   '/track': typeof TrackRoute
+  '/umrah': typeof UmrahRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
@@ -344,6 +351,7 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
   '/track': typeof TrackRoute
+  '/umrah': typeof UmrahRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/offers/$slug': typeof OffersSlugRoute
   '/request/$slug': typeof RequestSlugRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
   '/track': typeof TrackRoute
+  '/umrah': typeof UmrahRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/agency': typeof AuthenticatedAgencyRouteWithChildren
   '/checkout/$slug': typeof CheckoutSlugRoute
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/select'
     | '/track'
+    | '/umrah'
     | '/admin'
     | '/agency'
     | '/checkout/$slug'
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/select'
     | '/track'
+    | '/umrah'
     | '/checkout/$slug'
     | '/offers/$slug'
     | '/request/$slug'
@@ -521,6 +532,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/select'
     | '/track'
+    | '/umrah'
     | '/_authenticated/admin'
     | '/_authenticated/agency'
     | '/checkout/$slug'
@@ -567,6 +579,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   SelectRoute: typeof SelectRoute
   TrackRoute: typeof TrackRoute
+  UmrahRoute: typeof UmrahRoute
   CheckoutSlugRoute: typeof CheckoutSlugRoute
   OffersSlugRoute: typeof OffersSlugRoute
   RequestSlugRoute: typeof RequestSlugRoute
@@ -624,6 +637,13 @@ declare module '@tanstack/react-router' {
       path: '/track'
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/umrah': {
+      id: '/umrah'
+      path: '/umrah'
+      fullPath: '/umrah'
+      preLoaderRoute: typeof UmrahRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -977,6 +997,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   SelectRoute: SelectRoute,
   TrackRoute: TrackRoute,
+  UmrahRoute: UmrahRoute,
   CheckoutSlugRoute: CheckoutSlugRoute,
   OffersSlugRoute: OffersSlugRoute,
   RequestSlugRoute: RequestSlugRoute,
