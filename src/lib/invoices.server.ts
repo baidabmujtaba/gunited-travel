@@ -142,23 +142,27 @@ export async function issueInvoiceForOrder(
     .upload(path, pdf, { contentType: "application/pdf", upsert: true });
   if (upErr) console.error("invoice_pdf_upload_failed", upErr.message);
 
-  const email = await sendEmail({
-    to: order.customer_email,
-    subject: `فاتورة ${invoiceNumber} · Gunited Travel`,
-    html: invoiceEmailHtml({
-      invoiceNumber,
-      customerName: order.customer_name,
-      trackingId: order.tracking_id,
-      totalDisplay: money(totalDisplay, currency),
-      totalUsd: money(totalUsd, "USD"),
-      rows: [
-        { label: offer?.title_ar || "خدمة سفر", amount: money(netUsd, "USD") },
-        ...(taxUsd > 0 ? [{ label: "الضريبة", amount: money(taxUsd, "USD") }] : []),
-        ...(feesUsd > 0 ? [{ label: "رسوم الخدمة", amount: money(feesUsd, "USD") }] : []),
-      ],
-    }),
-    attachment: { filename: `${invoiceNumber}.pdf`, content: bytesToBase64(pdf) },
-  });
+  const email =
+    options.sendEmail === false
+      ? { sent: false, error: undefined as string | undefined }
+      : await sendEmail({
+          to: order.customer_email,
+          subject: `فاتورة ${invoiceNumber} · Gunited Travel`,
+          html: invoiceEmailHtml({
+            invoiceNumber,
+            customerName: order.customer_name,
+            trackingId: order.tracking_id,
+            totalDisplay: money(totalDisplay, currency),
+            totalUsd: money(totalUsd, "USD"),
+            rows: [
+              { label: offer?.title_ar || "خدمة سفر", amount: money(netUsd, "USD") },
+              ...(taxUsd > 0 ? [{ label: "الضريبة", amount: money(taxUsd, "USD") }] : []),
+              ...(feesUsd > 0 ? [{ label: "رسوم الخدمة", amount: money(feesUsd, "USD") }] : []),
+            ],
+          }),
+          attachment: { filename: `${invoiceNumber}.pdf`, content: bytesToBase64(pdf) },
+        });
+
 
   await sb
     .from("invoices")
