@@ -1108,13 +1108,47 @@ export const createPackageBooking = createServerFn({ method: "POST" })
     }
     await supabaseAdmin.rpc("track_offer_event", { _offer_id: offer.id, _event: "booking" });
 
+    // Treasury: pending transfer + unpaid invoice at the frozen booking price.
+    let invoiceNumber: string | null = null;
+    try {
+      const { data: method } = await supabaseAdmin
+        .from("payment_method_configs")
+        .select("name_en")
+        .eq("id", data.paymentMethodId)
+        .maybeSingle();
+      await recordCustomerTransfer(supabaseAdmin, userId, {
+        orderId: order.id,
+        agencyId: profile?.agency_id ?? null,
+        customerId: userId,
+        amount: quote.total,
+        currencyCode: quote.currency,
+        frozenRate: quote.rate,
+        amountUsd: quote.totalUsd,
+        paymentMethod: method?.name_en ?? "bank_transfer",
+        payerName: data.customerName,
+        transactionReference: data.transactionReference,
+        receiptPath: data.receiptPath,
+        description: `Booking ${order.tracking_id} · ${offer.title_en}`,
+      });
+      const { issueInvoiceForOrder } = await import("./invoices.server");
+      const inv = await issueInvoiceForOrder(supabaseAdmin, userId, order.id, {
+        status: "unpaid",
+        sendEmail: false,
+      });
+      invoiceNumber = inv?.invoiceNumber ?? null;
+    } catch (e) {
+      console.error("booking_treasury_failed", (e as Error).message);
+    }
+
     return {
       trackingId: order.tracking_id as string,
       orderId: order.id as string,
       totalUsd: quote.totalUsd,
       total: quote.total,
       currency: quote.currency,
+      invoiceNumber,
     };
+
   });
 
 /** Confirmation page read — scoped to the signed-in customer's own booking. */
