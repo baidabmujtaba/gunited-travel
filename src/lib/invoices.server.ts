@@ -103,8 +103,9 @@ export async function issueInvoiceForOrder(
         discount_usd: 0,
         total_usd: totalUsd,
         total_display: totalDisplay,
-        paid_usd: totalUsd,
-        status: "paid",
+        paid_usd: (options.status ?? "paid") === "paid" ? totalUsd : 0,
+        status: options.status ?? "paid",
+
         payment_method_id: order.payment_method_id,
         issued_by: actorId,
       } as any)
