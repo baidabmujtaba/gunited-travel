@@ -450,6 +450,23 @@ export const listPackages = createServerFn({ method: "GET" })
     queryPackages({ ...data, topLevelOnly: data.topLevelOnly ?? !data.parentId }),
   );
 
+/** Umrah request screen: every published Umrah package at any level, grouped by category. */
+export const listUmrahPackages = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) =>
+    z.object({ currency: z.unknown().transform(normalizeCurrency).default("USD") }).parse(d ?? {}),
+  )
+  .handler(async ({ data }) => {
+    const res = await queryPackages({ currency: data.currency, topLevelOnly: false, sort: "featured" });
+    const umrahCats = res.categories.filter((c) => c.slug.startsWith("umrah"));
+    const catIds = new Set(umrahCats.map((c) => c.id));
+    const offers = res.offers.filter(
+      (o) => (o.category_id && catIds.has(o.category_id)) || o.offer_type === "umrah_package",
+    );
+    return { offers, categories: umrahCats, currencies: res.currencies };
+  });
+
+
+
 /**
  * One level of the package hierarchy: the package itself, its ancestors for the
  * breadcrumb and its direct published children. Children exist -> group page.
