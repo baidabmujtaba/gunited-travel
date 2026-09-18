@@ -5,12 +5,14 @@ import { ArrowLeft, ArrowRight, Check, Loader2, Minus, Plus, Upload } from "luci
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { UMRAH_REQUEST_KEY } from "@/routes/umrah";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { getPaymentMethods } from "@/lib/catalog.functions";
+import { getDestinations } from "@/lib/catalog.functions";
 import { useI18n } from "@/lib/i18n";
 import { createPackageBooking, getPackage, quotePackage } from "@/lib/packages.functions";
 import { useSession } from "@/lib/session";
@@ -62,6 +64,7 @@ function BookPackage() {
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [nationality, setNationality] = useState("");
+  const [destination, setDestination] = useState("");
   const [notes, setNotes] = useState("");
   const [docFiles, setDocFiles] = useState<Record<string, File>>({});
   const [methodId, setMethodId] = useState("");
@@ -78,6 +81,34 @@ function BookPackage() {
   });
 
   const offer = offerQuery.data?.offer ?? null;
+
+  const destinationsQuery = useQuery({
+    queryKey: ["destinations"],
+    queryFn: () => getDestinations(),
+  });
+
+  // Trip details chosen on the /umrah request screen carry over into the flow.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.sessionStorage.getItem(UMRAH_REQUEST_KEY);
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw) as {
+        destination?: string;
+        travelDate?: string;
+        adults?: number;
+        children?: number;
+        infants?: number;
+      };
+      if (d.destination) setDestination(d.destination);
+      if (d.travelDate) setTravelDate(d.travelDate);
+      if (d.adults) setAdults(d.adults);
+      if (typeof d.children === "number") setChildren(d.children);
+      if (typeof d.infants === "number") setInfants(d.infants);
+    } catch {
+      /* ignore malformed draft */
+    }
+  }, []);
 
   useEffect(() => {
     if (session?.user) {
@@ -171,6 +202,7 @@ function BookPackage() {
           customerEmail: email.trim(),
           whatsapp: whatsapp.trim(),
           nationality: nationality.trim() || null,
+          destination: destination.trim() || null,
           notes: notes.trim() || null,
           paymentMethodId: methodId,
           transactionReference: reference.trim(),
@@ -450,6 +482,22 @@ function BookPackage() {
                 <Field label={ar ? "البريد الإلكتروني" : "Email"} value={email} onChange={setEmail} type="email" />
                 <Field label={ar ? "واتساب" : "WhatsApp"} value={whatsapp} onChange={setWhatsapp} />
                 <Field label={ar ? "الجنسية" : "Nationality"} value={nationality} onChange={setNationality} />
+                <div className="space-y-1.5">
+                  <Label>{ar ? "الوجهة" : "Destination"}</Label>
+                  <select
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    aria-label={ar ? "الوجهة" : "Destination"}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{ar ? "اختر الوجهة" : "Select a destination"}</option>
+                    {(destinationsQuery.data ?? []).map((d) => (
+                      <option key={d.code} value={d.code}>
+                        {ar ? d.name_ar : d.name_en}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>{ar ? "ملاحظات" : "Notes"}</Label>
