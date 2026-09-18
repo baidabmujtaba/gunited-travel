@@ -23,6 +23,8 @@ export function StoreLayout({ children }: { children: ReactNode }) {
   const links = [
     { to: "/", label: t("nav.home") },
     { to: "/offers", label: t("nav.offers") },
+    { to: "/umrah", label: lang === "ar" ? "طلب العمرة" : "Umrah request" },
+
     { to: "/track", label: t("nav.track") },
   ] as const;
 
