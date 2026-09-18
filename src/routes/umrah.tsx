@@ -104,7 +104,11 @@ function UmrahPage() {
                 : "Pick an Umrah package, set your destination, travellers and travel date, then complete a tracked booking."}
             </p>
           </div>
-          <CurrencySelector value={currency} onChange={setCurrency} />
+          <CurrencySelector
+            currencies={query.data?.currencies ?? []}
+            value={currency}
+            onChange={setCurrency}
+          />
         </header>
 
         {/* Trip details */}
