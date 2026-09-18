@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Loader2, MapPin, Minus, Plus, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Minus, Plus, Users } from "lucide-react";
 import { useState } from "react";
 
 import { CurrencySelector } from "@/components/store/CurrencySelector";
@@ -13,9 +13,9 @@ import { Label } from "@/components/ui/label";
 import { getDestinations } from "@/lib/catalog.functions";
 import { useI18n } from "@/lib/i18n";
 import { listUmrahPackages } from "@/lib/packages.functions";
+import { UMRAH_REQUEST_KEY } from "@/lib/umrah-request";
 
-/** Trip details chosen on this screen; the booking flow reads them back. */
-export const UMRAH_REQUEST_KEY = "gt-umrah-request";
+
 
 export const Route = createFileRoute("/umrah")({
   head: () => ({
@@ -104,7 +104,11 @@ function UmrahPage() {
                 : "Pick an Umrah package, set your destination, travellers and travel date, then complete a tracked booking."}
             </p>
           </div>
-          <CurrencySelector value={currency} onChange={setCurrency} />
+          <CurrencySelector
+            currencies={query.data?.currencies ?? []}
+            value={currency}
+            onChange={setCurrency}
+          />
         </header>
 
         {/* Trip details */}
@@ -259,9 +263,4 @@ function Stepper({
       </span>
     </div>
   );
-}
-
-/** Loader guard so the spinner import is used in SSR-friendly fallbacks. */
-export function UmrahFallback() {
-  return <Loader2 className="size-5 animate-spin" />;
 }
