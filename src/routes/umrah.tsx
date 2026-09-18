@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Loader2, MapPin, Minus, Plus, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Minus, Plus, Users } from "lucide-react";
 import { useState } from "react";
 
 import { CurrencySelector } from "@/components/store/CurrencySelector";
@@ -259,9 +259,4 @@ function Stepper({
       </span>
     </div>
   );
-}
-
-/** Loader guard so the spinner import is used in SSR-friendly fallbacks. */
-export function UmrahFallback() {
-  return <Loader2 className="size-5 animate-spin" />;
 }
