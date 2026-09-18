@@ -13,9 +13,9 @@ import { Label } from "@/components/ui/label";
 import { getDestinations } from "@/lib/catalog.functions";
 import { useI18n } from "@/lib/i18n";
 import { listUmrahPackages } from "@/lib/packages.functions";
+import { UMRAH_REQUEST_KEY } from "@/lib/umrah-request";
 
-/** Trip details chosen on this screen; the booking flow reads them back. */
-export const UMRAH_REQUEST_KEY = "gt-umrah-request";
+
 
 export const Route = createFileRoute("/umrah")({
   head: () => ({
