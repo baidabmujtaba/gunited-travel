@@ -282,14 +282,16 @@ export const Route = createFileRoute("/api/public/guest-order")({
               }),
             ]);
 
-            const { queueStatusChangeEmails } = await import("@/lib/notifications.server");
-            await queueStatusChangeEmails(supabaseAdmin, {
-              eventId: event.id,
-              orderId: order.id,
-              previousStatus: null,
-              newStatus: "submitted",
-              note: null,
-            });
+            if (event) {
+              const { queueStatusChangeEmails } = await import("@/lib/notifications.server");
+              await queueStatusChangeEmails(supabaseAdmin, {
+                eventId: event.id,
+                orderId: order.id,
+                previousStatus: null,
+                newStatus: "submitted",
+                note: null,
+              });
+            }
 
             return Response.json({ trackingId: order.tracking_id, orderId: order.id }, { status: 201 });
           } catch (error) {

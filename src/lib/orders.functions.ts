@@ -97,7 +97,7 @@ export const createOrder = createServerFn({ method: "POST" })
         : Number(offer.agency_price_usd);
     if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
     if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
-    const appliedPriceUsd = priceContext === "agency" ? agencyPriceUsd : customerPriceUsd;
+    const appliedPriceUsd = priceContext === "agency" ? (agencyPriceUsd ?? customerPriceUsd) : customerPriceUsd;
 
     const price = computePrice(
       {
@@ -226,14 +226,16 @@ export const createOrder = createServerFn({ method: "POST" })
       after_data: { tracking_id: order.tracking_id, amount_usd: price.totalUsd },
     });
 
-    const { queueStatusChangeEmails } = await import("./notifications.server");
-    await queueStatusChangeEmails(supabase, {
-      eventId: event.id,
-      orderId: order.id,
-      previousStatus: null,
-      newStatus: "submitted",
-      note: null,
-    });
+    if (event) {
+      const { queueStatusChangeEmails } = await import("./notifications.server");
+      await queueStatusChangeEmails(supabase, {
+        eventId: event.id,
+        orderId: order.id,
+        previousStatus: null,
+        newStatus: "submitted",
+        note: null,
+      });
+    }
 
     return { trackingId: order.tracking_id as string, orderId: order.id as string };
   });
