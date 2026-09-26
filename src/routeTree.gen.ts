@@ -50,6 +50,7 @@ import { Route as AuthenticatedBookSlugRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedBookingTrackingRouteImport } from './routes/_authenticated/booking.$tracking'
 import { Route as AuthenticatedInvoiceNumberRouteImport } from './routes/_authenticated/invoice.$number'
 import { Route as ApiPublicEmailDispatchRouteImport } from './routes/api/public/email-dispatch'
+import { Route as ApiPublicGuestOrderRouteImport } from './routes/api/public/guest-order'
 import { Route as AuthenticatedAdminAgencyIdRouteImport } from './routes/_authenticated/admin.agency.$id'
 import { Route as AuthenticatedAdminCustomerIdRouteImport } from './routes/_authenticated/admin.customer.$id'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -280,6 +281,11 @@ const ApiPublicEmailDispatchRoute = ApiPublicEmailDispatchRouteImport.update({
   path: '/api/public/email-dispatch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGuestOrderRoute = ApiPublicGuestOrderRouteImport.update({
+  id: '/api/public/guest-order',
+  path: '/api/public/guest-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminAgencyIdRoute =
   AuthenticatedAdminAgencyIdRouteImport.update({
     id: '/agency/$id',
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
+  '/api/public/guest-order': typeof ApiPublicGuestOrderRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/agency/': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -381,6 +388,7 @@ export interface FileRoutesByTo {
   '/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
+  '/api/public/guest-order': typeof ApiPublicGuestOrderRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/agency': typeof AuthenticatedAgencyIndexRoute
   '/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/_authenticated/booking/$tracking': typeof AuthenticatedBookingTrackingRoute
   '/_authenticated/invoice/$number': typeof AuthenticatedInvoiceNumberRoute
   '/api/public/email-dispatch': typeof ApiPublicEmailDispatchRoute
+  '/api/public/guest-order': typeof ApiPublicGuestOrderRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/agency/': typeof AuthenticatedAgencyIndexRoute
   '/_authenticated/admin/agency/$id': typeof AuthenticatedAdminAgencyIdRoute
@@ -475,6 +484,7 @@ export interface FileRouteTypes {
     | '/booking/$tracking'
     | '/invoice/$number'
     | '/api/public/email-dispatch'
+    | '/api/public/guest-order'
     | '/admin/'
     | '/agency/'
     | '/admin/agency/$id'
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/booking/$tracking'
     | '/invoice/$number'
     | '/api/public/email-dispatch'
+    | '/api/public/guest-order'
     | '/admin'
     | '/agency'
     | '/admin/agency/$id'
@@ -564,6 +575,7 @@ export interface FileRouteTypes {
     | '/_authenticated/booking/$tracking'
     | '/_authenticated/invoice/$number'
     | '/api/public/email-dispatch'
+    | '/api/public/guest-order'
     | '/_authenticated/admin/'
     | '/_authenticated/agency/'
     | '/_authenticated/admin/agency/$id'
@@ -585,6 +597,7 @@ export interface RootRouteChildren {
   RequestSlugRoute: typeof RequestSlugRoute
   OffersIndexRoute: typeof OffersIndexRoute
   ApiPublicEmailDispatchRoute: typeof ApiPublicEmailDispatchRoute
+  ApiPublicGuestOrderRoute: typeof ApiPublicGuestOrderRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -877,6 +890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEmailDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/guest-order': {
+      id: '/api/public/guest-order'
+      path: '/api/public/guest-order'
+      fullPath: '/api/public/guest-order'
+      preLoaderRoute: typeof ApiPublicGuestOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/agency/$id': {
       id: '/_authenticated/admin/agency/$id'
       path: '/agency/$id'
@@ -1003,6 +1023,7 @@ const rootRouteChildren: RootRouteChildren = {
   RequestSlugRoute: RequestSlugRoute,
   OffersIndexRoute: OffersIndexRoute,
   ApiPublicEmailDispatchRoute: ApiPublicEmailDispatchRoute,
+  ApiPublicGuestOrderRoute: ApiPublicGuestOrderRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
