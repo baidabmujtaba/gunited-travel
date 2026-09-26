@@ -140,6 +140,40 @@ async function writePayment(
 
   await notifyBalanceState(sb, agency as any, after.outstanding);
 
+  // A staff-recorded payment linked to an order is the authoritative payment-received event.
+  if (input.orderId) {
+    const { data: order } = await sb
+      .from("service_orders")
+      .select("id,status")
+      .eq("id", input.orderId)
+      .maybeSingle();
+    if (order && !["payment_confirmed", "processing", "completed"].includes(order.status)) {
+      await sb.from("service_orders").update({ status: "payment_confirmed" }).eq("id", order.id);
+      const { data: event } = await sb
+        .from("order_status_history")
+        .insert({
+          order_id: order.id,
+          previous_status: order.status,
+          new_status: "payment_confirmed",
+          note: `Payment ${payment.payment_number} received`,
+          actor_id: context.userId,
+          actor_name: "Finance",
+        })
+        .select("id")
+        .single();
+      if (event) {
+        const { queueStatusChangeEmails } = await import("./notifications.server");
+        await queueStatusChangeEmails(sb, {
+          eventId: event.id,
+          orderId: order.id,
+          previousStatus: order.status,
+          newStatus: "payment_confirmed",
+          note: `Payment ${payment.payment_number} received`,
+        });
+      }
+    }
+  }
+
   await sb.from("audit_logs").insert({
     actor_id: context.userId,
     action: type === "external" ? "payment.external.create" : "payment.create",

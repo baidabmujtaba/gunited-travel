@@ -292,6 +292,7 @@ export async function queueStatusChangeEmails(
     previousStatus: string | null;
     newStatus: OrderStatusKey;
     note: string | null;
+    forceDocumentsTemplate?: boolean;
   },
 ): Promise<void> {
   try {
@@ -318,7 +319,7 @@ export async function queueStatusChangeEmails(
     }
 
     const requiresDocs = String(order.document_status ?? "").toLowerCase() === "required";
-    const tpl = requiresDocs && input.newStatus === "processing"
+    const tpl = input.forceDocumentsTemplate || (requiresDocs && input.newStatus === "processing")
       ? DOCS_TEMPLATE
       : TEMPLATES[input.newStatus];
 

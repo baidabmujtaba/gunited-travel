@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Copy, Loader2, Upload } from "lucide-react";
+import { CheckCircle2, Copy, Loader2, MessageCircle, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import { createOrder } from "@/lib/orders.functions";
 import { REQUEST_DRAFT_PREFIX } from "@/routes/request.$slug";
 import { useRoles, useSession } from "@/lib/session";
 import { getAgencyOffer } from "@/lib/agency-catalog.functions";
+import { whatsappLink } from "@/lib/support";
 
 const ALLOWED = ["image/png", "image/jpeg", "application/pdf"];
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -24,6 +25,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 export const Route = createFileRoute("/checkout/$slug")({
   validateSearch: z.object({
     currency: z.unknown().transform(normalizeCurrency).default("USD"),
+    tracking: z.string().regex(/^GT-ORD-\d{4}-\d{6}$/).optional(),
   }),
   head: () => ({
     meta: [
@@ -43,7 +45,7 @@ export const Route = createFileRoute("/checkout/$slug")({
 
 function Checkout() {
   const { slug } = Route.useParams();
-  const { currency } = Route.useSearch();
+  const { currency, tracking } = Route.useSearch();
   const { lang, t, fmt } = useI18n();
   const { session, loading } = useSession();
   const navigate = useNavigate();
@@ -68,7 +70,9 @@ function Checkout() {
   const [reference, setReference] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [docFiles, setDocFiles] = useState<Record<string, File>>({});
-  const [result, setResult] = useState<{ trackingId: string } | null>(null);
+  const [result, setResult] = useState<{ trackingId: string } | null>(
+    tracking ? { trackingId: tracking } : null,
+  );
 
   useEffect(() => {
     if (session?.user) {
@@ -80,7 +84,14 @@ function Checkout() {
 
   const offer = offerQuery.data?.offer;
   const allowedIds = offer?.allowed_payment_methods ?? [];
-  const requiredDocs = offer?.required_documents ?? [];
+  const configuredDocs = offer?.required_documents ?? [];
+  const requiredDocs =
+    offer?.category === "security_approval" && !configuredDocs.some((doc) => doc.key === "passport")
+      ? [
+          ...configuredDocs,
+          { key: "passport", label_en: "Passport copy", label_ar: "صورة جواز السفر", required: true },
+        ]
+      : configuredDocs;
   // Only the payment methods the admin allowed on this offer are selectable.
   const methods = (methodsQuery.data ?? []).filter(
     (m) => allowedIds.length === 0 || allowedIds.includes(m.id),
@@ -91,43 +102,17 @@ function Checkout() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!offer || !session?.user) throw new Error("NO_SESSION");
+      if (!offer) throw new Error("OFFER_UNAVAILABLE");
       if (!file) throw new Error("NO_FILE");
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
-      const path = `${session.user.id}/${Date.now()}-receipt.${ext}`;
-      const { error: upErr } = await supabase.storage.from("receipts").upload(path, file, {
-        contentType: file.type,
-        upsert: false,
-      });
-      if (upErr) throw new Error(upErr.message);
-
-      // Each required document goes to the private order-documents bucket.
-      const documents: {
-        key: string;
-        label_en: string;
-        label_ar: string;
-        path: string;
-        name: string;
-      }[] = [];
-      for (const doc of requiredDocs) {
-        const docFile = docFiles[doc.key];
-        if (!docFile) continue;
-        const dExt = docFile.name.split(".").pop()?.toLowerCase() ?? "bin";
-        const dPath = `${session.user.id}/${Date.now()}-${doc.key}.${dExt}`;
-        const { error: dErr } = await supabase.storage
-          .from("order-documents")
-          .upload(dPath, docFile, { contentType: docFile.type, upsert: false });
-        if (dErr) throw new Error(dErr.message);
-        documents.push({
-          key: doc.key,
-          label_en: doc.label_en,
-          label_ar: doc.label_ar,
-          path: dPath,
-          name: docFile.name,
-        });
-      }
-
-      let draft: { nationality?: string; destination?: string; travelers?: number } = {};
+      let draft: {
+        nationality?: string;
+        destination?: string;
+        travelers?: number;
+        travelDate?: string;
+        flightNumber?: string;
+        borderPoint?: "argeen" | "halfa";
+        vehicleDetails?: string;
+      } = {};
       if (typeof window !== "undefined") {
         try {
           draft = JSON.parse(window.sessionStorage.getItem(`${REQUEST_DRAFT_PREFIX}${slug}`) ?? "{}");
@@ -135,26 +120,84 @@ function Checkout() {
           draft = {};
         }
       }
-      return createOrder({
-        data: {
+      const commonData = {
           offerId: offer.id,
           currency,
           nationality: draft.nationality || undefined,
           destination: draft.destination || undefined,
           travelers: draft.travelers,
-
+          travelDate: draft.travelDate,
+          flightNumber: draft.flightNumber,
+          borderPoint: draft.borderPoint,
+          vehicleDetails: draft.vehicleDetails,
           customerName: name.trim(),
           customerEmail: email.trim(),
           whatsapp: whatsapp.trim(),
           transactionReference: reference.trim(),
           paymentMethodId: methodId,
-          receiptPath: path,
-          documents,
-        },
-      });
+      };
+
+      if (!session?.user) {
+        const body = new FormData();
+        Object.entries(commonData).forEach(([key, value]) => {
+          if (value !== undefined) body.set(key, String(value));
+        });
+        body.set("website", "");
+        body.set("receipt", file);
+        requiredDocs.forEach((doc) => {
+          const document = docFiles[doc.key];
+          if (!document) return;
+          body.append("documentKey", doc.key);
+          body.set(`document:${doc.key}`, document);
+        });
+        const response = await fetch("/api/public/guest-order", { method: "POST", body });
+        const payload = (await response.json()) as { trackingId?: string; error?: string };
+        if (!response.ok || !payload.trackingId) throw new Error(payload.error ?? "ORDER_CREATE_FAILED");
+        return { trackingId: payload.trackingId };
+      }
+
+      const uploaded: Array<{ bucket: "receipts" | "order-documents"; path: string }> = [];
+      try {
+        const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+        const path = `${session.user.id}/${Date.now()}-receipt.${ext}`;
+        const { error: upErr } = await supabase.storage.from("receipts").upload(path, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+        if (upErr) throw new Error(upErr.message);
+        uploaded.push({ bucket: "receipts", path });
+
+        const documents: Array<{ key: string; label_en: string; label_ar: string; path: string; name: string }> = [];
+        for (const doc of requiredDocs) {
+          const docFile = docFiles[doc.key];
+          if (!docFile) continue;
+          const dExt = docFile.name.split(".").pop()?.toLowerCase() ?? "bin";
+          const dPath = `${session.user.id}/${Date.now()}-${doc.key}.${dExt}`;
+          const { error: dErr } = await supabase.storage
+            .from("order-documents")
+            .upload(dPath, docFile, { contentType: docFile.type, upsert: false });
+          if (dErr) throw new Error(dErr.message);
+          uploaded.push({ bucket: "order-documents", path: dPath });
+          documents.push({ key: doc.key, label_en: doc.label_en, label_ar: doc.label_ar, path: dPath, name: docFile.name });
+        }
+
+        return await createOrder({ data: { ...commonData, receiptPath: path, documents } });
+      } catch (error) {
+        await Promise.all(uploaded.map(({ bucket, path }) => supabase.storage.from(bucket).remove([path])));
+        throw error;
+      }
     },
     onSuccess: (data) => {
       setResult({ trackingId: data.trackingId });
+      void navigate({
+        to: "/checkout/$slug",
+        params: { slug },
+        search: { currency, tracking: data.trackingId },
+        replace: true,
+      });
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(`${REQUEST_DRAFT_PREFIX}${slug}`);
+      }
       toast.success(t("checkout.success"), { description: data.trackingId });
     },
     onError: (e) => toast.error(t("common.error"), { description: String(e.message ?? e) }),
@@ -232,33 +275,25 @@ function Checkout() {
               </Button>
             </div>
           </div>
-          <div className="mt-6 flex justify-center gap-3">
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild>
               <Link to="/track" search={{ ref: result.trackingId }}>
                 {t("nav.track")}
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/account">{t("nav.dashboard")}</Link>
+              <a
+                href={whatsappLink(
+                  `${lang === "ar" ? "أحتاج مساعدة بخصوص الطلب" : "I need help with order"} ${result.trackingId}`,
+                )}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <MessageCircle className="size-4" />
+                {t("track.whatsapp")}
+              </a>
             </Button>
           </div>
-        </div>
-      </StoreLayout>
-    );
-  }
-
-  if (!loading && !session) {
-    return (
-      <StoreLayout>
-        <div className="mx-auto max-w-md px-5 py-24 text-center">
-          <h1 className="text-2xl font-bold">{t("checkout.title")}</h1>
-          <p className="mt-3 text-sm text-muted-foreground">{t("checkout.needlogin")}</p>
-          <Button
-            className="mt-6"
-            onClick={() => navigate({ to: "/auth", search: { redirect: `/checkout/${slug}?currency=${currency}` } })}
-          >
-            {t("nav.login")}
-          </Button>
         </div>
       </StoreLayout>
     );
@@ -271,6 +306,9 @@ function Checkout() {
       <div className="mx-auto w-full max-w-5xl px-5 py-10">
         <h1 className="text-3xl font-bold">{t("checkout.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("checkout.note")}</p>
+        {!loading && !session ? (
+          <p className="mt-2 text-sm font-medium text-forest">{t("checkout.guest_note")}</p>
+        ) : null}
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <form onSubmit={submit} className="space-y-8">

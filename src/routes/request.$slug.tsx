@@ -80,16 +80,30 @@ function RequestPage() {
   const [nationality, setNationality] = useState("");
   const [destination, setDestination] = useState("");
   const [travelers, setTravelers] = useState(1);
+  const [travelDate, setTravelDate] = useState("");
+  const [flightNumber, setFlightNumber] = useState("");
+  const [vehicleDetails, setVehicleDetails] = useState("");
 
   const currentStep = 1; // zero-based: "البيانات"
 
-  const canProceed = Boolean(nationality) && Boolean(destination);
+  const isSecurity = offer?.category === "security_approval";
+  const borderPoint = slug.includes("argeen") ? "argeen" : slug.includes("halfa") ? "halfa" : undefined;
+  const isFlight = isSecurity && !borderPoint;
+  const canProceed = Boolean(nationality) && Boolean(destination) && (!isSecurity || Boolean(travelDate));
 
   const proceed = () => {
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(
         `${REQUEST_DRAFT_PREFIX}${slug}`,
-        JSON.stringify({ nationality, destination, travelers }),
+        JSON.stringify({
+          nationality,
+          destination,
+          travelers,
+          travelDate: travelDate || undefined,
+          flightNumber: isFlight ? flightNumber.trim() || undefined : undefined,
+          borderPoint,
+          vehicleDetails: borderPoint ? vehicleDetails.trim() || undefined : undefined,
+        }),
       );
     }
     void navigate({ to: "/checkout/$slug", params: { slug }, search: { currency: "USD" } });
@@ -193,16 +207,79 @@ function RequestPage() {
                 }))}
               />
 
+              {isSecurity ? (
+                <div className="space-y-1.5">
+                  <label htmlFor="travel-date" className="text-xs font-semibold text-forest-deep">
+                    {t("request.travel_date")} *
+                  </label>
+                  <input
+                    id="travel-date"
+                    type="date"
+                    value={travelDate}
+                    min={new Date().toISOString().slice(0, 10)}
+                    onChange={(event) => setTravelDate(event.target.value)}
+                    className="h-12 w-full rounded-2xl border border-border bg-white px-3 text-sm text-forest-deep outline-none focus:ring-2 focus:ring-ring"
+                    required
+                  />
+                </div>
+              ) : null}
+
+              {isFlight ? (
+                <div className="space-y-1.5">
+                  <label htmlFor="flight-number" className="text-xs font-semibold text-forest-deep">
+                    {t("request.flight_number")}
+                  </label>
+                  <input
+                    id="flight-number"
+                    value={flightNumber}
+                    maxLength={30}
+                    onChange={(event) => setFlightNumber(event.target.value)}
+                    placeholder="G9 546"
+                    className="h-12 w-full rounded-2xl border border-border bg-white px-3 text-sm text-forest-deep outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+              ) : null}
+
+              {borderPoint ? (
+                <div className="space-y-4 rounded-2xl border border-border bg-beige/30 p-4">
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground">{t("request.border_point")}</p>
+                    <p className="mt-1 text-sm font-bold text-forest-deep">
+                      {t(borderPoint === "argeen" ? "request.border_argeen" : "request.border_halfa")}
+                    </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label htmlFor="vehicle-details" className="text-xs font-semibold text-forest-deep">
+                      {t("request.vehicle_details")}
+                    </label>
+                    <input
+                      id="vehicle-details"
+                      value={vehicleDetails}
+                      maxLength={120}
+                      onChange={(event) => setVehicleDetails(event.target.value)}
+                      className="h-12 w-full rounded-2xl border border-border bg-white px-3 text-sm text-forest-deep outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               <SelectField
                 label={t("request.destination")}
                 placeholder={t("request.destination_placeholder")}
                 icon={<MapPin className="size-4 text-muted-foreground" />}
                 value={destination}
                 onChange={setDestination}
-                options={(destinationsQuery.data ?? []).map((d) => ({
-                  value: d.code,
-                  label: lang === "ar" ? d.name_ar : d.name_en,
-                }))}
+                options={
+                  (destinationsQuery.data ?? []).length > 0
+                    ? (destinationsQuery.data ?? []).map((d) => ({
+                        value: d.code,
+                        label: lang === "ar" ? d.name_ar : d.name_en,
+                      }))
+                    : NATIONALITIES.map((country) => ({
+                        value: country.code,
+                        label: lang === "ar" ? country.name_ar : country.name_en,
+                      }))
+                }
               />
 
               <div className="space-y-2">

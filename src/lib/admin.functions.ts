@@ -15,6 +15,9 @@ export type OrderRequestDetails = {
   destination: string | null;
   coupon: string | null;
   customer_notes: string | null;
+  flight_number: string | null;
+  border_point: string | null;
+  vehicle_details: string | null;
 };
 
 /** Reads the JSON snapshot the booking flow appends to internal notes. */
@@ -61,6 +64,9 @@ function toRequestDetails(notes: string | null): OrderRequestDetails | null {
     destination: snap["destination"] ?? null,
     coupon: snap["coupon"] ?? null,
     customer_notes: snap["notes"] ?? null,
+    flight_number: snap["flightNumber"] ?? null,
+    border_point: snap["borderPoint"] ?? null,
+    vehicle_details: snap["vehicleDetails"] ?? null,
   };
 }
 
@@ -323,6 +329,59 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     }
 
     return { ok: true, invoice };
+  });
+
+export const requestMissingDocuments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ orderId: z.string().uuid(), note: z.string().trim().min(3).max(400) }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context);
+    const sb = context.supabase;
+    const { data: order, error } = await sb
+      .from("service_orders")
+      .select("id,status")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!order) throw new Error("ORDER_NOT_FOUND");
+
+    const { error: updateError } = await sb
+      .from("service_orders")
+      .update({ document_status: "required" })
+      .eq("id", data.orderId);
+    if (updateError) throw new Error(updateError.message);
+
+    const { data: actor } = await sb
+      .from("profiles")
+      .select("full_name,email")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const { data: event, error: historyError } = await sb
+      .from("order_status_history")
+      .insert({
+        order_id: data.orderId,
+        previous_status: order.status,
+        new_status: order.status,
+        note: data.note,
+        actor_id: context.userId,
+        actor_name: actor?.full_name || actor?.email || "Staff",
+      })
+      .select("id")
+      .single();
+    if (historyError) throw new Error(historyError.message);
+
+    const { queueStatusChangeEmails } = await import("./notifications.server");
+    await queueStatusChangeEmails(sb, {
+      eventId: event.id,
+      orderId: data.orderId,
+      previousStatus: order.status,
+      newStatus: order.status,
+      note: data.note,
+      forceDocumentsTemplate: true,
+    });
+    return { ok: true };
   });
 
 export const saveOrderNotes = createServerFn({ method: "POST" })

@@ -38,6 +38,7 @@ import {
   getAdminOverview,
   getReceiptUrl,
   listAdminOrders,
+  requestMissingDocuments,
   saveOrderNotes,
   updateOrderStatus,
 } from "@/lib/admin.functions";
@@ -260,6 +261,14 @@ function RequestDetailBlock({ row }: { row: any }) {
   if (d?.return_date) lines.push({ label: ar ? "تاريخ العودة" : "Return date", value: d.return_date });
   if (d?.nationality) lines.push({ label: ar ? "الجنسية" : "Nationality", value: d.nationality });
   if (d?.destination) lines.push({ label: ar ? "الوجهة" : "Destination", value: d.destination });
+  if (d?.flight_number) lines.push({ label: ar ? "رقم الرحلة" : "Flight number", value: d.flight_number });
+  if (d?.border_point) {
+    lines.push({
+      label: ar ? "المعبر" : "Border crossing",
+      value: d.border_point === "argeen" ? (ar ? "أرقين" : "Argeen") : (ar ? "وادي حلفا" : "Wadi Halfa"),
+    });
+  }
+  if (d?.vehicle_details) lines.push({ label: ar ? "المركبة" : "Vehicle", value: d.vehicle_details });
   if (d?.extras?.length) {
     lines.push({
       label: ar ? "خدمات إضافية" : "Extra services",
@@ -347,6 +356,17 @@ function OrderPanel({ row }: { row: any }) {
   const notesMutation = useMutation({
     mutationFn: () => saveOrderNotes({ data: { orderId: row.id, notes } }),
     onSuccess: () => toast.success(t("admin.orders.saved")),
+    onError: () => toast.error(t("common.error")),
+  });
+
+  const missingDocsMutation = useMutation({
+    mutationFn: () => requestMissingDocuments({ data: { orderId: row.id, note } }),
+    onSuccess: () => {
+      toast.success(t("admin.orders.updated"));
+      setNote("");
+      void queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      void queryClient.invalidateQueries({ queryKey: ["order-notifications", row.id] });
+    },
     onError: () => toast.error(t("common.error")),
   });
 
@@ -440,6 +460,13 @@ function OrderPanel({ row }: { row: any }) {
           disabled={statusMutation.isPending || next === row.status}
         >
           {t("admin.orders.setstatus")}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => missingDocsMutation.mutate()}
+          disabled={missingDocsMutation.isPending || note.trim().length < 3}
+        >
+          {t("admin.orders.request_documents")}
         </Button>
 
         {["completed", "cancelled", "rejected"].includes(row.status) ? (
