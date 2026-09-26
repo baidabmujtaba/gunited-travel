@@ -30,7 +30,7 @@ export function SecurityClearanceCard() {
         <div className="p-6">
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
-              to="/checkout/$slug"
+              to="/request/$slug"
               params={{ slug: "security-approval-flight" }}
               className="group flex items-center gap-3 rounded-2xl border-2 border-forest/15 bg-cream p-5 transition-colors hover:border-gold hover:bg-mint/40"
             >
@@ -85,7 +85,7 @@ export function SecurityClearanceCard() {
                 ].map((b) => (
                   <Link
                     key={b.slug}
-                    to="/checkout/$slug"
+                    to="/request/$slug"
                     params={{ slug: b.slug }}
                     className="flex items-center justify-between gap-2 rounded-xl bg-forest px-4 py-3 text-sm font-semibold text-cream transition-opacity hover:opacity-90"
                   >
