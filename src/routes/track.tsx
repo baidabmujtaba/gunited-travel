@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Loader2, Search } from "lucide-react";
+import { Check, CircleX, Loader2, MessageCircle, Search } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import GunitedTicketCard from "@/components/GunitedTicketCard";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { trackOrder } from "@/lib/orders.functions";
+import { whatsappLink } from "@/lib/support";
 
 const STAGES = ["submitted", "payment_pending", "payment_confirmed", "processing", "completed"] as const;
 
@@ -44,6 +45,7 @@ function TrackPage() {
 
   const order = query.data?.order ?? null;
   const currentIndex = order ? STAGES.indexOf(order.status as (typeof STAGES)[number]) : -1;
+  const isStopped = order?.status === "cancelled" || order?.status === "rejected";
 
   return (
     <StoreLayout>
@@ -117,7 +119,17 @@ function TrackPage() {
               />
             </div>
 
-            <ol className="surface-card space-y-1 p-6">
+            {isStopped ? (
+              <div className="surface-card flex items-center gap-3 border-destructive/30 p-5" role="status">
+                <CircleX className="size-6 shrink-0 text-destructive" />
+                <div>
+                  <p className="font-bold text-destructive">{t(`status.${order.status}`)}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{t("track.stopped_help")}</p>
+                </div>
+              </div>
+            ) : null}
+
+            <ol className={`surface-card space-y-1 p-6 ${isStopped ? "opacity-60" : ""}`}>
               {STAGES.map((stage, i) => {
                 const done = currentIndex >= i;
                 const current = currentIndex === i;
@@ -177,6 +189,19 @@ function TrackPage() {
                 {t("track.invoice")} — {query.data.invoice.invoice_number}
               </Button>
             ) : null}
+
+            <Button asChild variant="outline" className="w-full gap-2 sm:w-auto">
+              <a
+                href={whatsappLink(
+                  `${lang === "ar" ? "أحتاج مساعدة بخصوص الطلب" : "I need help with order"} ${order.tracking_id}`,
+                )}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <MessageCircle className="size-4" />
+                {t("track.whatsapp")}
+              </a>
+            </Button>
           </div>
         ) : null}
       </div>

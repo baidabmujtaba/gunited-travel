@@ -137,6 +137,11 @@ export const messages: Dict = {
   "track.notfound": { ar: "لم نجد طلباً بهذا الرقم.", en: "No order found with that reference." },
   "track.invoice": { ar: "تنزيل الفاتورة", en: "Download invoice" },
   "track.history": { ar: "سجل الحالة", en: "Status history" },
+  "track.stopped_help": {
+    ar: "راجع سجل الحالة أدناه أو تواصل معنا لمعرفة التفاصيل.",
+    en: "Check the status history below or contact us for details.",
+  },
+  "track.whatsapp": { ar: "استفسر عن الطلب عبر واتساب", en: "Ask about this order on WhatsApp" },
 
   "status.submitted": { ar: "تم إرسال الطلب ورفع الإيصال", en: "Order submitted & receipt uploaded" },
   "status.payment_pending": { ar: "بانتظار التحقق من الدفع", en: "Payment verification pending" },
