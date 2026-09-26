@@ -111,6 +111,7 @@ function AdminSettingsPage() {
   const done = () => {
     toast.success(t("admin.settings.saved"));
     void qc.invalidateQueries({ queryKey: ["platform-settings"] });
+    void qc.invalidateQueries({ queryKey: ["store-social-links"] });
   };
   const fail = (e: unknown) =>
     toast.error(t("common.error"), { description: String((e as Error)?.message ?? e) });

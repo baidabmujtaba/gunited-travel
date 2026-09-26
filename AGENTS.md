@@ -11,3 +11,4 @@
 
 - Security-clearance entry links must pass through `/request/$slug` before checkout so traveller data is always captured.
 - Guest checkout writes through the validated server route and keeps receipts and identity documents in private storage; never grant anonymous bucket reads.
+- Store social links are HTTPS-only company settings and render publicly only when configured, preventing unsafe or empty footer links.
