@@ -13,6 +13,7 @@ import { trackOrder } from "@/lib/orders.functions";
 import { whatsappLink } from "@/lib/support";
 
 const STAGES = ["submitted", "payment_pending", "payment_confirmed", "processing", "completed"] as const;
+const TRACKING_PATTERN = /^GT-ORD-\d{4}-\d{6}$/;
 
 export const Route = createFileRoute("/track")({
   validateSearch: z.object({ ref: z.string().optional() }),
@@ -40,7 +41,7 @@ function TrackPage() {
   const query = useQuery({
     queryKey: ["track", ref],
     queryFn: () => trackOrder({ data: { ref: ref! } }),
-    enabled: Boolean(ref),
+    enabled: Boolean(ref && TRACKING_PATTERN.test(ref)),
   });
 
   const order = query.data?.order ?? null;
@@ -57,13 +58,20 @@ function TrackPage() {
           className="mt-6 flex flex-col gap-3 sm:flex-row"
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ to: "/track", search: { ref: input.trim() } });
+            const normalized = input.trim().toUpperCase();
+            if (TRACKING_PATTERN.test(normalized)) {
+              navigate({ to: "/track", search: { ref: normalized } });
+            }
           }}
         >
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t("track.placeholder")}
+            pattern="GT-ORD-[0-9]{4}-[0-9]{6}"
+            maxLength={18}
+            autoCapitalize="characters"
+            required
             className="bg-card"
           />
           <Button type="submit" className="gap-2">

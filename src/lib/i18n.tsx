@@ -119,6 +119,7 @@ export const messages: Dict = {
   },
   "checkout.success": { ar: "تم استلام طلبك", en: "Order received" },
   "checkout.tracking": { ar: "رقم التتبع الخاص بك", en: "Your tracking ID" },
+  "checkout.guest_note": { ar: "يمكنك إكمال الطلب كضيف دون إنشاء حساب.", en: "You can complete this order as a guest without an account." },
   "checkout.needlogin": {
     ar: "سجّل الدخول أو أنشئ حساباً لإتمام الطلب ومتابعته.",
     en: "Sign in or create an account to place and follow your order.",
@@ -748,6 +749,8 @@ export const messages: Dict = {
   "request.gender_female": { ar: "أنثى", en: "Female" },
   "request.gender_placeholder": { ar: "اختر", en: "Select" },
   "request.travel_date": { ar: "تاريخ السفر المتوقع", en: "Expected travel date" },
+  "request.flight_number": { ar: "رقم الرحلة (اختياري)", en: "Flight number (optional)" },
+  "request.vehicle_details": { ar: "بيانات المركبة (اختياري)", en: "Vehicle details (optional)" },
   "request.border_point": { ar: "منفذ السفر", en: "Border / departure point" },
   "request.border_placeholder": { ar: "اختر المنفذ", en: "Select point" },
   "request.border_airport": { ar: "مطار الخرطوم", en: "Khartoum airport" },

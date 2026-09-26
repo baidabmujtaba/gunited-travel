@@ -19,6 +19,10 @@ const createOrderInput = z.object({
   nationality: z.string().max(80).optional(),
   destination: z.string().max(80).optional(),
   travelers: z.number().int().min(1).max(50).optional(),
+  travelDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  flightNumber: z.string().trim().max(30).optional(),
+  borderPoint: z.enum(["argeen", "halfa"]).optional(),
+  vehicleDetails: z.string().trim().max(120).optional(),
   documents: z
     .array(
       z.object({
@@ -42,7 +46,7 @@ export const createOrder = createServerFn({ method: "POST" })
     const { data: offer, error: offerErr } = await supabase
       .from("service_offers")
       .select(
-        "id,base_price_usd,customer_price_usd,agency_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
+        "id,category,base_price_usd,customer_price_usd,agency_price_usd,tax_percent,fee_amount_usd,discount_percent,commission_percent,title_en,title_ar,status,allowed_payment_methods,required_documents",
       )
       .eq("id", data.offerId)
       .maybeSingle();
@@ -59,6 +63,9 @@ export const createOrder = createServerFn({ method: "POST" })
 
     // Every mandatory document from the offer checklist must be attached.
     const requiredDocs = normalizeDocs(offer.required_documents).filter((d) => d.required);
+    if (offer.category === "security_approval" && !requiredDocs.some((d) => d.key === "passport")) {
+      requiredDocs.push({ key: "passport", label_en: "Passport copy", label_ar: "صورة جواز السفر", required: true });
+    }
     const provided = new Set(data.documents.map((d) => d.key));
     const missing = requiredDocs.filter((d) => !provided.has(d.key));
     if (missing.length > 0) throw new Error("DOCUMENTS_MISSING");
@@ -89,7 +96,8 @@ export const createOrder = createServerFn({ method: "POST" })
         ? null
         : Number(offer.agency_price_usd);
     if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
-    const appliedPriceUsd = priceContext === "agency" ? agencyPriceUsd! : customerPriceUsd;
+    if (priceContext === "agency" && agencyPriceUsd === null) throw new Error("AGENCY_PRICE_MISSING");
+    const appliedPriceUsd = priceContext === "agency" ? agencyPriceUsd : customerPriceUsd;
 
     const price = computePrice(
       {
@@ -113,6 +121,10 @@ export const createOrder = createServerFn({ method: "POST" })
       extras: [],
       nationality: data.nationality ?? null,
       destination: data.destination ?? null,
+      travelDate: data.travelDate ?? null,
+      flightNumber: data.flightNumber ?? null,
+      borderPoint: data.borderPoint ?? null,
+      vehicleDetails: data.vehicleDetails ?? null,
       priceContext,
     };
     const requestNotes = [
@@ -120,6 +132,10 @@ export const createOrder = createServerFn({ method: "POST" })
       `Travellers: ${data.travelers ?? 1}`,
       data.nationality ? `Nationality: ${data.nationality}` : null,
       data.destination ? `Destination: ${data.destination}` : null,
+      data.travelDate ? `Travel date: ${data.travelDate}` : null,
+      data.flightNumber ? `Flight: ${data.flightNumber}` : null,
+      data.borderPoint ? `Border: ${data.borderPoint}` : null,
+      data.vehicleDetails ? `Vehicle: ${data.vehicleDetails}` : null,
       `SNAPSHOT ${JSON.stringify(requestSnapshot)}`,
     ]
       .filter(Boolean)
@@ -169,13 +185,17 @@ export const createOrder = createServerFn({ method: "POST" })
       if (docErr) throw new Error(docErr.message);
     }
 
-    await supabase.from("order_status_history").insert({
-      order_id: order.id,
-      new_status: "submitted",
-      note: `Payment notified · ref ${data.transactionReference} · ${data.documents.length} document(s) uploaded`,
-      actor_id: userId,
-      actor_name: data.customerName,
-    });
+    const { data: event } = await supabase
+      .from("order_status_history")
+      .insert({
+        order_id: order.id,
+        new_status: "submitted",
+        note: `Payment notified · ref ${data.transactionReference} · ${data.documents.length} document(s) uploaded`,
+        actor_id: userId,
+        actor_name: data.customerName,
+      })
+      .select("id")
+      .single();
 
     await supabase.from("notifications").insert([
       {
@@ -206,11 +226,22 @@ export const createOrder = createServerFn({ method: "POST" })
       after_data: { tracking_id: order.tracking_id, amount_usd: price.totalUsd },
     });
 
+    const { queueStatusChangeEmails } = await import("./notifications.server");
+    await queueStatusChangeEmails(supabase, {
+      eventId: event.id,
+      orderId: order.id,
+      previousStatus: null,
+      newStatus: "submitted",
+      note: null,
+    });
+
     return { trackingId: order.tracking_id as string, orderId: order.id as string };
   });
 
 export const trackOrder = createServerFn({ method: "GET" })
-  .inputValidator((d: unknown) => z.object({ ref: z.string().min(4).max(60) }).parse(d))
+  .inputValidator((d: unknown) =>
+    z.object({ ref: z.string().trim().regex(/^GT-ORD-\d{4}-\d{6}$/) }).parse(d),
+  )
   .handler(async ({ data }) => {
     const sb = getPublicClient();
     const ref = data.ref.trim();
@@ -219,7 +250,7 @@ export const trackOrder = createServerFn({ method: "GET" })
       .select(
         "id,tracking_id,status,document_status,currency_code,amount_display,created_at,customer_name,offer_id",
       )
-      .or(`tracking_id.eq.${ref},transaction_reference.eq.${ref}`)
+      .eq("tracking_id", ref)
       .maybeSingle();
     if (!order) return { order: null, history: [], offerTitle: null, invoice: null };
 
