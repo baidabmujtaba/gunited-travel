@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Menu } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Facebook, Instagram, LogOut, Menu, Music2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
@@ -11,6 +12,19 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
+import { supabase } from "@/integrations/supabase/client";
+
+type SocialKey = "facebook_url" | "instagram_url" | "tiktok_url";
+
+function validSocialUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 
 export function StoreLayout({ children }: { children: ReactNode }) {
   const i18n = useI18n();
@@ -19,6 +33,25 @@ export function StoreLayout({ children }: { children: ReactNode }) {
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
+  const socials = useQuery({
+    queryKey: ["store-social-links"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("settings").select("value").eq("key", "company").maybeSingle();
+      if (error) throw error;
+      const value = (data?.value ?? {}) as Record<string, unknown>;
+      return {
+        facebook_url: validSocialUrl(value["facebook_url"]),
+        instagram_url: validSocialUrl(value["instagram_url"]),
+        tiktok_url: validSocialUrl(value["tiktok_url"]),
+      } satisfies Record<SocialKey, string | null>;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const socialItems = [
+    { key: "facebook_url" as const, label: "Facebook", icon: Facebook },
+    { key: "instagram_url" as const, label: "Instagram", icon: Instagram },
+    { key: "tiktok_url" as const, label: "TikTok", icon: Music2 },
+  ].filter((item) => socials.data?.[item.key]);
 
   const links = [
     { to: "/", label: t("nav.home") },
@@ -160,9 +193,22 @@ export function StoreLayout({ children }: { children: ReactNode }) {
             <BrandMark />
             <Wordmark showBoth />
           </div>
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Gunited Travel · جيونايتد ترافيل — {t("footer.rights")}
-          </p>
+          <div className="flex flex-col items-center gap-3 sm:items-end">
+            {socialItems.length > 0 ? (
+              <div className="flex items-center gap-2" aria-label={i18n.lang === "ar" ? "روابط التواصل الاجتماعي" : "Social media links"}>
+                {socialItems.map(({ key, label, icon: Icon }) => (
+                  <Button key={key} asChild variant="outline" size="icon" className="size-9 rounded-full bg-background">
+                    <a href={socials.data?.[key] ?? "#"} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}>
+                      <Icon className="size-4" aria-hidden="true" />
+                    </a>
+                  </Button>
+                ))}
+              </div>
+            ) : null}
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} Gunited Travel · جيونايتد ترافيل — {t("footer.rights")}
+            </p>
+          </div>
         </div>
       </footer>
 

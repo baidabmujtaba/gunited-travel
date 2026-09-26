@@ -26,6 +26,9 @@ const siteSchema = z.object({
   address_ar: z.string().max(400).optional().default(""),
   tax_number: z.string().max(80).optional().default(""),
   registration_number: z.string().max(80).optional().default(""),
+  facebook_url: z.union([z.literal(""), z.string().url().startsWith("https://").max(500)]).optional().default(""),
+  instagram_url: z.union([z.literal(""), z.string().url().startsWith("https://").max(500)]).optional().default(""),
+  tiktok_url: z.union([z.literal(""), z.string().url().startsWith("https://").max(500)]).optional().default(""),
 });
 
 const invoiceSchema = z.object({
@@ -55,6 +58,9 @@ const SITE_DEFAULTS: SiteSettings = {
   address_ar: "",
   tax_number: "",
   registration_number: "",
+  facebook_url: "",
+  instagram_url: "",
+  tiktok_url: "",
 };
 
 const INVOICE_DEFAULTS: InvoiceSettings = {

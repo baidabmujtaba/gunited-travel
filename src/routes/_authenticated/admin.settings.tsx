@@ -162,6 +162,14 @@ function AdminSettingsPage() {
             <Textarea value={site["address_en"] ?? ""} disabled={readOnly} onChange={(e) => setSite({ ...site, address_en: e.target.value })} className="bg-white" />
           </div>
         </div>
+        <div className="border-t border-border/70 pt-4">
+          <h3 className="mb-3 text-sm font-bold text-forest-deep">{t("admin.settings.social")}</h3>
+          <div className="grid gap-4 md:grid-cols-3" dir="ltr">
+            <Field label={t("admin.settings.facebook")} type="url" value={site["facebook_url"] ?? ""} disabled={readOnly} onChange={(v) => setSite({ ...site, facebook_url: v })} hint="https://facebook.com/..." />
+            <Field label={t("admin.settings.instagram")} type="url" value={site["instagram_url"] ?? ""} disabled={readOnly} onChange={(v) => setSite({ ...site, instagram_url: v })} hint="https://instagram.com/..." />
+            <Field label={t("admin.settings.tiktok")} type="url" value={site["tiktok_url"] ?? ""} disabled={readOnly} onChange={(v) => setSite({ ...site, tiktok_url: v })} hint="https://tiktok.com/@..." />
+          </div>
+        </div>
         <Button
           disabled={readOnly || siteMutation.isPending}
           onClick={() => siteMutation.mutate()}
