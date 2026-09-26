@@ -31,7 +31,7 @@ export function SecurityClearanceCard() {
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
               to="/request/$slug"
-              params={{ slug: "security-approval-flight" }}
+              params={{ slug: "security-approval" }}
               className="group flex items-center gap-3 rounded-2xl border-2 border-forest/15 bg-cream p-5 transition-colors hover:border-gold hover:bg-mint/40"
             >
               <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-forest text-cream">
