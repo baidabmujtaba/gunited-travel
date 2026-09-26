@@ -120,6 +120,7 @@ export const messages: Dict = {
   "checkout.success": { ar: "تم استلام طلبك", en: "Order received" },
   "checkout.tracking": { ar: "رقم التتبع الخاص بك", en: "Your tracking ID" },
   "checkout.guest_note": { ar: "يمكنك إكمال الطلب كضيف دون إنشاء حساب.", en: "You can complete this order as a guest without an account." },
+  "admin.orders.request_documents": { ar: "طلب مستندات ناقصة وإرسال إشعار", en: "Request missing documents and notify" },
   "checkout.needlogin": {
     ar: "سجّل الدخول أو أنشئ حساباً لإتمام الطلب ومتابعته.",
     en: "Sign in or create an account to place and follow your order.",
