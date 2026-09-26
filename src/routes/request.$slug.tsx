@@ -269,10 +269,17 @@ function RequestPage() {
                 icon={<MapPin className="size-4 text-muted-foreground" />}
                 value={destination}
                 onChange={setDestination}
-                options={(destinationsQuery.data ?? []).map((d) => ({
-                  value: d.code,
-                  label: lang === "ar" ? d.name_ar : d.name_en,
-                }))}
+                options={
+                  (destinationsQuery.data ?? []).length > 0
+                    ? (destinationsQuery.data ?? []).map((d) => ({
+                        value: d.code,
+                        label: lang === "ar" ? d.name_ar : d.name_en,
+                      }))
+                    : NATIONALITIES.map((country) => ({
+                        value: country.code,
+                        label: lang === "ar" ? country.name_ar : country.name_en,
+                      }))
+                }
               />
 
               <div className="space-y-2">
