@@ -58,6 +58,25 @@ export const Route = createFileRoute("/offers/$slug")({
             ]
           : []),
       ],
+      links: [{ rel: "canonical", href: `https://www.gunitedtravel.com/offers/${o.slug}` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TouristTrip",
+            name: o.title_en,
+            alternateName: o.title_ar,
+            description,
+            url: `https://www.gunitedtravel.com/offers/${o.slug}`,
+            ...(image ? { image } : {}),
+            provider: { "@type": "TravelAgency", name: "Gunited Travel", url: "https://www.gunitedtravel.com" },
+            ...(o.price?.total > 0
+              ? { offers: { "@type": "Offer", price: o.price.total, priceCurrency: "USD", availability: "https://schema.org/InStock" } }
+              : {}),
+          }),
+        },
+      ],
     };
   },
   component: OfferDetail,
@@ -200,7 +219,7 @@ function OfferDetail() {
         {/* Hero */}
         <div className="surface-card overflow-hidden">
           <div className="relative aspect-16/9 bg-secondary">
-            <img src={hero} alt={ar ? offer.title_ar : offer.title_en} className="size-full object-cover" />
+            <img src={hero} fetchPriority="high" decoding="async" alt={ar ? offer.title_ar : offer.title_en} className="size-full object-cover" />
             {offer.badge ? (
               <span
                 className="absolute top-4 start-4 rounded-full px-3 py-1 text-xs font-bold text-white shadow-soft"
@@ -218,7 +237,7 @@ function OfferDetail() {
                   onClick={() => setActive(i)}
                   className={`size-16 shrink-0 overflow-hidden rounded-lg border-2 ${i === active ? "border-forest" : "border-transparent"}`}
                 >
-                  <img src={g} alt="" className="size-full object-cover" />
+                  <img src={g} loading="lazy" decoding="async" alt="" className="size-full object-cover" />
                 </button>
               ))}
             </div>
@@ -268,7 +287,7 @@ function OfferDetail() {
                   {offer.hotels.map((h) => (
                     <div key={h.id} className="surface-card overflow-hidden">
                       {h.image ? (
-                        <img src={h.image} alt={ar ? h.name_ar : h.name_en} className="aspect-16/9 w-full object-cover" />
+                        <img src={h.image} loading="lazy" decoding="async" alt={ar ? h.name_ar : h.name_en} className="aspect-16/9 w-full object-cover" />
                       ) : null}
                       <div className="space-y-2 p-4">
                         <p className="text-xs text-muted-foreground">{ar ? h.city_ar : h.city_en}</p>
