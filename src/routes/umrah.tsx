@@ -34,6 +34,21 @@ export const Route = createFileRoute("/umrah")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://www.gunitedtravel.com/umrah" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          serviceType: "Umrah packages",
+          name: "Umrah Request — طلب العمرة",
+          url: "https://www.gunitedtravel.com/umrah",
+          areaServed: ["SA", "SD"],
+          provider: { "@type": "TravelAgency", name: "Gunited Travel", url: "https://www.gunitedtravel.com" },
+        }),
+      },
+    ],
   }),
   component: UmrahPage,
   errorComponent: ({ error }) => (

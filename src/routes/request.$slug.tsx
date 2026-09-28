@@ -23,7 +23,7 @@ import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/request/$slug")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
       { title: "Submit a Request — Gunited Travel | تقديم طلب موافقة" },
       {
@@ -36,7 +36,23 @@ export const Route = createFileRoute("/request/$slug")({
         property: "og:description",
         content: "Guided approval request: service, traveller details, documents and payment.",
       },
-      { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+    links: [{ rel: "canonical", href: `https://www.gunitedtravel.com/request/${params.slug}` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          serviceType: "Security clearance approval — الموافقة الأمنية",
+          name: "Gunited Travel security approval request",
+          url: `https://www.gunitedtravel.com/request/${params.slug}`,
+          areaServed: ["SD", "EG"],
+          provider: { "@type": "TravelAgency", name: "Gunited Travel", url: "https://www.gunitedtravel.com" },
+        }),
+      },
     ],
   }),
   component: RequestPage,

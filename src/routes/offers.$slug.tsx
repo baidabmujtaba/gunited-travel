@@ -58,6 +58,25 @@ export const Route = createFileRoute("/offers/$slug")({
             ]
           : []),
       ],
+      links: [{ rel: "canonical", href: `https://www.gunitedtravel.com/offers/${o.slug}` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TouristTrip",
+            name: o.title_en,
+            alternateName: o.title_ar,
+            description,
+            url: `https://www.gunitedtravel.com/offers/${o.slug}`,
+            ...(image ? { image } : {}),
+            provider: { "@type": "TravelAgency", name: "Gunited Travel", url: "https://www.gunitedtravel.com" },
+            ...(o.price?.total > 0
+              ? { offers: { "@type": "Offer", price: o.price.total, priceCurrency: "USD", availability: "https://schema.org/InStock" } }
+              : {}),
+          }),
+        },
+      ],
     };
   },
   component: OfferDetail,
