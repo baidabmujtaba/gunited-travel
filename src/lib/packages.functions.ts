@@ -1059,13 +1059,28 @@ export const createPackageBooking = createServerFn({ method: "POST" })
       if (docErr) throw new Error(docErr.message);
     }
 
-    await supabase.from("order_status_history").insert({
-      order_id: order.id,
-      new_status: "submitted",
-      note: `Package booking · ${quote.totalPax} traveller(s) · total ${quote.totalUsd} USD · ref ${data.transactionReference}`,
-      actor_id: userId,
-      actor_name: data.customerName,
-    });
+    const { data: pkgEvent } = await supabase
+      .from("order_status_history")
+      .insert({
+        order_id: order.id,
+        new_status: "submitted",
+        note: `Package booking · ${quote.totalPax} traveller(s) · total ${quote.totalUsd} USD · ref ${data.transactionReference}`,
+        actor_id: userId,
+        actor_name: data.customerName,
+      })
+      .select("id")
+      .single();
+
+    if (pkgEvent) {
+      const { queueStatusChangeEmails } = await import("./notifications.server");
+      await queueStatusChangeEmails(supabase, {
+        eventId: pkgEvent.id,
+        orderId: order.id,
+        previousStatus: null,
+        newStatus: "submitted",
+        note: null,
+      });
+    }
 
     await supabase.from("notifications").insert([
       {
