@@ -16,7 +16,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const { data } = await sb
           .from("service_offers")
           .select("slug,category,security_subtype,updated_at")
-          .eq("is_active", true)
+          .eq("status", "active")
           .limit(1000);
         const urls = STATIC.map((p) => `<url><loc>${BASE}${p}</loc></url>`);
         for (const o of data ?? []) {
