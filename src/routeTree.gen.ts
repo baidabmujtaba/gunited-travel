@@ -15,6 +15,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as SelectRouteImport } from './routes/select'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as UmrahRouteImport } from './routes/umrah'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -82,6 +83,11 @@ const CatalogRoute = CatalogRouteImport.update({
 const SelectRoute = SelectRouteImport.update({
   id: '/select',
   path: '/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackRoute = TrackRouteImport.update({
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/umrah': typeof UmrahRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -357,6 +364,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/umrah': typeof UmrahRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/catalog': typeof CatalogRoute
   '/select': typeof SelectRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/umrah': typeof UmrahRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalog'
     | '/select'
+    | '/sitemap.xml'
     | '/track'
     | '/umrah'
     | '/admin'
@@ -497,6 +507,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalog'
     | '/select'
+    | '/sitemap.xml'
     | '/track'
     | '/umrah'
     | '/checkout/$slug'
@@ -542,6 +553,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalog'
     | '/select'
+    | '/sitemap.xml'
     | '/track'
     | '/umrah'
     | '/_authenticated/admin'
@@ -590,6 +602,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CatalogRoute: typeof CatalogRoute
   SelectRoute: typeof SelectRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackRoute: typeof TrackRoute
   UmrahRoute: typeof UmrahRoute
   CheckoutSlugRoute: typeof CheckoutSlugRoute
@@ -643,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/select'
       fullPath: '/select'
       preLoaderRoute: typeof SelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track': {
@@ -1016,6 +1036,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CatalogRoute: CatalogRoute,
   SelectRoute: SelectRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackRoute: TrackRoute,
   UmrahRoute: UmrahRoute,
   CheckoutSlugRoute: CheckoutSlugRoute,
