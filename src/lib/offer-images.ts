@@ -1,7 +1,7 @@
-import packageImg from "@/assets/offer-package.jpg";
-import visaImg from "@/assets/offer-visa.jpg";
-import tourImg from "@/assets/offer-tour.jpg";
-import insuranceImg from "@/assets/offer-insurance.jpg";
+import packageImg from "@/assets/offer-package.webp";
+import visaImg from "@/assets/offer-visa.webp";
+import tourImg from "@/assets/offer-tour.webp";
+import insuranceImg from "@/assets/offer-insurance.webp";
 
 const byCategory: Record<string, string> = {
   package: packageImg,
