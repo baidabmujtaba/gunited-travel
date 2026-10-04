@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { getFeaturedPackages } from "@/lib/packages.functions";
 
-/** Homepage "باقات العمرة" section: featured offers with category tabs. */
+/** Homepage selection of active administrator-featured offers. */
 export function FeaturedPackages({ currency = "USD" }: { currency?: string }) {
   const { lang } = useI18n();
   const ar = lang === "ar";
@@ -28,15 +28,15 @@ export function FeaturedPackages({ currency = "USD" }: { currency?: string }) {
     <section className="mx-auto w-full max-w-6xl px-5 py-14">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold">{ar ? "باقات العمرة" : "Umrah packages"}</h2>
+          <h2 className="text-3xl font-bold">{ar ? "عروض مختارة لك" : "Offers selected for you"}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {ar
-              ? "باقات مختارة بعناية بأسعار شاملة وفنادق قريبة من الحرم."
-              : "Hand-picked packages with all-inclusive pricing and hotels close to the Haram."}
+              ? "أحدث الخدمات والباقات التي أضافها فريق جيونايتد ترافيل."
+              : "The latest services and packages published by the Gunited Travel team."}
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link to="/offers">{ar ? "كل الباقات" : "All packages"}</Link>
+          <Link to="/offers">{ar ? "كل العروض" : "All offers"}</Link>
         </Button>
       </div>
 

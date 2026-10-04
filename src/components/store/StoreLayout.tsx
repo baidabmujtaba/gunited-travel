@@ -185,9 +185,9 @@ export function StoreLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-11">{children}</main>
 
-      <footer className="mt-16 border-t border-border/70 bg-beige">
+      <footer className="mt-16 border-t border-border/70 bg-beige pb-11">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
             <BrandMark />
