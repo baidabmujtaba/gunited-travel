@@ -1,206 +1,73 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { ArrowUpLeft, MapPin, PlaneTakeoff, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import GunitedTicketCard from "@/components/GunitedTicketCard";
-import { supabase } from "@/integrations/supabase/client";
-import { getMyLatestTicket } from "@/lib/orders.functions";
+import heroImage from "@/assets/home-travel-hero.jpg";
 
 /**
- * Signature hero: a realistic airliner taxis along the dashed runway, rotates
- * nose-up, then climbs off the top-right leaving a sage vapour trail. The
- * headline reveals once it is airborne (~3.3s). Reduced motion skips to the
- * settled state (handled in styles.css).
+ * Editorial storefront hero with the primary travel actions above the fold.
  */
 export function PlaneHero() {
-  const { t, lang } = useI18n();
+  const { lang } = useI18n();
   const isAr = lang === "ar";
 
-  // Only signed-in visitors get their own booking on the card; guests see the sample.
-  const [hasSession, setHasSession] = useState(false);
-  useEffect(() => {
-    let active = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) setHasSession(Boolean(data.session));
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setHasSession(Boolean(session));
-    });
-    return () => {
-      active = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
-
-  const fetchLatest = useServerFn(getMyLatestTicket);
-  const { data: latest } = useQuery({
-    queryKey: ["hero-latest-ticket"],
-    queryFn: () => fetchLatest(),
-    enabled: hasSession,
-    staleTime: 60_000,
-    retry: false,
-  });
-
-  const sampleCard = {
-    locale: isAr ? ("ar" as const) : ("en" as const),
-    from: {
-      city: isAr ? "الخرطوم" : "Khartoum",
-      country: "SD",
-      code: "KRT",
-      time: "08:40",
-    },
-    to: {
-      city: isAr ? "إسطنبول" : "Istanbul",
-      country: "TR",
-      code: "IST",
-      time: "13:15",
-    },
-    bookingRef: "GUT-2026-0917",
-    travelClass: isAr ? "درجة اقتصادية" : "Economy",
-    passenger: isAr ? "أحمد محمد" : "Ahmed Mohamed",
-  };
-
-  const isReal = Boolean(latest?.trackingId);
-  const ticketCard = isReal
-    ? {
-        locale: isAr ? ("ar" as const) : ("en" as const),
-        from: null,
-        to: null,
-        bookingRef: latest!.trackingId as string,
-        travelClass: latest!.offerTitle
-          ? isAr
-            ? latest!.offerTitle.ar
-            : latest!.offerTitle.en
-          : null,
-        passenger: latest!.customerName,
-      }
-    : sampleCard;
-
-
   return (
-    <section className="relative overflow-hidden bg-beige">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            "radial-gradient(120% 80% at 50% 0%, var(--cream) 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, var(--mint) 0%, transparent 55%)",
-        }}
-        aria-hidden="true"
+    <section className="relative min-h-[38rem] overflow-hidden border-b border-border/70 sm:min-h-[43rem]">
+      <img
+        src={heroImage}
+        alt=""
+        width={1400}
+        height={800}
+        fetchPriority="high"
+        className="absolute inset-0 size-full object-cover object-center"
       />
+      <div className="hero-veil absolute inset-0" aria-hidden="true" />
 
-      {/* vapour trail path */}
-      <svg
-        className="pointer-events-none absolute inset-0 size-full"
-        viewBox="0 0 1000 500"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          className="gt-vapor"
-          d="M150 400 C 380 380, 640 250, 980 30"
-          fill="none"
-          stroke="var(--sage)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          opacity="0"
-        />
-      </svg>
+      <div className="relative mx-auto flex min-h-[38rem] w-full max-w-6xl flex-col items-center px-5 pt-16 pb-10 text-center sm:min-h-[43rem] sm:pt-24">
+        <p className="gt-reveal inline-flex items-center gap-2 text-sm font-bold text-forest">
+          <ShieldCheck className="size-4 text-gold" aria-hidden="true" />
+          {isAr ? "إجراءات سفر موثوقة من البداية للنهاية" : "Trusted travel services, end to end"}
+        </p>
+        <h1 className="gt-reveal mt-5 max-w-4xl text-4xl leading-[1.15] font-extrabold sm:text-6xl">
+          {isAr ? (
+            <>أسرع طريق لإتمام <span className="text-gold">رحلتك</span> بثقة</>
+          ) : (
+            <>A faster way to complete your <span className="text-gold">journey</span></>
+          )}
+        </h1>
+        <p className="gt-reveal-late mt-5 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+          {isAr
+            ? "موافقات أمنية، تأشيرات، رحلات وباقات عمرة في مكان واحد مع متابعة واضحة لكل طلب."
+            : "Security approvals, visas, flights and Umrah packages in one place, with clear tracking for every request."}
+        </p>
 
-      <div className="relative mx-auto w-full max-w-6xl px-5 pt-16 pb-28 sm:pt-24 sm:pb-36">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div className="max-w-2xl">
-            <p className="gt-reveal text-sm font-semibold tracking-wide text-sage">
-              {t("brand.name")} · {t("brand.tagline")}
-            </p>
-            <h1 className="gt-reveal mt-4 text-4xl leading-tight font-bold sm:text-6xl">
-              {t("hero.title")}
-            </h1>
-            <p className="gt-reveal-late mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {t("hero.subtitle")}
-            </p>
-            <div className="gt-reveal-late mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link to="/offers">{t("hero.cta.browse")}</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/track">{t("hero.cta.track")}</Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="gt-reveal-late flex flex-col items-center gap-2 lg:items-end">
-            <p className="text-xs font-semibold tracking-wide text-sage">
-              {isReal ? t("hero.ticket.latest") : t("hero.ticket.sample")}
-            </p>
-            <GunitedTicketCard {...ticketCard} />
-          </div>
+        <div className="gt-reveal-late mt-8 grid w-full max-w-4xl gap-3 rounded-lg border border-border/80 bg-card/95 p-3 shadow-lift backdrop-blur sm:grid-cols-[1fr_1fr_auto]">
+          <Link
+            to="/request/$slug"
+            params={{ slug: "security-approval" }}
+            className="flex min-h-16 items-center gap-3 rounded-md border border-border bg-background px-4 text-start transition-colors hover:border-gold"
+          >
+            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-secondary text-forest"><PlaneTakeoff className="size-4" /></span>
+            <span><span className="block text-[11px] text-muted-foreground">{isAr ? "نوع الخدمة" : "Service"}</span><span className="block text-sm font-bold">{isAr ? "موافقة أمنية للطيران" : "Flight security approval"}</span></span>
+          </Link>
+          <Link
+            to="/select"
+            className="flex min-h-16 items-center gap-3 rounded-md border border-border bg-background px-4 text-start transition-colors hover:border-gold"
+          >
+            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-secondary text-forest"><MapPin className="size-4" /></span>
+            <span><span className="block text-[11px] text-muted-foreground">{isAr ? "الوجهة" : "Destination"}</span><span className="block text-sm font-bold">{isAr ? "اختر خدمتك أو وجهتك" : "Choose service or destination"}</span></span>
+          </Link>
+          <Button asChild size="lg" className="min-h-16 px-7">
+            <Link to="/select">{isAr ? "ابدأ الطلب" : "Start request"}<ArrowUpLeft className="size-4 rtl:-rotate-90" /></Link>
+          </Button>
         </div>
-      </div>
 
-      {/* runway */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-10 h-px border-t-2 border-dashed border-sage/60" />
-
-      {/* aircraft */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-6 h-24">
-        <div className="gt-plane w-[240px] sm:w-[340px]">
-          <Airliner />
+        <div className="mt-auto flex flex-wrap justify-center gap-x-7 gap-y-2 pt-8 text-xs font-semibold text-forest-deep/80">
+          <span>✓ {isAr ? "دفع آمن وموثّق" : "Verified payment"}</span>
+          <span>✓ {isAr ? "تتبع لحظي" : "Live tracking"}</span>
+          <span>✓ {isAr ? "خدمة بالعربية والإنجليزية" : "Arabic and English service"}</span>
         </div>
       </div>
     </section>
-  );
-}
-
-function Airliner() {
-  return (
-    <svg viewBox="0 0 340 110" className="w-full drop-shadow-sm" aria-hidden="true">
-      {/* tail fin with painted wordmark */}
-      <path d="M232 62 L262 8 L282 8 L280 62 Z" fill="var(--mint)" />
-      <text
-        x="264"
-        y="36"
-        fill="var(--forest-deep)"
-        fontSize="11"
-        fontWeight="700"
-        textAnchor="middle"
-        transform="rotate(-90 264 36)"
-        style={{ letterSpacing: "0.5px" }}
-      >
-        Gunited Travel
-      </text>
-      {/* horizontal stabiliser */}
-      <path d="M248 62 L300 58 L306 66 L250 68 Z" fill="var(--sage)" />
-      {/* fuselage */}
-      <path
-        d="M18 68 C 40 56, 90 50, 150 50 L 250 50 C 272 50, 286 56, 292 64 C 286 72, 268 76, 246 76 L 60 76 C 36 76, 24 73, 18 68 Z"
-        fill="var(--cream)"
-        stroke="var(--forest-deep)"
-        strokeWidth="1.5"
-      />
-      {/* cockpit windows */}
-      <path d="M30 64 L46 60 L48 66 L30 68 Z" fill="var(--forest-deep)" opacity="0.75" />
-      {/* cabin window strip */}
-      <g fill="var(--sage)" opacity="0.75">
-        {Array.from({ length: 14 }).map((_, i) => (
-          <rect key={i} x={68 + i * 13} y={58} width={6} height={5} rx={2.5} />
-        ))}
-      </g>
-      {/* main wing */}
-      <path d="M140 70 L214 92 L246 92 L188 68 Z" fill="var(--forest)" />
-      <path d="M150 60 L208 34 L224 34 L184 62 Z" fill="var(--sage)" opacity="0.85" />
-      {/* engine */}
-      <rect x="146" y="72" width="42" height="15" rx="7.5" fill="var(--forest-deep)" />
-      <rect x="146" y="72" width="7" height="15" rx="3.5" fill="var(--mint)" />
-      {/* landing gear */}
-      <g stroke="var(--forest-deep)" strokeWidth="2.5">
-        <line x1="60" y1="76" x2="60" y2="88" />
-        <line x1="170" y1="87" x2="170" y2="94" />
-      </g>
-      <circle cx="60" cy="91" r="4" fill="var(--forest-deep)" />
-      <circle cx="170" cy="97" r="4.5" fill="var(--forest-deep)" />
-      {/* belly stripe */}
-      <path d="M40 73 L286 68 L286 71 L44 76 Z" fill="var(--gold)" opacity="0.85" />
-    </svg>
   );
 }

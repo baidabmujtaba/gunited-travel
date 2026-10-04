@@ -192,6 +192,19 @@
   background-image: linear-gradient(140deg, var(--forest-deep), var(--forest) 55%, var(--sage));
 }
 
+@utility hero-veil {
+  background-image: linear-gradient(to bottom, color-mix(in oklab, var(--cream) 94%, transparent) 0%, color-mix(in oklab, var(--cream) 78%, transparent) 50%, color-mix(in oklab, var(--cream) 34%, transparent) 100%);
+}
+
+@keyframes offer-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@utility offer-ticker-track {
+  animation: offer-ticker 34s linear infinite;
+}
+
 /* ============ hero: plane taxi + takeoff ============ */
 @keyframes gt-taxi {
   0% {
@@ -282,7 +295,8 @@
     opacity: 0;
   }
   .gt-reveal,
-  .gt-reveal-late {
+  .gt-reveal-late,
+  .offer-ticker-track {
     animation: none !important;
     opacity: 1;
   }
