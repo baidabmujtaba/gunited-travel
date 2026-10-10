@@ -18,7 +18,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { getDestinations, getOffer } from "@/lib/catalog.functions";
-import { NATIONALITIES } from "@/lib/countries";
+import { DESTINATION_COUNTRIES, NATIONALITIES } from "@/lib/countries";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -285,17 +285,18 @@ function RequestPage() {
                 icon={<MapPin className="size-4 text-muted-foreground" />}
                 value={destination}
                 onChange={setDestination}
-                options={
-                  (destinationsQuery.data ?? []).length > 0
-                    ? (destinationsQuery.data ?? []).map((d) => ({
-                        value: d.code,
-                        label: lang === "ar" ? d.name_ar : d.name_en,
-                      }))
-                    : NATIONALITIES.map((country) => ({
-                        value: country.code,
-                        label: lang === "ar" ? country.name_ar : country.name_en,
-                      }))
-                }
+                options={[
+                  ...DESTINATION_COUNTRIES,
+                  ...(destinationsQuery.data ?? []).filter(
+                    (destination) =>
+                      !DESTINATION_COUNTRIES.some((country) => country.code === destination.code),
+                  ),
+                ]
+                  .map((country) => ({
+                    value: country.code,
+                    label: lang === "ar" ? country.name_ar : country.name_en,
+                  }))
+                  .sort((a, b) => a.label.localeCompare(b.label, lang))}
               />
 
               <div className="space-y-2">
