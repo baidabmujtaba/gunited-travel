@@ -36,7 +36,7 @@ export const Route = createFileRoute("/offers/")({
   errorComponent: ({ error, reset }) => (
     <StoreLayout>
       <div className="mx-auto max-w-lg px-5 py-20 text-center">
-        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
         <button className="mt-4 rounded-md bg-forest px-4 py-2 text-sm text-cream" onClick={reset}>
           إعادة المحاولة / Try again
         </button>

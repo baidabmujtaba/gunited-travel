@@ -54,7 +54,7 @@ export const Route = createFileRoute("/umrah")({
   errorComponent: ({ error }) => (
     <StoreLayout>
       <p className="mx-auto max-w-lg px-5 py-20 text-center text-sm text-destructive">
-        {error.message}
+        {error instanceof Error ? error.message : String(error)}
       </p>
     </StoreLayout>
   ),

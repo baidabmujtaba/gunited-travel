@@ -42,7 +42,7 @@ export const Route = createFileRoute("/select")({
   }),
   component: SelectPage,
   errorComponent: ({ error }) => (
-    <p className="p-6 text-sm text-destructive">{error.message}</p>
+    <p className="p-6 text-sm text-destructive">{error instanceof Error ? error.message : String(error)}</p>
   ),
   notFoundComponent: () => <p className="p-6 text-sm">404</p>,
 });
