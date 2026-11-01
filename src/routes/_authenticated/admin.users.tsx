@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
   }),
   component: AdminUsersPage,
   errorComponent: ({ error }) => (
-    <p className="surface-card p-6 text-sm text-destructive">{error.message}</p>
+    <p className="surface-card p-6 text-sm text-destructive">{error instanceof Error ? error.message : String(error)}</p>
   ),
   notFoundComponent: () => <p className="surface-card p-6 text-sm">404</p>,
 });
