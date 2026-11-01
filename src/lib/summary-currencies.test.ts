@@ -16,6 +16,6 @@ describe("order summary currencies", () => {
     ]);
   });
   it("never invents an unavailable exchange rate", () => {
-    assert.equal(summaryTotals(100, [])[0].total, null);
+    assert.equal(summaryTotals(100, [])[0]?.total, null);
   });
 });
