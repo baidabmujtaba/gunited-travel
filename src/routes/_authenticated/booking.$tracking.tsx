@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { SummaryTotals } from "@/components/store/SummaryTotals";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { getMyBooking } from "@/lib/packages.functions";
@@ -131,12 +132,7 @@ function BookingConfirmation() {
               {quote.feesUsd > 0 ? <Row label={ar ? "رسوم" : "Fees"} value={fmt(quote.fees, quote.currency)} /> : null}
             </>
           ) : null}
-          <div className="flex items-center justify-between border-t border-border pt-2 text-base font-bold">
-            <span>{ar ? "الإجمالي" : "Total"}</span>
-            <span className="text-forest">
-              {fmt(Number(order.amount_display), order.currency_code)}
-            </span>
-          </div>
+          <SummaryTotals totalUsd={Number(order.amount_usd)} />
           <p className="text-xs text-muted-foreground">
             {ar ? "المبلغ المرجعي بالدولار" : "USD anchor"}: {Number(order.amount_usd).toFixed(2)} USD
           </p>

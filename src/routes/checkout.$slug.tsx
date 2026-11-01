@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { SummaryTotals } from "@/components/store/SummaryTotals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,8 @@ export const Route = createFileRoute("/checkout/$slug")({
       { property: "og:title", content: "Checkout — Gunited Travel" },
       { property: "og:description", content: "Pay by bank or app transfer and upload your receipt." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Checkout,
@@ -466,12 +469,7 @@ function Checkout() {
                   <p className="text-sm font-semibold">
                     {lang === "ar" ? offer.title_ar : offer.title_en}
                   </p>
-                  <div className="flex items-baseline justify-between border-t border-border pt-3">
-                    <span className="text-sm text-muted-foreground">{t("offer.total")}</span>
-                    <span className="text-2xl font-bold text-forest">
-                      {fmt(p.total, p.currency)}
-                    </span>
-                  </div>
+                  <SummaryTotals totalUsd={p.totalUsd} />
                   <p className="text-xs text-muted-foreground">{t("offer.rate.note")}</p>
                 </>
               ) : (
