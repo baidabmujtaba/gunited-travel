@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Loader2, Minus, Plus, Upload } from "luci
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { SummaryTotals } from "@/components/store/SummaryTotals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -609,10 +610,7 @@ function BookPackage() {
               {quote.feesUsd > 0 ? (
                 <Line label={ar ? "رسوم" : "Fees"} value={fmt(quote.fees, quote.currency)} />
               ) : null}
-              <div className="flex items-center justify-between border-t border-border pt-2 text-base font-bold">
-                <span>{ar ? "الإجمالي" : "Total"}</span>
-                <span className="text-forest">{fmt(quote.total, quote.currency)}</span>
-              </div>
+              <SummaryTotals totalUsd={quote.totalUsd} />
               <p className="text-xs text-muted-foreground">
                 {fmt(quote.perPerson, quote.currency)} {ar ? "للفرد" : "per person"} ·{" "}
                 {quote.totalPax} {ar ? "مسافر" : "travellers"}
