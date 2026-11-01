@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { StoreLayout } from "@/components/store/StoreLayout";
+import { SummaryTotals } from "@/components/store/SummaryTotals";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { getMyBooking } from "@/lib/packages.functions";
