@@ -13,3 +13,4 @@
 - Guest checkout writes through the validated server route and keeps receipts and identity documents in private storage; never grant anonymous bucket reads.
 - Store social links are HTTPS-only company settings and render publicly only when configured, preventing unsafe or empty footer links.
 - The homepage offer ticker is fed only by the active public catalog so administrator changes appear automatically without a second content source.
+- Order summary currency equivalents use the authoritative USD final total and configured exchange rates; they never change the charged or recorded amount.
