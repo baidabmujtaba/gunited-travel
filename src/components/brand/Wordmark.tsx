@@ -1,5 +1,6 @@
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import brandLogo from "@/assets/brand-logo.png";
 
 /**
  * Official brand lockup. English wordmark in LTR, the exact Arabic
