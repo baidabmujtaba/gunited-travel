@@ -43,6 +43,8 @@ function recentlyDismissed() {
 
 export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAudience }) {
   const { lang } = useI18n();
+  const siteName = useSiteName();
+  const brand = siteName.forLang(lang);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
   const [hidden, setHidden] = useState(true);

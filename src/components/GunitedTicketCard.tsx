@@ -42,6 +42,8 @@ export default function GunitedTicketCard({
   passenger = null,
 }: GunitedTicketCardProps) {
   const t = LABELS[locale] ?? LABELS.ar;
+  const siteName = useSiteName();
+  const brand = locale === "ar" ? siteName.name_ar : siteName.name_en;
   const isRtl = t.dir === "rtl";
   const hasRoute = Boolean(from?.code || to?.code);
 

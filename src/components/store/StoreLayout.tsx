@@ -29,6 +29,7 @@ function validSocialUrl(value: unknown) {
 export function StoreLayout({ children }: { children: ReactNode }) {
   const i18n = useI18n();
   const { t } = i18n;
+  const siteName = useSiteName();
   const { session } = useSession();
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
