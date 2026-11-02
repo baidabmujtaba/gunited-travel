@@ -228,7 +228,7 @@ export default function GunitedTicketCard({
             <div className="gt-data-flex">
               <span className="gt-brand">
                 <Plane size={12} style={{ transform: "rotate(45deg)" }} />
-                {t.brand}
+                {brand}
               </span>
               {travelClass ? (
                 <div style={{ textAlign: isRtl ? "left" : "right" }}>

@@ -89,7 +89,7 @@ export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAu
 
   if (hidden || (!deferred && !showIosHint)) return null;
 
-  const message = COPY[audience][lang === "ar" ? "ar" : "en"];
+  const message = COPY[audience][lang === "ar" ? "ar" : "en"].replaceAll("{brand}", brand);
 
   return (
     <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border border-border bg-card/95 p-4 shadow-lg backdrop-blur sm:inset-x-auto sm:end-4">
