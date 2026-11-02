@@ -71,8 +71,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 py-3">
           <Link to="/" className="flex items-center gap-2.5">
-            <BrandMark />
-            <Wordmark />
+            <BrandMark className="h-10" />
           </Link>
 
           <nav className="mx-auto hidden items-center gap-1 md:flex">
@@ -190,8 +189,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
       <footer className="mt-16 border-t border-border/70 bg-beige pb-11">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
-            <BrandMark />
-            <Wordmark showBoth />
+            <BrandMark className="h-12" />
           </div>
           <div className="flex flex-col items-center gap-3 sm:items-end">
             {socialItems.length > 0 ? (
