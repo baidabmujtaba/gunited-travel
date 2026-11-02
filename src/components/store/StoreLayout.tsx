@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
 import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
-import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
+import { BrandMark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";

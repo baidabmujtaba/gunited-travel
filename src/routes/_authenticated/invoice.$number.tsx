@@ -65,7 +65,7 @@ function InvoicePage() {
 
       <article className="rounded-2xl border border-border/60 bg-card p-8 print:border-0 print:p-0">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border/60 pb-6">
-          <Wordmark />
+          <BrandMark className="h-12" />
           <div className="text-end">
             <h1 className="text-xl font-bold text-forest-deep">{t("invoice.title")}</h1>
             <p className="font-mono text-sm text-forest">{inv.invoice_number}</p>

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
 import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
-import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
+import { BrandMark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -106,8 +106,9 @@ function AgencyLayout() {
     <div className="flex min-h-screen flex-col bg-cream lg:flex-row">
       <aside className="border-b border-border/70 bg-forest-deep text-cream lg:w-64 lg:border-b-0 lg:border-e">
         <div className="flex items-center gap-2.5 px-5 py-4">
-          <BrandMark />
-          <Wordmark />
+          <span className="rounded-xl bg-white px-3 py-1.5">
+            <BrandMark className="h-9" />
+          </span>
         </div>
         <div className="px-5 pb-3">
           <Badge className="bg-gold/90 text-forest-deep">{l("بوابة الوكالة", "Agency portal")}</Badge>
