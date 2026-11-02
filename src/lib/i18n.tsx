@@ -859,7 +859,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<I18nValue>(() => {
-    const t = (key: string) => messages[key]?.[lang] ?? key;
+    const brand = (siteNames ?? SITE_NAME_DEFAULTS)[lang === "ar" ? "name_ar" : "name_en"];
+    const t = (key: string) => (messages[key]?.[lang] ?? key).replaceAll("{brand}", brand);
     const fmt = (n: number, currency?: string) => {
       const locale = lang === "ar" ? "ar-EG" : "en-US";
       const value = Number.isFinite(n) ? n : 0;
