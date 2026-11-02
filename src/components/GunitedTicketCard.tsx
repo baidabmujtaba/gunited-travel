@@ -1,15 +1,15 @@
 import { Plane } from "lucide-react";
 
+import { useSiteName } from "@/lib/site-name";
+
 const LABELS = {
   en: {
-    brand: "Gunited Travel",
     class: "Class",
     ref: "Booking Ref",
     passenger: "Passenger",
     dir: "ltr",
   },
   ar: {
-    brand: "جيونايتد ترافيل",
     class: "الدرجة",
     ref: "رقم الحجز",
     passenger: "المسافر",
@@ -42,6 +42,8 @@ export default function GunitedTicketCard({
   passenger = null,
 }: GunitedTicketCardProps) {
   const t = LABELS[locale] ?? LABELS.ar;
+  const siteName = useSiteName();
+  const brand = locale === "ar" ? siteName.name_ar : siteName.name_en;
   const isRtl = t.dir === "rtl";
   const hasRoute = Boolean(from?.code || to?.code);
 
@@ -226,7 +228,7 @@ export default function GunitedTicketCard({
             <div className="gt-data-flex">
               <span className="gt-brand">
                 <Plane size={12} style={{ transform: "rotate(45deg)" }} />
-                {t.brand}
+                {brand}
               </span>
               {travelClass ? (
                 <div style={{ textAlign: isRtl ? "left" : "right" }}>

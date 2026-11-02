@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { isIosSafari, isStandalone } from "@/lib/pwa";
+import { useSiteName } from "@/lib/site-name";
 
 export type InstallAudience = "client" | "agency" | "staff";
 
 const COPY: Record<InstallAudience, { ar: string; en: string }> = {
   client: {
-    ar: "ثبّت تطبيق جيونايتد ترافيل لتصفّح العروض ومتابعة طلباتك بسرعة.",
-    en: "Install Gunited Travel to browse offers and follow your orders instantly.",
+    ar: "ثبّت تطبيق {brand} لتصفّح العروض ومتابعة طلباتك بسرعة.",
+    en: "Install {brand} to browse offers and follow your orders instantly.",
   },
   agency: {
     ar: "ثبّت بوابة الوكالة للوصول السريع لإدارة الطلبات والعملاء والرصيد.",
@@ -42,6 +43,8 @@ function recentlyDismissed() {
 
 export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAudience }) {
   const { lang } = useI18n();
+  const siteName = useSiteName();
+  const brand = siteName.forLang(lang);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
   const [hidden, setHidden] = useState(true);
@@ -86,7 +89,7 @@ export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAu
 
   if (hidden || (!deferred && !showIosHint)) return null;
 
-  const message = COPY[audience][lang === "ar" ? "ar" : "en"];
+  const message = COPY[audience][lang === "ar" ? "ar" : "en"].replaceAll("{brand}", brand);
 
   return (
     <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border border-border bg-card/95 p-4 shadow-lg backdrop-blur sm:inset-x-auto sm:end-4">
@@ -101,7 +104,7 @@ export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAu
       <div className="flex items-start gap-3 pe-6">
         <img
           src="/icons/icon-192.png"
-          alt="Gunited Travel"
+          alt={brand}
           className="size-11 shrink-0 rounded-xl"
         />
         <div className="min-w-0 flex-1">

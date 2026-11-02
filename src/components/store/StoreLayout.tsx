@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
+import { useSiteName } from "@/lib/site-name";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,6 +30,7 @@ function validSocialUrl(value: unknown) {
 export function StoreLayout({ children }: { children: ReactNode }) {
   const i18n = useI18n();
   const { t } = i18n;
+  const siteName = useSiteName();
   const { session } = useSession();
   const { isStaff, isAgency } = useRoles();
   const signOut = useSignOut();
@@ -204,7 +206,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
               </div>
             ) : null}
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Gunited Travel · جيونايتد ترافيل — {t("footer.rights")}
+              © {new Date().getFullYear()} {siteName.combined} — {t("footer.rights")}
             </p>
           </div>
         </div>
