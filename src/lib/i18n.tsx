@@ -840,6 +840,7 @@ const STORAGE_KEY = "gt-lang";
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ar");
+  const { data: siteNames } = useQuery(siteNameQueryOptions);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
