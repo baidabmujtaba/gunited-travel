@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Wordmark } from "@/components/brand/Wordmark";
+import { BrandMark } from "@/components/brand/Wordmark";
 import { StoreLayout } from "@/components/store/StoreLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,7 +125,7 @@ function AuthPage() {
     <StoreLayout>
       <div className="mx-auto w-full max-w-md px-5 py-14">
         <div className="mb-8 text-center">
-          <Wordmark className="mx-auto" />
+          <BrandMark className="mx-auto h-14" />
           <h1 className="mt-4 text-2xl font-bold">{t("auth.title")}</h1>
         </div>
 

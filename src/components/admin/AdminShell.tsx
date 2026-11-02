@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AssistantWidget } from "@/components/AssistantWidget";
 import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { NotificationBell } from "@/components/NotificationBell";
-import { BrandMark, Wordmark } from "@/components/brand/Wordmark";
+import { BrandMark } from "@/components/brand/Wordmark";
 import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,8 +41,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-border/70 bg-forest-deep text-cream shadow-sm">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2 px-3 py-3 sm:gap-3 sm:px-5 sm:py-4">
           <Link to="/admin" className="flex items-center gap-2.5">
-            <BrandMark />
-            <Wordmark />
+            <BrandMark className="h-10" />
           </Link>
           <Badge className="bg-gold/90 text-forest-deep">{t("admin.title")}</Badge>
           <div className="ms-auto flex items-center gap-2">

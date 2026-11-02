@@ -1,5 +1,6 @@
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import brandLogo from "@/assets/brand-logo.png";
 
 /**
  * Official brand lockup. English wordmark in LTR, the exact Arabic
@@ -30,16 +31,13 @@ export function Wordmark({
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <span
-      className={cn(
-        "grid size-9 shrink-0 place-items-center rounded-xl brand-gradient text-primary-foreground shadow-soft",
-        className,
-      )}
+    <img
+      src={brandLogo}
+      alt=""
       aria-hidden="true"
-    >
-      <svg viewBox="0 0 24 24" className="size-5" fill="currentColor">
-        <path d="M21 15.5 13.5 12V5.8a1.5 1.5 0 0 0-3 0V12L3 15.5v2l7.5-2.2V19l-2.2 1.6v1.2l3.7-1 3.7 1v-1.2L13.5 19v-3.7l7.5 2.2z" />
-      </svg>
-    </span>
+      className={cn("h-9 w-auto shrink-0 object-contain", className)}
+      loading="eager"
+      decoding="async"
+    />
   );
 }
