@@ -1,10 +1,11 @@
 import { useI18n } from "@/lib/i18n";
+import { useSiteName } from "@/lib/site-name";
 import { cn } from "@/lib/utils";
 import brandLogo from "@/assets/brand-logo.png";
 
 /**
- * Official brand lockup. English wordmark in LTR, the exact Arabic
- * transliteration جيونايتد ترافيل in RTL. Never translated differently.
+ * Official brand lockup. Names come from the company settings row, so an
+ * admin renaming the site updates every surface automatically.
  */
 export function Wordmark({
   className,
@@ -14,8 +15,9 @@ export function Wordmark({
   showBoth?: boolean;
 }) {
   const { lang } = useI18n();
-  const primary = lang === "ar" ? "جيونايتد ترافيل" : "Gunited Travel";
-  const secondary = lang === "ar" ? "Gunited Travel" : "جيونايتد ترافيل";
+  const site = useSiteName();
+  const primary = lang === "ar" ? site.name_ar : site.name_en;
+  const secondary = lang === "ar" ? site.name_en : site.name_ar;
 
   return (
     <span className={cn("inline-flex items-baseline gap-2", className)}>

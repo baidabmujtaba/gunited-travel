@@ -877,7 +877,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
     };
     return { lang, dir: lang === "ar" ? "rtl" : "ltr", setLang, t, fmt };
-  }, [lang, setLang]);
+  }, [lang, setLang, siteNames]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
