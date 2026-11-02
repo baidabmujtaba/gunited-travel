@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { isIosSafari, isStandalone } from "@/lib/pwa";
+import { useSiteName } from "@/lib/site-name";
 
 export type InstallAudience = "client" | "agency" | "staff";
 
 const COPY: Record<InstallAudience, { ar: string; en: string }> = {
   client: {
-    ar: "ثبّت تطبيق جيونايتد ترافيل لتصفّح العروض ومتابعة طلباتك بسرعة.",
-    en: "Install Gunited Travel to browse offers and follow your orders instantly.",
+    ar: "ثبّت تطبيق {brand} لتصفّح العروض ومتابعة طلباتك بسرعة.",
+    en: "Install {brand} to browse offers and follow your orders instantly.",
   },
   agency: {
     ar: "ثبّت بوابة الوكالة للوصول السريع لإدارة الطلبات والعملاء والرصيد.",

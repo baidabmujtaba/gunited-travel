@@ -1,15 +1,15 @@
 import { Plane } from "lucide-react";
 
+import { useSiteName } from "@/lib/site-name";
+
 const LABELS = {
   en: {
-    brand: "Gunited Travel",
     class: "Class",
     ref: "Booking Ref",
     passenger: "Passenger",
     dir: "ltr",
   },
   ar: {
-    brand: "جيونايتد ترافيل",
     class: "الدرجة",
     ref: "رقم الحجز",
     passenger: "المسافر",

@@ -204,7 +204,7 @@ export function StoreLayout({ children }: { children: ReactNode }) {
               </div>
             ) : null}
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Gunited Travel · جيونايتد ترافيل — {t("footer.rights")}
+              © {new Date().getFullYear()} {siteName.combined} — {t("footer.rights")}
             </p>
           </div>
         </div>
