@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Context, ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { normalizeCurrency } from "./currency";
+import { SITE_NAME_DEFAULTS, siteNameQueryOptions } from "./site-name";
 
 export type Lang = "ar" | "en";
 
@@ -8,7 +10,8 @@ type Dict = Record<string, { ar: string; en: string }>;
 
 /** Centralized copy. Never hardcode user-facing strings in components. */
 export const messages: Dict = {
-  "brand.name": { ar: "جيونايتد ترافيل", en: "Gunited Travel" },
+  // Resolved dynamically from the company settings row; see I18nProvider.
+  "brand.name": { ar: "{brand}", en: "{brand}" },
   "brand.tagline": { ar: "سفر وسياحة بثقة", en: "Travel & tourism, done right" },
 
   "nav.home": { ar: "الرئيسية", en: "Home" },
