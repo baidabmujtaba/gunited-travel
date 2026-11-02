@@ -25,8 +25,8 @@ export const messages: Dict = {
 
   "hero.title": { ar: "رحلتك تبدأ من هنا", en: "Your journey starts here" },
   "hero.subtitle": {
-    ar: "تأشيرات، تذاكر طيران، باقات سياحية وتأمين سفر — بإدارة فريق جيونايتد ترافيل ومتابعة لحظية لطلبك.",
-    en: "Visas, flight deals, tourism packages and travel insurance — managed by the Gunited Travel team with live tracking on every order.",
+    ar: "تأشيرات، تذاكر طيران، باقات سياحية وتأمين سفر — بإدارة فريق {brand} ومتابعة لحظية لطلبك.",
+    en: "Visas, flight deals, tourism packages and travel insurance — managed by the {brand} team with live tracking on every order.",
   },
   "hero.cta.browse": { ar: "تصفح العروض", en: "Browse offers" },
   "hero.cta.track": { ar: "تتبع طلبي", en: "Track my order" },
@@ -156,7 +156,7 @@ export const messages: Dict = {
   "status.cancelled": { ar: "ملغي", en: "Cancelled" },
   "status.rejected": { ar: "مرفوض", en: "Rejected" },
 
-  "auth.title": { ar: "الدخول إلى جيونايتد ترافيل", en: "Sign in to Gunited Travel" },
+  "auth.title": { ar: "الدخول إلى {brand}", en: "Sign in to {brand}" },
   "auth.signin": { ar: "تسجيل الدخول", en: "Sign in" },
   "auth.signup": { ar: "إنشاء حساب", en: "Create account" },
   "auth.password": { ar: "كلمة المرور", en: "Password" },
@@ -198,7 +198,7 @@ export const messages: Dict = {
   "common.close": { ar: "إغلاق", en: "Close" },
   "assistant.client.open": { ar: "مساعد الحجز", en: "Booking assistant" },
   "assistant.admin.open": { ar: "مساعد الإدارة", en: "ERP copilot" },
-  "assistant.client.title": { ar: "مساعد جيونايتد ترافيل", en: "Gunited Travel assistant" },
+  "assistant.client.title": { ar: "مساعد {brand}", en: "{brand} assistant" },
   "assistant.admin.title": { ar: "مساعد الإدارة الذكي", en: "Gunited ERP copilot" },
   "assistant.client.scope": {
     ar: "معلومات الخدمات والحجز فقط",
@@ -248,8 +248,8 @@ export const messages: Dict = {
   "admin.tab.partners": { ar: "الشركاء", en: "Partners" },
   "admin.tab.finance": { ar: "المالية", en: "Finance" },
   "admin.forbidden": {
-    ar: "هذه الصفحة مخصصة لفريق جيونايتد ترافيل فقط.",
-    en: "This area is restricted to Gunited Travel staff.",
+    ar: "هذه الصفحة مخصصة لفريق {brand} فقط.",
+    en: "This area is restricted to {brand} staff.",
   },
   "admin.backstore": { ar: "العودة للمتجر", en: "Back to store" },
 
@@ -502,7 +502,7 @@ export const messages: Dict = {
   "invoice.tax": { ar: "الضريبة", en: "Tax" },
   "invoice.total": { ar: "الإجمالي", en: "Total" },
   "invoice.usd": { ar: "ما يعادل بالدولار", en: "Equivalent in USD" },
-  "invoice.thanks": { ar: "شكراً لسفرك مع جيونايتد ترافيل.", en: "Thank you for travelling with Gunited Travel." },
+  "invoice.thanks": { ar: "شكراً لسفرك مع {brand}.", en: "Thank you for travelling with {brand}." },
 
   "admin.tab.flights": { ar: "الرحلات", en: "Flights" },
   "flights.title": { ar: "البحث عن رحلات (Amadeus)", en: "Flight search (Amadeus)" },
@@ -715,7 +715,7 @@ export const messages: Dict = {
   },
   "select.title": { ar: "اختر نوع الموافقة/العرض", en: "Choose an approval or service" },
   "select.subtitle": { ar: "حدد الخدمة المطلوبة للمتابعة", en: "Select the service you need to continue" },
-  "select.brand.title": { ar: "جيونايتد ترافيل", en: "Gunited Travel" },
+  "select.brand.title": { ar: "{brand}", en: "{brand}" },
   "select.brand.subtitle": { ar: "شريكك في إجراءات السفر", en: "Your travel procedures partner" },
   "select.perk.easy": { ar: "إجراءات سهلة", en: "Easy procedures" },
   "select.perk.followup": { ar: "متابعة مستمرة", en: "Continuous follow-up" },
