@@ -103,7 +103,7 @@ function SelectPage() {
           <Link to="/" aria-label={t("nav.home")} className="rounded-lg p-2 hover:bg-white/10">
             <Menu className="size-5" />
           </Link>
-          <span className="font-display text-lg font-bold tracking-wide">Gunited</span>
+          <span className="font-display text-lg font-bold tracking-wide">{t("brand.name")}</span>
           <Link
             to="/account"
             aria-label={t("nav.dashboard")}
