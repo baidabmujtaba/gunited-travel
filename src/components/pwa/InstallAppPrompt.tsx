@@ -104,7 +104,7 @@ export function InstallAppPrompt({ audience = "client" }: { audience?: InstallAu
       <div className="flex items-start gap-3 pe-6">
         <img
           src="/icons/icon-192.png"
-          alt="Gunited Travel"
+          alt={brand}
           className="size-11 shrink-0 rounded-xl"
         />
         <div className="min-w-0 flex-1">

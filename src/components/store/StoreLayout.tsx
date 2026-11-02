@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/store/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n } from "@/lib/i18n";
+import { useSiteName } from "@/lib/site-name";
 import { useRoles, useSession, useSignOut } from "@/lib/session";
 import { supabase } from "@/integrations/supabase/client";
 
