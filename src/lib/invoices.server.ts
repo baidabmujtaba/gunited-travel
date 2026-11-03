@@ -4,6 +4,7 @@
  */
 import { buildInvoicePdf } from "./invoice-pdf.server";
 import { bytesToBase64, invoiceEmailHtml, sendEmail } from "./email.server";
+import { getSiteNames } from "./site-name.server";
 
 type Sb = any;
 
@@ -123,6 +124,8 @@ export async function issueInvoiceForOrder(
     ...(feesUsd > 0 ? [{ label: "Service fees", amount: money(feesUsd, "USD") }] : []),
   ];
 
+  const siteNames = await getSiteNames(sb);
+
   const pdf = await buildInvoicePdf({
     invoiceNumber,
     issuedAt: new Date().toISOString().slice(0, 10),
@@ -134,6 +137,7 @@ export async function issueInvoiceForOrder(
     totalUsd: money(totalUsd, "USD"),
     totalDisplay: money(totalDisplay, currency),
     paymentMethod: method?.name_en ?? null,
+    siteNameEn: siteNames.name_en,
   });
 
   const path = `${new Date().getUTCFullYear()}/${invoiceNumber}.pdf`;
@@ -147,13 +151,15 @@ export async function issueInvoiceForOrder(
       ? { sent: false, error: undefined as string | undefined }
       : await sendEmail({
           to: order.customer_email,
-          subject: `فاتورة ${invoiceNumber} · Gunited Travel`,
+          subject: `فاتورة ${invoiceNumber} · ${siteNames.name_ar}`,
           html: invoiceEmailHtml({
             invoiceNumber,
             customerName: order.customer_name,
             trackingId: order.tracking_id,
             totalDisplay: money(totalDisplay, currency),
             totalUsd: money(totalUsd, "USD"),
+            siteNameAr: siteNames.name_ar,
+            siteNameEn: siteNames.name_en,
             rows: [
               { label: offer?.title_ar || "خدمة سفر", amount: money(netUsd, "USD") },
               ...(taxUsd > 0 ? [{ label: "الضريبة", amount: money(taxUsd, "USD") }] : []),
