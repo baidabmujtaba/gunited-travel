@@ -132,9 +132,11 @@ export function renderStatusEmail(
   tpl: Template,
   lang: "ar" | "en",
   f: EmailFacts,
+  site: SiteNames = SITE_NAME_DEFAULTS,
 ): { subject: string; html: string } {
   const ar = lang === "ar";
-  const subject = ar ? tpl.subject_ar : tpl.subject_en;
+  const brand = ar ? site.name_ar : site.name_en;
+  const subject = (ar ? tpl.subject_ar : tpl.subject_en).replaceAll("{brand}", brand);
   const lead = ar ? tpl.lead_ar : tpl.lead_en;
   const L = (a: string, e: string) => (ar ? a : e);
 
@@ -162,7 +164,7 @@ export function renderStatusEmail(
   const html = `<!doctype html><html dir="${ar ? "rtl" : "ltr"}" lang="${ar ? "ar" : "en"}"><body style="margin:0;background:#FBF8F2;font-family:Tahoma,Arial,sans-serif">
   <div style="max-width:600px;margin:0 auto;padding:24px">
     <div style="background:#1F4D3A;color:#fff;border-radius:16px;padding:24px">
-      <div style="font-size:20px;font-weight:700">جيونايتد ترافيل · Gunited Travel</div>
+      <div style="font-size:20px;font-weight:700">${esc(combinedSiteName(site))}</div>
       <div style="color:#C9A063;font-size:13px;margin-top:4px">${esc(subject)}</div>
     </div>
     <div style="background:#fff;border-radius:16px;padding:24px;margin-top:16px">
@@ -176,7 +178,7 @@ export function renderStatusEmail(
       </p>
     </div>
     <p style="text-align:center;color:#6B9080;font-size:12px;margin-top:16px">${esc(
-      L("شكراً لسفرك مع جيونايتد ترافيل", "Thank you for travelling with Gunited Travel"),
+      L(`شكراً لسفرك مع ${site.name_ar}`, `Thank you for travelling with ${site.name_en}`),
     )}</p>
   </div></body></html>`;
 
