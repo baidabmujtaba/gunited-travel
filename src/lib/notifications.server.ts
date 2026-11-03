@@ -341,8 +341,8 @@ export async function queueStatusChangeEmails(
       await sb.from("notifications").insert({
         user_id: order.customer_id,
         audience: "user",
-        title_ar: tpl.subject_ar,
-        title_en: tpl.subject_en,
+        title_ar: subjectAr,
+        title_en: subjectEn,
         body_ar: `${tpl.lead_ar} (${reference})`,
         body_en: `${tpl.lead_en} (${reference})`,
         link: `/track?ref=${reference}`,
@@ -352,8 +352,8 @@ export async function queueStatusChangeEmails(
       await sb.from("notifications").insert({
         agency_id: order.agency_id,
         audience: "agency",
-        title_ar: tpl.subject_ar,
-        title_en: tpl.subject_en,
+        title_ar: subjectAr,
+        title_en: subjectEn,
         body_ar: `${tpl.lead_ar} (${reference})`,
         body_en: `${tpl.lead_en} (${reference})`,
         link: `/agency/orders`,
@@ -417,7 +417,7 @@ export async function queueStatusChangeEmails(
             : `${SITE_URL}/track?ref=${encodeURIComponent(reference)}`,
       };
 
-      const { subject, html } = renderStatusEmail(tpl, r.lang, facts);
+      const { subject, html } = renderStatusEmail(tpl, r.lang, facts, siteNames);
 
       await sb.from("email_queue").insert({
         idempotency_key: key,
