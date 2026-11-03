@@ -9,6 +9,8 @@
  * Server-only: nothing here may be imported from client code.
  */
 
+import { combinedSiteName, getSiteNames, SITE_NAME_DEFAULTS, type SiteNames } from "./site-name.server";
+
 type Sb = any;
 
 export type OrderStatusKey =
@@ -326,6 +328,11 @@ export async function queueStatusChangeEmails(
       : TEMPLATES[input.newStatus];
 
     const { recipients, customerLang } = await resolveRecipients(sb, order);
+    const siteNames = await getSiteNames(sb);
+    const brandAr = siteNames.name_ar;
+    const brandEn = siteNames.name_en;
+    const subjectAr = tpl.subject_ar.replaceAll("{brand}", brandAr);
+    const subjectEn = tpl.subject_en.replaceAll("{brand}", brandEn);
     const reference = order.tracking_id ?? order.id;
     const changedAtIso = new Date().toISOString();
 
