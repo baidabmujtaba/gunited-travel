@@ -124,7 +124,11 @@ export function invoiceEmailHtml(opts: {
   totalDisplay: string;
   totalUsd: string;
   rows: { label: string; amount: string }[];
+  siteNameAr?: string;
+  siteNameEn?: string;
 }) {
+  const nameAr = opts.siteNameAr || "جيونايتد ترافيل";
+  const nameEn = opts.siteNameEn || "Gunited Travel";
   const rows = opts.rows
     .map(
       (r) =>
@@ -135,7 +139,7 @@ export function invoiceEmailHtml(opts: {
   return `<!doctype html><html dir="rtl" lang="ar"><body style="margin:0;background:#FBF8F2;font-family:Tahoma,Arial,sans-serif">
   <div style="max-width:600px;margin:0 auto;padding:24px">
     <div style="background:#1F4D3A;color:#fff;border-radius:16px;padding:24px">
-      <div style="font-size:20px;font-weight:700">جيونايتد ترافيل · Gunited Travel</div>
+      <div style="font-size:20px;font-weight:700">${nameAr} · ${nameEn}</div>
       <div style="color:#C9A063;font-size:13px;margin-top:4px">فاتورة ${opts.invoiceNumber}</div>
     </div>
     <div style="background:#fff;border-radius:16px;padding:24px;margin-top:16px">
@@ -149,6 +153,6 @@ export function invoiceEmailHtml(opts: {
       </div>
       <p style="margin:12px 0 0;color:#6B9080;font-size:12px">ما يعادل ${opts.totalUsd}</p>
     </div>
-    <p style="text-align:center;color:#6B9080;font-size:12px;margin-top:16px">شكراً لسفرك مع جيونايتد ترافيل</p>
+    <p style="text-align:center;color:#6B9080;font-size:12px;margin-top:16px">شكراً لسفرك مع ${nameAr}</p>
   </div></body></html>`;
 }

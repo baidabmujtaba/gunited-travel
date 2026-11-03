@@ -9,6 +9,8 @@
  * Server-only: nothing here may be imported from client code.
  */
 
+import { combinedSiteName, getSiteNames, SITE_NAME_DEFAULTS, type SiteNames } from "./site-name.server";
+
 type Sb = any;
 
 export type OrderStatusKey =
@@ -32,43 +34,43 @@ type Template = {
 const TEMPLATES: Record<OrderStatusKey, Template> = {
   submitted: {
     key: "order_submitted",
-    subject_ar: "تم استلام طلبك – Gunited Travel",
-    subject_en: "We received your order – Gunited Travel",
+    subject_ar: "تم استلام طلبك – {brand}",
+    subject_en: "We received your order – {brand}",
     lead_ar: "تم استلام طلبك وهو الآن قيد المراجعة.",
     lead_en: "Your order has been received and is under review.",
   },
   payment_pending: {
     key: "order_payment_pending",
-    subject_ar: "بانتظار تأكيد الدفع – Gunited Travel",
-    subject_en: "Awaiting payment confirmation – Gunited Travel",
+    subject_ar: "بانتظار تأكيد الدفع – {brand}",
+    subject_en: "Awaiting payment confirmation – {brand}",
     lead_ar: "طلبك بانتظار تأكيد الدفع من فريقنا المالي.",
     lead_en: "Your order is awaiting payment confirmation by our finance team.",
   },
   payment_confirmed: {
     key: "order_confirmed",
-    subject_ar: "تم تأكيد طلبك – Gunited Travel",
-    subject_en: "Your order is confirmed – Gunited Travel",
+    subject_ar: "تم تأكيد طلبك – {brand}",
+    subject_en: "Your order is confirmed – {brand}",
     lead_ar: "تم تأكيد الدفع وتأكيد طلبك بنجاح.",
     lead_en: "Your payment was confirmed and your order is now confirmed.",
   },
   processing: {
     key: "order_processing",
-    subject_ar: "طلبك قيد التنفيذ – Gunited Travel",
-    subject_en: "Your order is being processed – Gunited Travel",
+    subject_ar: "طلبك قيد التنفيذ – {brand}",
+    subject_en: "Your order is being processed – {brand}",
     lead_ar: "بدأ فريقنا تنفيذ طلبك. سنبلغك عند اكتمال الإجراءات.",
     lead_en: "Our team started processing your order. We will notify you once complete.",
   },
   completed: {
     key: "order_completed",
-    subject_ar: "تم إصدار طلبك – Gunited Travel",
-    subject_en: "Your order is issued – Gunited Travel",
+    subject_ar: "تم إصدار طلبك – {brand}",
+    subject_en: "Your order is issued – {brand}",
     lead_ar: "تم اكتمال طلبك وإصدار مستنداته.",
     lead_en: "Your order is complete and its documents have been issued.",
   },
   cancelled: {
     key: "order_cancelled",
-    subject_ar: "تم إلغاء طلبك – Gunited Travel",
-    subject_en: "Your order was cancelled – Gunited Travel",
+    subject_ar: "تم إلغاء طلبك – {brand}",
+    subject_en: "Your order was cancelled – {brand}",
     lead_ar: "تم إلغاء طلبك. لأي استفسار يمكنك التواصل معنا.",
     lead_en: "Your order was cancelled. Contact us for any question.",
   },
@@ -132,9 +134,11 @@ export function renderStatusEmail(
   tpl: Template,
   lang: "ar" | "en",
   f: EmailFacts,
+  site: SiteNames = SITE_NAME_DEFAULTS,
 ): { subject: string; html: string } {
   const ar = lang === "ar";
-  const subject = ar ? tpl.subject_ar : tpl.subject_en;
+  const brand = ar ? site.name_ar : site.name_en;
+  const subject = (ar ? tpl.subject_ar : tpl.subject_en).replaceAll("{brand}", brand);
   const lead = ar ? tpl.lead_ar : tpl.lead_en;
   const L = (a: string, e: string) => (ar ? a : e);
 
@@ -162,7 +166,7 @@ export function renderStatusEmail(
   const html = `<!doctype html><html dir="${ar ? "rtl" : "ltr"}" lang="${ar ? "ar" : "en"}"><body style="margin:0;background:#FBF8F2;font-family:Tahoma,Arial,sans-serif">
   <div style="max-width:600px;margin:0 auto;padding:24px">
     <div style="background:#1F4D3A;color:#fff;border-radius:16px;padding:24px">
-      <div style="font-size:20px;font-weight:700">جيونايتد ترافيل · Gunited Travel</div>
+      <div style="font-size:20px;font-weight:700">${esc(combinedSiteName(site))}</div>
       <div style="color:#C9A063;font-size:13px;margin-top:4px">${esc(subject)}</div>
     </div>
     <div style="background:#fff;border-radius:16px;padding:24px;margin-top:16px">
@@ -176,7 +180,7 @@ export function renderStatusEmail(
       </p>
     </div>
     <p style="text-align:center;color:#6B9080;font-size:12px;margin-top:16px">${esc(
-      L("شكراً لسفرك مع جيونايتد ترافيل", "Thank you for travelling with Gunited Travel"),
+      L(`شكراً لسفرك مع ${site.name_ar}`, `Thank you for travelling with ${site.name_en}`),
     )}</p>
   </div></body></html>`;
 
@@ -324,6 +328,11 @@ export async function queueStatusChangeEmails(
       : TEMPLATES[input.newStatus];
 
     const { recipients, customerLang } = await resolveRecipients(sb, order);
+    const siteNames = await getSiteNames(sb);
+    const brandAr = siteNames.name_ar;
+    const brandEn = siteNames.name_en;
+    const subjectAr = tpl.subject_ar.replaceAll("{brand}", brandAr);
+    const subjectEn = tpl.subject_en.replaceAll("{brand}", brandEn);
     const reference = order.tracking_id ?? order.id;
     const changedAtIso = new Date().toISOString();
 
@@ -332,8 +341,8 @@ export async function queueStatusChangeEmails(
       await sb.from("notifications").insert({
         user_id: order.customer_id,
         audience: "user",
-        title_ar: tpl.subject_ar,
-        title_en: tpl.subject_en,
+        title_ar: subjectAr,
+        title_en: subjectEn,
         body_ar: `${tpl.lead_ar} (${reference})`,
         body_en: `${tpl.lead_en} (${reference})`,
         link: `/track?ref=${reference}`,
@@ -343,8 +352,8 @@ export async function queueStatusChangeEmails(
       await sb.from("notifications").insert({
         agency_id: order.agency_id,
         audience: "agency",
-        title_ar: tpl.subject_ar,
-        title_en: tpl.subject_en,
+        title_ar: subjectAr,
+        title_en: subjectEn,
         body_ar: `${tpl.lead_ar} (${reference})`,
         body_en: `${tpl.lead_en} (${reference})`,
         link: `/agency/orders`,
@@ -408,7 +417,7 @@ export async function queueStatusChangeEmails(
             : `${SITE_URL}/track?ref=${encodeURIComponent(reference)}`,
       };
 
-      const { subject, html } = renderStatusEmail(tpl, r.lang, facts);
+      const { subject, html } = renderStatusEmail(tpl, r.lang, facts, siteNames);
 
       await sb.from("email_queue").insert({
         idempotency_key: key,

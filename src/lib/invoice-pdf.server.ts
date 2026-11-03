@@ -18,6 +18,8 @@ export type InvoicePdfData = {
   totalUsd: string;
   totalDisplay: string;
   paymentMethod: string | null;
+  /** Latin-only brand name from company settings; defaults to Gunited Travel. */
+  siteNameEn?: string;
 };
 
 /** Keeps only glyphs the built-in WinAnsi fonts can draw. */
@@ -40,7 +42,8 @@ export async function buildInvoicePdf(data: InvoicePdfData): Promise<Uint8Array>
   const muted = rgb(0.42, 0.45, 0.43);
 
   page.drawRectangle({ x: 0, y: 762, width: 595, height: 80, color: forest });
-  page.drawText("GUNITED TRAVEL", { x: 42, y: 806, size: 20, font: bold, color: rgb(1, 1, 1) });
+  const brandEn = latin(data.siteNameEn, "Gunited Travel").toUpperCase();
+  page.drawText(brandEn, { x: 42, y: 806, size: 20, font: bold, color: rgb(1, 1, 1) });
   page.drawText("Travel & Tourism  |  Invoice", { x: 42, y: 786, size: 10, font, color: gold });
 
   let y = 720;
@@ -78,7 +81,7 @@ export async function buildInvoicePdf(data: InvoicePdfData): Promise<Uint8Array>
   page.drawText(`Total in USD: ${latin(data.totalUsd)}`, { x: 42, y, size: 10, font, color: muted });
 
   page.drawText(
-    "Thank you for travelling with Gunited Travel. This invoice was generated automatically.",
+    `Thank you for travelling with ${latin(data.siteNameEn, "Gunited Travel")}. This invoice was generated automatically.`,
     { x: 42, y: 60, size: 9, font, color: muted },
   );
 
